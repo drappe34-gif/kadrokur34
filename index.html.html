@@ -98,14 +98,14 @@ body{font-family:Inter,sans-serif;background:#090d16;color:#f8fafc}.pitch-bg{bac
 <div class="mt-8 relative z-10"><div id="redTeamPitch" class="space-y-3"></div><div class="text-center mt-3"><span class="px-3 py-1 rounded-full text-xs font-extrabold bg-red-500/20 text-red-300">🔴 2. TAKIM (KIRMIZI YELEK)</span></div></div></div>
 
 <div id="adminBar" class="hidden glass-card rounded-xl p-4"><div class="flex flex-wrap justify-between gap-3 mb-3"><b class="text-xs text-amber-300">🛠️ Oda Yönetici Paneli (Kişi Sayısı, Taktik & Ücret Kontrolü)</b><button onclick="adminLogout()" class="px-3 py-1.5 rounded bg-slate-700 text-xs">Çıkış yap</button></div>
-<div class="flex flex-wrap gap-2"><button onclick="resetAllPlayers()" class="px-3 py-1.5 rounded bg-red-700 text-xs">Yeni hafta: kadroyu boşalt</button><button onclick="refreshAdminApplications()" class="px-3 py-1.5 rounded bg-slate-700 text-xs">↻ Başvuruları yenile</button></div>
+<div class="flex flex-wrap gap-2"><button onclick="resetAllPlayers()" class="px-3 py-1.5 rounded bg-red-700 text-xs">Yeni hafta: kadroyu boşalt</button><button onclick="refreshAdminApplications()" class="px-3 py-1.5 rounded bg-slate-700 text-xs">↻ Başvuruları yenile</button><button type="button" onclick="deleteCurrentRoom()" class="px-3 py-1.5 rounded bg-rose-900 border border-rose-500/50 text-rose-200 text-xs font-bold">🗑️ Bu Odayı Sil</button></div>
 
 <!-- SADECE ODA KURUCUSU / YÖNETİCİ TAKTİK, KİŞİ SAYISI & ÜCRET DÜZENLEME -->
 <div class="mt-4 rounded-xl bg-slate-900/95 border border-amber-500/30 p-3.5">
 <h3 class="text-sm font-bold text-amber-300 mb-2">⚙️ Taktik, Kişi Sayısı ve Saha Ücretlerini Düzenle</h3>
 <form onsubmit="saveRoomMatchSettings(event)" class="space-y-3">
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-<div><label class="block text-[11px] font-bold text-slate-300 mb-1" for="editRoomTactic">Taktik & Kişi Sayısı</label><select id="editRoomTactic" onchange="applyTacticPriceHint('edit')" class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"></select></div>
+<div><label class="block text-[11px] font-bold text-slate-300 mb-1" for="editRoomTactic">Taktik & Kişi Sayısı</label><select id="editRoomTactic" class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"></select></div>
 <div><label class="block text-[11px] font-bold text-slate-300 mb-1" for="editFlatPrice">Standart Kişi Ücreti (₺ - İsteğe Bağlı)</label><input id="editFlatPrice" type="number" min="0" max="10000" placeholder="Hepsine aynı tutarı uygula" oninput="applyFlatPriceToInputs('edit')" class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"></div>
 </div>
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -147,7 +147,7 @@ Kadroya başvurmak için önce <button type="button" onclick="goHome()" class="u
 </main>
 
 <!-- YENİ ODA KURMA MODALI -->
-<div id="createRoomModal" class="hidden fixed inset-0 z-50 bg-black/75 p-4 flex items-center justify-center overflow-y-auto"><div class="glass-card rounded-2xl p-6 w-full max-w-lg my-auto"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-black">➕ Yeni Maç Odası Kur</h2><button type="button" onclick="closeCreateRoomModal()" class="text-xl leading-none">×</button></div><p class="text-xs text-slate-400 mb-4">Bölge/yaka, ilçe, halı saha, gün, saat, kişi sayısı, taktik ve saha ücretini belirle.</p><form onsubmit="createRoom(event)" class="space-y-3">
+<div id="createRoomModal" class="hidden fixed inset-0 z-50 bg-black/75 p-4 flex items-center justify-center overflow-y-auto"><div class="glass-card rounded-2xl p-6 w-full max-w-lg my-auto"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-black">➕ Yeni Maç Odası Kur</h2><button type="button" onclick="closeCreateRoomModal()" class="text-xl leading-none">×</button></div><p class="text-xs text-slate-400 mb-4">Bölge/yaka, ilçe, halı saha, gün, saat, kişi sayısı, taktik ve saha ücretini belirle. Oda maç saatinden 30 dk sonra otomatik silinir.</p><form onsubmit="createRoom(event)" class="space-y-3">
 <div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomTitle">Oda / Maç Başlığı</label><input id="newRoomTitle" required maxlength="60" placeholder="Örn: Cuma Akşamı Halı Saha" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 <div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomRegion">Bölge / İl</label><select id="newRoomRegion" onchange="syncCreateDistricts()" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white">
@@ -201,6 +201,7 @@ const firebaseConfig={apiKey:"AIzaSyDI5PGiOBZWEMMz6HSU-6-AYXFCWNW7POc",authDomai
 const ADMIN_UIDS=["Q83RJGZIUdOh2uDhF1HfdJFt3sQ2","5WlVfp3r3pfSnfFMR9GZKCzxeih1"];
 const DEFAULT_PRICES={GK:300,DEF:300,MID:325,FWD:350};
 const SLOT_ORDER=["GK","DEF","MID","FWD"], SLOT_LABEL={GK:"Kaleci",DEF:"Defans",MID:"Orta Saha",FWD:"Forvet"};
+const DAY_INDEX_MAP={"Pazar":0,"Pazartesi":1,"Salı":2,"Çarşamba":3,"Perşembe":4,"Cuma":5,"Cumartesi":6};
 
 const TACTIC_PRESETS={
   "2-3-1_14":{label:"2-3-1 Taktik • 7v7 (14 Kişi)",formation:[["GK",1],["DEF",2],["MID",3],["FWD",1]]},
@@ -225,7 +226,7 @@ const ISTANBUL_LOCATIONS={
     "Beylikdüzü":["Beylikdüzü Merkez Halı Saha","Gürpınar Spor Tesisi"],
     "Beyoğlu":["Beyoğlu Hasköy Halı Saha","Karaköy Spor Tesisi"],
     "Büyükçekmece":["Büyükçekmece Sahil Halı Saha","Mimaroba Halı Saha"],
-    "Çatalca":["Çatalca Merkez Halı Saha"],
+    "Çatalca":["Atatürk Spor Kompleksi","Arena Halı Saha","Merkez Arena","Binkılıç Futbol Halı Saha","Çatalca Merkez Halı Saha"],
     "Esenler":["Esenler Merkez Halı Saha","Atışalanı Halı Saha"],
     "Esenyurt":["Esenyurt Merkez Halı Saha","İncirtepe Halı Saha"],
     "Eyüpsultan":["Eyüpsultan Merkez Halı Saha","Göktürk Spor Tesisi","Alibeyköy Halı Saha"],
@@ -256,6 +257,24 @@ const ISTANBUL_LOCATIONS={
   }
 };
 
+function computeExpireAtMs(matchDay,timeSlot){
+  const m=String(timeSlot||"").match(/(\d{1,2}):(\d{2})/);
+  if(!m)return null;
+  const startH=Number(m[1]),startM=Number(m[2]);
+  if(!Number.isFinite(startH)||!Number.isFinite(startM))return null;
+  const targetDay=DAY_INDEX_MAP[matchDay];
+  const now=new Date();
+  const candidate=new Date(now.getFullYear(),now.getMonth(),now.getDate(),startH,startM,0,0);
+  if(typeof targetDay==="number"){
+    const diffDays=(targetDay-now.getDay()+7)%7;
+    candidate.setDate(candidate.getDate()+diffDays);
+    if(diffDays===0&&candidate.getTime()+30*60*1000<=now.getTime()){
+      candidate.setDate(candidate.getDate()+7);
+    }
+  }
+  return candidate.getTime()+30*60*1000;
+}
+
 function getTacticKeyFromInfo(info){const k=info&&info.tacticKey;return TACTIC_PRESETS[k]?k:"2-3-1_14";}
 function getFormationFromInfo(info){return TACTIC_PRESETS[getTacticKeyFromInfo(info)].formation;}
 function getTotalCapacityFromInfo(info){return getFormationFromInfo(info).reduce((sum,[,c])=>sum+c,0)*2;}
@@ -264,13 +283,17 @@ function getPricesFromInfo(info){const p=(info&&info.prices)||{};const num=(v,fb
 function makeDefaultRoster(info=null){const formation=getFormationFromInfo(info);const a=[];for(const team of ["green","red"]){const p=team==="green"?"g":"r";let idx=0;formation.forEach(([pos,count])=>{for(let n=1;n<=count;n++){idx+=1;const id=p+idx;a.push({id,team,pos,label:SLOT_LABEL[pos],name:"",paid:false,status:"empty",applicationId:null});}});}return a;}
 function makeDefaultRosterMap(info=null){const m={};for(const s of makeDefaultRoster(info))m[s.id]={name:"",paid:false,status:"empty",applicationId:null};return m;}
 
-let app,auth,db,rooms={},currentRoomId=null,currentRoomInfo=null,roster=makeDefaultRoster(),applications={},isAdmin=false,isRoomAdmin=false,currentUser=null,movingContext=null,broadcastListener=null,initialBroadcastSeen=false,roomRosterRef=null,roomAppsRef=null,pendingPinRoomId=null;
+let app,auth,db,rooms={},currentRoomId=null,currentRoomInfo=null,roster=makeDefaultRoster(),applications={},isAdmin=false,isRoomAdmin=false,currentUser=null,movingContext=null,broadcastListener=null,initialBroadcastSeen=false,roomRosterRef=null,roomAppsRef=null,pendingPinRoomId=null,expiryTimer=null;
 
 function populateTacticSelects(){const opts=Object.entries(TACTIC_PRESETS).map(([k,v])=>`<option value="${esc(k)}">${esc(v.label)}</option>`).join("");const nSel=document.getElementById("newRoomTactic"),eSel=document.getElementById("editRoomTactic");if(nSel){nSel.innerHTML=opts;nSel.value="2-3-1_14";}if(eSel){eSel.innerHTML=opts;}}
 function applyFlatPriceToInputs(mode){const flatVal=document.getElementById(mode==="new"?"newRoomFlatPrice":"editFlatPrice").value;if(flatVal==="")return;const n=Number(flatVal);if(!Number.isFinite(n)||n<0)return;for(const pos of SLOT_ORDER){const el=document.getElementById((mode==="new"?"newPrice":"editPrice")+pos);if(el)el.value=n;}}
 function syncRoomSettingsForm(){if(!currentRoomInfo)return;const tKey=getTacticKeyFromInfo(currentRoomInfo),prices=getPricesFromInfo(currentRoomInfo);const tSel=document.getElementById("editRoomTactic");if(tSel)tSel.value=tKey;document.getElementById("editPriceGK").value=prices.GK;document.getElementById("editPriceDEF").value=prices.DEF;document.getElementById("editPriceMID").value=prices.MID;document.getElementById("editPriceFWD").value=prices.FWD;document.getElementById("editFlatPrice").value="";}
 
 async function saveRoomMatchSettings(e){e.preventDefault();if(!isRoomAdmin||!currentRoomId)return;const btn=document.getElementById("saveRoomSettingsBtn"),st=document.getElementById("roomSettingsStatus");const tacticKey=document.getElementById("editRoomTactic").value;const prices={GK:Math.max(0,Number(document.getElementById("editPriceGK").value)||0),DEF:Math.max(0,Number(document.getElementById("editPriceDEF").value)||0),MID:Math.max(0,Number(document.getElementById("editPriceMID").value)||0),FWD:Math.max(0,Number(document.getElementById("editPriceFWD").value)||0)};const prevTactic=getTacticKeyFromInfo(currentRoomInfo);const tacticChanged=tacticKey!==prevTactic;if(tacticChanged&&!confirm("Taktik ve kişi sayısı değiştiğinde mevcut saha kadrosu yeni taktiğe göre sıfırlanacak. Onaylıyor musunuz?"))return;btn.disabled=true;st.textContent="Kaydediliyor…";try{const updates={"rooms/"+currentRoomId+"/info/tacticKey":tacticKey,"rooms/"+currentRoomId+"/info/prices":prices};if(tacticChanged){updates["rooms/"+currentRoomId+"/roster"]=makeDefaultRosterMap({tacticKey});}await db.ref().update(updates);st.textContent="Taktik, kişi sayısı ve saha ücretleri güncellendi!";}catch(err){st.textContent="Kaydedilemedi: "+err.message;}finally{btn.disabled=false;}}
+
+async function deleteCurrentRoom(){if(!isRoomAdmin||!currentRoomId)return;const title=(currentRoomInfo&&currentRoomInfo.title)||currentRoomId;if(!confirm(`"${title}" maç odası kalıcı olarak silinsin mi?`))return;try{await db.ref("rooms/"+currentRoomId).remove();alert("Maç odası silindi.");goHome();}catch(e){alert("Oda silinemedi: "+e.message);}}
+
+async function sweepExpiredRooms(){if(!db||!rooms)return;const now=Date.now();const toDelete=[];for(const [roomId,room] of Object.entries(rooms)){const info=(room&&room.info)||{};const exp=Number(info.expireAt);if(Number.isFinite(exp)&&exp>0&&now>=exp){toDelete.push(roomId);}}if(!toDelete.length)return;for(const roomId of toDelete){try{await db.ref("rooms/"+roomId).remove();if(currentRoomId===roomId){goHome();}}catch(_){}}}
 
 function populateTimeSlots(defaultSlot="20:00 - 21:00"){const sel=document.getElementById("newRoomTimeSlot");if(!sel)return;const pad=n=>String(n).padStart(2,"0");const slots=[];for(let mins=0;mins<24*60;mins+=30){const sH=Math.floor(mins/60),sM=mins%60;const eMins=mins+60,eH=Math.floor(eMins/60)%24,eM=eMins%60;slots.push(`${pad(sH)}:${pad(sM)} - ${pad(eH)}:${pad(eM)}`);}sel.innerHTML=slots.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join("");if(slots.includes(defaultSlot))sel.value=defaultSlot;}
 
@@ -290,7 +313,8 @@ function mergeRoster(data,info=null){const base=makeDefaultRoster(info);return b
 function computeRoomAdmin(){isRoomAdmin=!!currentUser&&(ADMIN_UIDS.includes(currentUser.uid)||(!!currentRoomInfo&&currentRoomInfo.ownerUid===currentUser.uid));document.getElementById("adminBar").classList.toggle("hidden",!isRoomAdmin);if(!isRoomAdmin)closeMoveModal();if(isRoomAdmin){syncRoomSettingsForm();}if(isRoomAdmin&&currentRoomId)startRoomApplicationsListener();else stopRoomApplicationsListener();}
 
 function initFirebase(){try{syncFilterDistricts();syncCreateDistricts("Arnavutköy");populateTimeSlots("20:00 - 21:00");populateTacticSelects();app=firebase.initializeApp(firebaseConfig);auth=firebase.auth();db=firebase.database();updateNotificationUi();
-db.ref("rooms").on("value",snap=>{rooms=snap.val()||{};document.getElementById("quotaBadge").textContent=`Aktif Oda: ${Object.keys(rooms).length}`;renderRoomsLobby();if(currentRoomId&&rooms[currentRoomId]){currentRoomInfo=rooms[currentRoomId].info||{};updateRoomHeader();if(isRoomAdmin)syncRoomSettingsForm();}},e=>console.error("Odalar okunamadı:",e));
+db.ref("rooms").on("value",snap=>{rooms=snap.val()||{};document.getElementById("quotaBadge").textContent=`Aktif Oda: ${Object.keys(rooms).length}`;renderRoomsLobby();if(currentRoomId&&rooms[currentRoomId]){currentRoomInfo=rooms[currentRoomId].info||{};updateRoomHeader();if(isRoomAdmin)syncRoomSettingsForm();}else if(currentRoomId&&!rooms[currentRoomId]){goHome();}sweepExpiredRooms();},e=>console.error("Odalar okunamadı:",e));
+if(!expiryTimer)expiryTimer=setInterval(sweepExpiredRooms,30000);
 
 auth.onAuthStateChanged(u=>{currentUser=u||null;isAdmin=!!u&&ADMIN_UIDS.includes(u.uid);document.getElementById("adminBtn").textContent=isAdmin?"🔓 Sistem Admini":"🔒 Yönetici Girişi";document.getElementById("accountLoggedOut").classList.toggle("hidden",!!u);document.getElementById("accountLoggedIn").classList.toggle("hidden",!u);document.getElementById("roomLoginPrompt").classList.toggle("hidden",!!u);document.getElementById("joinForm").classList.toggle("hidden",!u);if(u){document.getElementById("accountIdentity").textContent=u.email||"Üye hesabı";if(!document.getElementById("playerName").value){db.ref("users/"+u.uid+"/name").once("value").then(x=>{if(x.val())document.getElementById("playerName").value=x.val();}).catch(()=>{});}if("Notification"in window&&Notification.permission==="granted"){saveDeviceSubscriptionState("granted").catch(()=>{});}startBroadcastListener();}else{stopBroadcastListener();}updateNotificationUi();computeRoomAdmin();renderAll();});
 
@@ -302,9 +326,10 @@ function goHome(){currentRoomId=null;currentRoomInfo=null;detachRoomListeners();
 async function openRoom(roomId,bypassPin=false){const cleanId=String(roomId||"").trim();if(!cleanId)return;
 let info=(rooms[cleanId]&&rooms[cleanId].info)||null;
 if(!info){try{const snap=await db.ref("rooms/"+cleanId+"/info").once("value");info=snap.val()||{};}catch(_){info={};}}
+if(info&&Number(info.expireAt)>0&&Date.now()>=Number(info.expireAt)){try{await db.ref("rooms/"+cleanId).remove();}catch(_){}alert("Bu maç odasının süresi dolduğu için otomatik silindi.");goHome();return;}
 if(!bypassPin&&!hasRoomPinAccess(cleanId,info)){openRoomPinModal(cleanId,info);return;}
 currentRoomId=cleanId;detachRoomListeners();const url=new URL(window.location.href);url.searchParams.set("room",cleanId);window.history.replaceState({},"",url.toString());document.getElementById("homeView").classList.add("hidden");document.getElementById("roomView").classList.remove("hidden");document.getElementById("homeNavBtn").classList.remove("hidden");
-db.ref("rooms/"+cleanId+"/info").on("value",snap=>{currentRoomInfo=snap.val()||{title:"Maç Odası",region:"",district:"",pitchName:"",schedule:"",iban:"TR53 0006 2000 5950 0006 6773 76",ibanOwner:"Oda Sahibi"};updateRoomHeader();computeRoomAdmin();renderAll();});
+db.ref("rooms/"+cleanId+"/info").on("value",snap=>{if(!snap.exists()){goHome();return;}currentRoomInfo=snap.val()||{title:"Maç Odası",region:"",district:"",pitchName:"",schedule:"",iban:"TR53 0006 2000 5950 0006 6773 76",ibanOwner:"Oda Sahibi"};updateRoomHeader();computeRoomAdmin();renderAll();sweepExpiredRooms();});
 roomRosterRef=db.ref("rooms/"+cleanId+"/roster");roomRosterRef.on("value",s=>{roster=mergeRoster(s.val()||{},currentRoomInfo);renderAll();},e=>showMessage("Kadro okuma hatası: "+e.message,false));
 computeRoomAdmin();renderAll();}
 
@@ -329,10 +354,10 @@ function openCreateRoomModal(){if(!currentUser){alert("Yeni maç odası kurmak i
 function closeCreateRoomModal(){document.getElementById("createRoomModal").classList.add("hidden");}
 function slugifyRoom(str){return String(str||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,20);}
 async function createRoom(e){e.preventDefault();if(!currentUser)return;const btn=document.getElementById("createRoomSubmit"),err=document.getElementById("createRoomError");err.textContent="";
-const title=document.getElementById("newRoomTitle").value.trim(),region=document.getElementById("newRoomRegion").value.trim(),district=document.getElementById("newRoomDistrict").value.trim(),pitchSelVal=document.getElementById("newRoomPitchSelect").value,pitchCustomVal=document.getElementById("newRoomPitchCustom").value.trim(),pitchName=pitchSelVal==="__CUSTOM__"?pitchCustomVal:pitchSelVal,matchDay=document.getElementById("newRoomDay").value.trim(),timeSlot=document.getElementById("newRoomTimeSlot").value.trim(),schedule=[matchDay,timeSlot].filter(Boolean).join(" • "),tacticKey=document.getElementById("newRoomTactic").value,prices={GK:Math.max(0,Number(document.getElementById("newPriceGK").value)||0),DEF:Math.max(0,Number(document.getElementById("newPriceDEF").value)||0),MID:Math.max(0,Number(document.getElementById("newPriceMID").value)||0),FWD:Math.max(0,Number(document.getElementById("newPriceFWD").value)||0)},roomPin=document.getElementById("newRoomPin").value.trim(),ibanOwner=document.getElementById("newRoomIbanOwner").value.trim(),iban=document.getElementById("newRoomIban").value.trim();
+const title=document.getElementById("newRoomTitle").value.trim(),region=document.getElementById("newRoomRegion").value.trim(),district=document.getElementById("newRoomDistrict").value.trim(),pitchSelVal=document.getElementById("newRoomPitchSelect").value,pitchCustomVal=document.getElementById("newRoomPitchCustom").value.trim(),pitchName=pitchSelVal==="__CUSTOM__"?pitchCustomVal:pitchSelVal,matchDay=document.getElementById("newRoomDay").value.trim(),timeSlot=document.getElementById("newRoomTimeSlot").value.trim(),schedule=[matchDay,timeSlot].filter(Boolean).join(" • "),expireAt=computeExpireAtMs(matchDay,timeSlot),tacticKey=document.getElementById("newRoomTactic").value,prices={GK:Math.max(0,Number(document.getElementById("newPriceGK").value)||0),DEF:Math.max(0,Number(document.getElementById("newPriceDEF").value)||0),MID:Math.max(0,Number(document.getElementById("newPriceMID").value)||0),FWD:Math.max(0,Number(document.getElementById("newPriceFWD").value)||0)},roomPin=document.getElementById("newRoomPin").value.trim(),ibanOwner=document.getElementById("newRoomIbanOwner").value.trim(),iban=document.getElementById("newRoomIban").value.trim();
 if(!title||!region||!district||!pitchName||!schedule){err.textContent="Lütfen tüm zorunlu alanları seçin veya doldurun.";return;}
 const baseSlug=slugifyRoom(pitchName||title)||"mac";const roomId=baseSlug+"-"+Math.random().toString(36).slice(2,6);
-const roomInfoPayload={title,region,district,pitchName,schedule,tacticKey,prices,roomPin,ibanOwner:ibanOwner||"Oda Sahibi",iban:iban||"TR53 0006 2000 5950 0006 6773 76",ownerUid:currentUser.uid,ownerEmail:currentUser.email||"",createdAt:firebase.database.ServerValue.TIMESTAMP};
+const roomInfoPayload={title,region,district,pitchName,schedule,matchDay,timeSlot,expireAt,tacticKey,prices,roomPin,ibanOwner:ibanOwner||"Oda Sahibi",iban:iban||"TR53 0006 2000 5950 0006 6773 76",ownerUid:currentUser.uid,ownerEmail:currentUser.email||"",createdAt:firebase.database.ServerValue.TIMESTAMP};
 btn.disabled=true;try{await db.ref("rooms/"+roomId).set({info:roomInfoPayload,roster:makeDefaultRosterMap(roomInfoPayload)});if(roomPin)markRoomUnlocked(roomId,roomPin);closeCreateRoomModal();openRoom(roomId,true);}catch(x){err.textContent="Oda oluşturulamadı: "+x.message;}finally{btn.disabled=false;}}
 
 function joinByRoomCode(){const raw=(document.getElementById("directRoomCode").value||"").trim();if(!raw)return;try{if(raw.includes("room=")){const u=new URL(raw);const r=u.searchParams.get("room");if(r)return openRoom(r);}}catch(_){}openRoom(raw.replace(/^#/, ""));}
