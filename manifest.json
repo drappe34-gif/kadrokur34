@@ -1,0 +1,9 @@
+{
+  "name": "KadroKur | Sahabiler FK",
+  "short_name": "KadroKur",
+  "start_url": "./index.html.html",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#10b981",
+  "orientation": "portrait"
+}
