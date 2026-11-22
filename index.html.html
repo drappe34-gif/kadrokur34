@@ -1022,7 +1022,12 @@ function initFirebase(){
   }
 }
 
-function goHome(){switchMainFlow("home");renderRoomsLobby();}
+function goHome(){
+  const st=document.getElementById("lobbyJoinStatus");
+  if(st)st.textContent="";
+  switchMainFlow("home");
+  renderRoomsLobby();
+}
 
 async function openRoom(roomId,bypassPin=false){
   const cleanId=extractRoomIdFromInput(roomId);
@@ -1040,37 +1045,33 @@ async function openRoom(roomId,bypassPin=false){
 
   if(!info&&db){
     try{
-      const fullSnap=await db.ref("rooms/"+cleanId).once("value");
-      if(fullSnap.exists()){
-        const val=fullSnap.val()||{};
+      const roomSnap=await db.ref("rooms/"+cleanId).once("value");
+      if(roomSnap.exists()){
+        const val=roomSnap.val()||{};
         info=val.info||{};
         initialRosterData=val.roster||{};
         rooms[cleanId]=val;
       }else{
-        const allSnap=await db.ref("rooms").once("value");
-        const allVal=allSnap.val()||{};
-        rooms=allVal;
-        if(allVal[cleanId]){
-          info=allVal[cleanId].info||{};
-          initialRosterData=allVal[cleanId].roster||{};
+        const infoSnap=await db.ref("rooms/"+cleanId+"/info").once("value");
+        if(infoSnap.exists()){
+          info=infoSnap.val()||{};
+          initialRosterData={};
         }
       }
     }catch(err){
-      if(statusEl)statusEl.textContent="Oda okunamadı: "+err.message;
+      if(statusEl)statusEl.textContent="Odaya erişilemedi ("+err.message+"). Firebase veritabanı okuma izinlerini kontrol edin.";
       return;
     }
   }
 
-  if(!info||(!info.title&&!info.pitchName&&!initialRosterData)){
+  if(!info||(!info.title&&!info.pitchName&&!info.schedule&&!initialRosterData)){
     if(statusEl)statusEl.textContent=`"${cleanId}" kodlu maç odası bulunamadı veya süresi doldu.`;
-    switchMainFlow("home");
     return;
   }
 
   if(Number(info.expireAt)>0&&Date.now()>=Number(info.expireAt)){
     try{await db.ref("rooms/"+cleanId).remove();}catch(_){}
     if(statusEl)statusEl.textContent="Bu maç odasının süresi doldu.";
-    switchMainFlow("home");
     return;
   }
 
@@ -1109,6 +1110,8 @@ async function openRoom(roomId,bypassPin=false){
     computeRoomAdmin();
     renderAll();
     sweepExpiredRooms();
+  },e=>{
+    if(statusEl)statusEl.textContent="Oda bilgisi güncellenemedi: "+e.message;
   });
   roomRosterRef=db.ref("rooms/"+cleanId+"/roster");
   roomRosterRef.on("value",s=>{
@@ -1127,7 +1130,7 @@ async function openRoom(roomId,bypassPin=false){
       document.getElementById("teamTacticNoteInput").value=cur.note||"";
       renderTeamTacticBoard();
     }
-  });
+  },()=>{});
 }
 
 function openRoomPinModal(roomId,info){pendingPinRoomId=roomId;document.getElementById("roomPinInput").value="";document.getElementById("roomPinError").textContent="";const title=(info&&info.title)||roomId;document.getElementById("roomPinDesc").textContent=`"${title}" odası şifre korumalıdır. Giriş şifresini yazın.`;document.getElementById("roomPinModal").classList.remove("hidden");document.getElementById("roomPinInput").focus();}
