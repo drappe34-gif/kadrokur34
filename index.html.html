@@ -588,16 +588,10 @@ function extractRoomIdFromInput(rawInput){
   if(!str)return "";
   try{
     if(str.includes("room=")){
-      const normalized=str.startsWith("http")||str.startsWith("file:")?str:"https://example.com/?"+str.split("?").pop().replace(/^#/, "");
-      const u=new URL(normalized);
-      const qRoom=u.searchParams.get("room");
-      if(qRoom)return String(qRoom).trim().replace(/^#/, "").replace(/[.$#[\]]/g,"");
-      const hashMatch=String(u.hash||"").match(/room=([^&]+)/);
-      if(hashMatch&&hashMatch[1])return decodeURIComponent(hashMatch[1]).trim().replace(/[.$#[\]]/g,"");
+      const qPart=str.split("room=")[1].split(/[&#?]/)[0];
+      if(qPart)return decodeURIComponent(qPart).trim().replace(/[.$#[\]]/g,"");
     }
   }catch(_){}
-  const regexMatch=str.match(/[?&]room=([^&#]+)/i);
-  if(regexMatch&&regexMatch[1])return decodeURIComponent(regexMatch[1]).trim().replace(/[.$#[\]]/g,"");
   return str.replace(/^#/, "").replace(/\/+$/, "").split("/").pop().trim().replace(/[.$#[\]]/g,"");
 }
 
@@ -605,10 +599,12 @@ function getInitialRoomFromLocation(){
   try{
     const params=new URLSearchParams(window.location.search);
     const fromQuery=params.get("room");
-    if(fromQuery)return fromQuery.trim();
+    if(fromQuery&&fromQuery.trim())return fromQuery.trim();
     const hash=String(window.location.hash||"");
     const hm=hash.match(/room=([^&]+)/i);
     if(hm&&hm[1])return decodeURIComponent(hm[1]).trim();
+    const hrefMatch=String(window.location.href||"").match(/[?&]room=([^&#]+)/i);
+    if(hrefMatch&&hrefMatch[1])return decodeURIComponent(hrefMatch[1]).trim();
   }catch(_){}
   return "";
 }
@@ -999,8 +995,12 @@ function initFirebase(){
       if(msg)msg.textContent="Kimlik doğrulama hatası: "+err.message;
     });
 
+    const initialRoom=getInitialRoomFromLocation();
+    let roomsLoadedOnce=false;
+
     db.ref("rooms").on("value",snap=>{
       rooms=snap.val()||{};
+      roomsLoadedOnce=true;
       document.getElementById("quotaBadge").textContent=`Aktif Oda: ${Object.keys(rooms).length}`;
       renderRoomsLobby();
       renderHomePlayersShowcase();
@@ -1010,8 +1010,6 @@ function initFirebase(){
           updateRoomHeader();
           roster=mergeRoster((rooms[currentRoomId].roster)||{},currentRoomInfo);
           renderAll();
-        }else if(Object.keys(rooms).length>0){
-          goHome();
         }
       }
       sweepExpiredRooms();
@@ -1023,7 +1021,6 @@ function initFirebase(){
 
     if(!expiryTimer)expiryTimer=setInterval(sweepExpiredRooms,30000);
 
-    const initialRoom=getInitialRoomFromLocation();
     if(initialRoom){
       openRoom(initialRoom);
     }else{
@@ -1061,24 +1058,24 @@ async function openRoom(roomId,bypassPin=false){
   let info=(roomObj&&roomObj.info)||null;
   let initialRosterData=(roomObj&&roomObj.roster)||null;
 
-  if(!roomObj||!info){
-    try{
-      const roomSnap=await db.ref("rooms/"+cleanId).once("value");
-      if(roomSnap.exists()){
-        const val=roomSnap.val()||{};
-        roomObj=val;
-        info=val.info||{};
-        initialRosterData=val.roster||{};
-        rooms[cleanId]=val;
-      }
-    }catch(err){
-      if(statusEl)statusEl.textContent="Odaya erişilemedi: "+err.message;
-      return;
+  try{
+    const roomSnap=await db.ref("rooms/"+cleanId).once("value");
+    if(roomSnap.exists()){
+      const val=roomSnap.val()||{};
+      roomObj=val;
+      info=val.info||{};
+      initialRosterData=val.roster||{};
+      rooms[cleanId]=val;
+    }else{
+      roomObj=null;
     }
+  }catch(err){
+    if(statusEl)statusEl.textContent="Odaya erişilemedi: "+err.message;
+    return;
   }
 
   if(!roomObj||typeof roomObj!=="object"){
-    if(statusEl)statusEl.textContent=`"${cleanId}" kodlu maç odası bulunamadı.`;
+    if(statusEl)statusEl.textContent=`"${cleanId}" kodlu maç odası bulunamadı veya silinmiş.`;
     return;
   }
   if(!info||typeof info!=="object"){
