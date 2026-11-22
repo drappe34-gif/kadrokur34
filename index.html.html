@@ -1084,16 +1084,12 @@ async function openRoom(roomId,bypassPin=false){
     return;
   }
 
-  setStatus("Firebase oturumu doğrulanıyor…");
+  setStatus("Oda bağlantısı hazırlanıyor…");
   restoreCreateFormToModal();
 
   try{
-    // RTDB kuralları auth gerektiriyorsa, ilk okuma auth geri yüklenmeden yapılmamalı.
-    if(auth&&!authStateReady){
-      await withTimeout(authReadyPromise,10000,"Kullanıcı oturumu doğrulaması");
-    }
-    if(requestId!==roomOpenRequest)return;
-
+    // rooms/.read=true olduğu için oda verisini okumak için Auth oturumunu beklemek gerekmez.
+    // Auth callback'i gecikirse oda ekranının beklemede kalmasına bu bekleme neden oluyordu.
     setStatus("Oda bilgileri sunucudan alınıyor…");
     // Eski lobby önbelleğine güvenme; her girişte ilgili oda kaydını doğrudan doğrula.
     const roomSnap=await withTimeout(
