@@ -1,262 +1,523 @@
 <!DOCTYPE html>
+
 <html lang="tr">
+
 <head>
+
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <meta name="theme-color" content="#10b981">
+
 <link rel="manifest" href="./manifest.json">
+
 <title>KadroKur | Maç Odaları & Kadro</title>
+
 <script src="https://cdn.tailwindcss.com"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <style>
+
 body{font-family:Inter,sans-serif;background:#090d16;color:#f8fafc}.pitch-bg{background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0,rgba(255,255,255,.03) 40px,transparent 40px,transparent 80px),linear-gradient(180deg,#0b2415,#10351f 50%,#0b2415);border:2px solid rgba(74,222,128,.35);box-shadow:0 0 40px rgba(16,185,129,.12)}.glass-card{background:rgba(15,23,42,.84);backdrop-filter:blur(12px);border:1px solid rgba(148,163,184,.18)}button:disabled{opacity:.45;cursor:not-allowed}
+
 .home-video-backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse at center,#173d2a 0%,#090d16 78%)}
+
 .home-video-backdrop video{width:100%;height:100%;object-fit:cover;opacity:.88;filter:saturate(1.22) contrast(1.12)}
+
 .home-video-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,8,16,.40),rgba(3,8,16,.12) 50%,rgba(3,8,16,.40)),linear-gradient(0deg,rgba(3,8,16,.72),rgba(3,8,16,.08) 48%,rgba(3,8,16,.30))}
+
 header,#homeView,#roomView,footer{position:relative;z-index:1}
+
 .home-header{background:rgba(3,10,18,.48)!important;backdrop-filter:blur(14px);border-color:rgba(255,255,255,.14)!important}
+
 .home-menu-link{padding:.6rem .9rem;border-radius:999px;color:#e2e8f0;font-size:11px;font-weight:800;letter-spacing:.04em;transition:.2s}
+
 .home-menu-link:hover{background:rgba(16,185,129,.22);color:#6ee7b7}
+
 .home-hero{min-height:clamp(390px,58vh,620px);display:flex;align-items:center;background:linear-gradient(90deg,rgba(2,8,15,.58),rgba(2,8,15,.08));border:1px solid rgba(255,255,255,.16);box-shadow:0 24px 80px rgba(0,0,0,.24)}
+
 .home-hero-kicker{display:inline-flex;align-items:center;gap:.5rem;padding:.45rem .8rem;border:1px solid rgba(110,231,183,.38);border-radius:999px;background:rgba(2,44,34,.48);color:#a7f3d0;font-size:10px;font-weight:900;letter-spacing:.16em}
+
 .home-hero-title{text-shadow:0 4px 30px rgba(0,0,0,.65);letter-spacing:-.055em}
+
 .home-content-card{background:rgba(5,13,22,.78)!important;backdrop-filter:blur(16px);border-color:rgba(255,255,255,.16)!important}
+
 @media(max-width:640px){.home-menu-link{padding:.5rem .65rem;font-size:10px}.home-hero{min-height:430px}}
+
 body.room-open .home-video-backdrop{display:none}
+
 #homeChatMessages{scrollbar-width:thin;scrollbar-color:#475569 transparent}
+
 @media(prefers-reduced-motion:reduce){.home-video-backdrop video{display:none}}
 
+
+
 /* KadroKur 3D halı saha görünümü */
+
 .pitch-stage{padding:10px 5px 22px;perspective:1300px;}
+
 .pitch-surface{isolation:isolate;overflow:hidden;min-height:620px;position:relative;border:5px solid #a8f0b2!important;box-shadow:0 24px 55px rgba(0,0,0,.48),inset 0 0 0 2px rgba(255,255,255,.22),0 0 35px rgba(16,185,129,.18)!important;background:repeating-linear-gradient(90deg,rgba(255,255,255,.055) 0,rgba(255,255,255,.055) 9%,transparent 9%,transparent 18%),linear-gradient(180deg,#167a3c 0%,#0f6932 50%,#0b572b 100%)!important;transform:rotateX(7deg);transform-origin:center top;}
+
 .pitch-surface:before{content:"";position:absolute;inset:12px;border:2px solid rgba(236,253,245,.78);border-radius:3px;pointer-events:none;z-index:0;}
+
 .pitch-surface:after{content:"";position:absolute;left:50%;top:12px;bottom:12px;border-left:2px solid rgba(236,253,245,.72);pointer-events:none;z-index:0;}
+
 .pitch-team-block{position:relative;z-index:2;padding:12px 4px;}
+
 .pitch-green-block{padding-top:24px;padding-bottom:22px;}
+
 .pitch-red-block{padding-top:22px;padding-bottom:24px;}
+
 .pitch-team-heading{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 12px;width:max-content;max-width:100%;padding:6px 13px;border-radius:999px;background:rgba(2,20,12,.72);border:1px solid rgba(255,255,255,.3);box-shadow:0 5px 12px rgba(0,0,0,.22);font-size:11px;font-weight:900;letter-spacing:.1em;color:#fff;}
+
 .pitch-team-heading small{font-size:8px;letter-spacing:.08em;color:#d1fae5;}
+
 .pitch-team-dot{width:9px;height:9px;border-radius:50%;box-shadow:0 0 10px currentColor}.green-dot{background:#4ade80;color:#4ade80}.red-dot{background:#fb7185;color:#fb7185}
+
 .pitch-player-rows{display:flex;flex-direction:column;gap:12px;position:relative;z-index:2;}
+
 .pitch-player-rows>div{display:flex;justify-content:center;align-items:center;gap:clamp(5px,2vw,18px);flex-wrap:wrap;min-height:58px;}
+
 .pitch-midline{height:2px;background:rgba(236,253,245,.76);position:relative;z-index:1;margin:2px -28px;display:flex;justify-content:center;align-items:center;}
+
 .pitch-center-circle{position:absolute;width:92px;height:92px;border:2px solid rgba(236,253,245,.68);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+
 .pitch-mid-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:8px;letter-spacing:.2em;font-weight:900;color:rgba(255,255,255,.5);background:rgba(8,65,33,.72);padding:3px 8px;border-radius:20px;white-space:nowrap;}
+
 .pitch-top-goal,.pitch-bottom-goal{position:relative;z-index:2;margin:0 auto;width:25%;min-width:90px;height:13px;border:2px solid rgba(255,255,255,.72);border-top:0;background:rgba(255,255,255,.08);text-align:center;font-size:7px;font-weight:900;letter-spacing:.25em;color:rgba(255,255,255,.72);}
+
 .pitch-bottom-goal{border:2px solid rgba(255,255,255,.72);border-bottom:0;}
+
 .pitch-corner{position:absolute;width:14px;height:14px;border:1px solid rgba(255,255,255,.65);border-radius:50%;z-index:1}.pitch-corner.c1{top:12px;left:12px}.pitch-corner.c2{top:12px;right:12px}.pitch-corner.c3{bottom:12px;left:12px}.pitch-corner.c4{bottom:12px;right:12px}
+
 .pitch-player-rows button,.pitch-player-rows>div>div{min-width:76px;max-width:112px;min-height:68px;padding:8px 7px;border-radius:12px!important;box-shadow:0 7px 0 rgba(0,0,0,.22),0 10px 18px rgba(0,0,0,.22);backdrop-filter:blur(5px);transition:transform .18s,box-shadow .18s;}
+
 .pitch-player-rows button:hover{transform:translateY(-4px) scale(1.035);box-shadow:0 10px 0 rgba(0,0,0,.18),0 16px 22px rgba(0,0,0,.25);}
+
 .pitch-player-rows button{background:linear-gradient(145deg,rgba(9,48,28,.96),rgba(4,25,16,.94));border:1px dashed rgba(187,247,208,.72)!important;color:#ecfdf5;}
+
 .pitch-player-rows>div>div{background:linear-gradient(145deg,rgba(5,75,42,.97),rgba(3,38,25,.97));border:1px solid rgba(134,239,172,.75)!important;color:white;}
+
 .pitch-red-block .pitch-player-rows>div>div{background:linear-gradient(145deg,rgba(127,29,29,.97),rgba(69,10,10,.97));border-color:rgba(252,165,165,.8)!important;}
+
 .pitch-red-block .pitch-player-rows button{background:linear-gradient(145deg,rgba(127,29,29,.92),rgba(69,10,10,.95));border-color:rgba(252,165,165,.72)!important;}
+
 @media(max-width:640px){.pitch-stage{padding:4px 0 14px;perspective:900px}.pitch-surface{min-height:580px;padding:12px 8px!important;transform:rotateX(5deg)}.pitch-player-rows>div{gap:5px}.pitch-player-rows button,.pitch-player-rows>div>div{min-width:65px;max-width:85px;min-height:62px;padding:6px 4px}.pitch-center-circle{width:72px;height:72px}.pitch-team-heading{font-size:9px;padding:5px 9px}}
 
+
+
 </style>
+
 </head>
+
 <body class="min-h-screen flex flex-col justify-between">
+
 <div id="homeVideoBackdrop" class="home-video-backdrop" aria-hidden="true">
-  <video autoplay muted loop playsinline preload="metadata" poster="">
-    <source src="https://res.cloudinary.com/p5kt4ew2/video/upload/hali-saha-4k.mp4" type="video/mp4">
-  </video>
-  <div class="home-video-shade"></div>
+
+<video autoplay muted loop playsinline preload="metadata" poster="">
+
+<source src="https://res.cloudinary.com/p5kt4ew2/video/upload/hali-saha-4k.mp4" type="video/mp4">
+
+</video>
+
+<div class="home-video-shade"></div>
+
 </div>
+
 <header class="home-header border-b border-slate-800 sticky top-0 z-30"><div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+
 <div class="flex items-center gap-3"><button type="button" onclick="goHome()" class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-slate-950 text-lg">KK</button><div><div class="flex items-center gap-2"><button type="button" onclick="goHome()" class="font-black text-lg text-left">Kadro<span class="text-emerald-400">Kur</span></button><span id="headerBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300">MAÇ ODALARI</span></div><p id="headerSubtitle" class="text-xs text-slate-400 mt-1">Bölge, ilçe ve halı saha seç • Kendi maç odanı kurup paylaş</p></div></div>
+
 <div class="flex items-center gap-2 flex-wrap"><nav class="hidden md:flex items-center gap-1 mr-2"><button type="button" class="home-menu-link" onclick="document.getElementById('roomsList').scrollIntoView({behavior:'smooth'})">MAÇLAR</button><button type="button" class="home-menu-link" onclick="document.getElementById('accountPanel').scrollIntoView({behavior:'smooth'})">ÜYELİK</button><button type="button" class="home-menu-link" aria-label="Canlı sohbet" title="Canlı sohbet" onclick="document.getElementById('homeChatPanel').scrollIntoView({behavior:'smooth'})">💬</button></nav><button type="button" onclick="goHome()" id="homeNavBtn" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-emerald-300">🏠 Odalar</button><span id="quotaBadge" class="px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400">Aktif Oda: 0</span><button type="button" onclick="toggleAdminPanel()" id="adminBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-200">🔒 Yönetici Girişi</button></div>
+
 </div></header>
 
+
+
 <section id="homeView" class="max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
+
 <div class="home-hero rounded-[2rem] p-7 sm:p-12 lg:p-16">
+
 <div class="max-w-2xl">
+
 <div class="home-hero-kicker"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> KADROKUR • SAHAYA HAZIR MISIN?</div>
+
 <h1 class="home-hero-title text-5xl sm:text-6xl lg:text-7xl font-black leading-[.98] mt-6">Takımını kur.<br><span class="text-emerald-300">Maçını yap.</span></h1>
+
 <p class="text-sm sm:text-base text-slate-100/90 leading-relaxed mt-6 max-w-xl">Yakınındaki halı saha maçlarını keşfet, kadrodaki yerini ayırt veya kendi maç odanı oluştur. Takımın burada başlıyor.</p>
+
 <div class="flex flex-wrap gap-3 mt-8">
+
 <button type="button" onclick="document.getElementById('roomsList').scrollIntoView({behavior:'smooth'})" class="px-6 py-3.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-sm font-black shadow-xl">⚽ Maçları Keşfet</button>
+
 <button type="button" onclick="openCreateRoomModal()" class="px-6 py-3.5 rounded-xl border border-white/35 bg-black/25 hover:bg-white/10 text-white text-sm font-extrabold">＋ Maç Odası Kur</button>
+
 </div>
+
 <div class="flex flex-wrap gap-5 mt-9 text-[10px] sm:text-xs font-bold tracking-wider text-white/80"><span>● CANLI MAÇ ODALARI</span><span>● ANLIK KADRO</span><span>● TOPLULUK SOHBETİ</span></div>
+
 </div>
+
 </div>
+
+
 
 <!-- Sponsor reklam alanı: yalnızca yönetici tarafından onaylanan sponsorlar gösterilir. -->
+
 <section id="sponsorShowcase" class="hidden rounded-2xl border border-amber-400/30 bg-slate-950/75 p-4 sm:p-5 shadow-xl" aria-label="Sponsor reklamları">
-  <div class="flex items-center justify-between gap-3 mb-3"><div><p class="text-[10px] font-black tracking-[.2em] text-amber-300">KADROKUR SPONSORLARI</p><h2 class="text-lg font-black text-white">Bizi destekleyenler</h2></div><span class="text-[10px] rounded-full px-2 py-1 bg-amber-400/10 text-amber-200 border border-amber-300/20">Sponsorlu</span></div>
-  <div id="sponsorPublicList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"><p class="text-xs text-slate-400">Sponsorlar yükleniyor…</p></div>
+
+<div class="flex items-center justify-between gap-3 mb-3"><div><p class="text-[10px] font-black tracking-[.2em] text-amber-300">KADROKUR SPONSORLARI</p><h2 class="text-lg font-black text-white">Bizi destekleyenler</h2></div><span class="text-[10px] rounded-full px-2 py-1 bg-amber-400/10 text-amber-200 border border-amber-300/20">Sponsorlu</span></div>
+
+<div id="sponsorPublicList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"><p class="text-xs text-slate-400">Sponsorlar yükleniyor…</p></div>
+
 </section>
+
+
 
 <!-- Google AdSense alanı etkinleştirilecek: onaylı hesap ve yayıncı kodu gerektiğinde buraya eklenecek. -->
+
 <div id="adsenseHomeSlot" class="hidden" aria-label="Google reklam alanı"></div>
 
+
+
 <div id="sponsorAdminPanel" class="hidden glass-card rounded-2xl border border-amber-400/30 p-4 space-y-3">
-  <div><p class="text-[10px] font-black tracking-widest text-amber-300">GELİR YÖNETİMİ</p><h2 class="text-base font-black">📢 Sponsor reklam yönetimi</h2><p class="text-xs text-slate-400 mt-1">Buradan eklediğin ve aktif ettiğin sponsorlar ana sayfada herkese görünür.</p></div>
-  <form id="sponsorAdminForm" onsubmit="saveSponsorAd(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-    <input id="sponsorTitle" required maxlength="70" placeholder="İşletme / sponsor adı" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
-    <input id="sponsorImage" type="url" required placeholder="Logo veya reklam görseli URL'si (https://...)" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
-    <input id="sponsorLink" type="url" required placeholder="Tıklanınca açılacak web sitesi (https://...)" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white sm:col-span-2">
-    <input id="sponsorDescription" maxlength="140" placeholder="Kısa açıklama (isteğe bağlı)" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white sm:col-span-2">
-    <label class="flex items-center gap-2 text-xs text-slate-300"><input id="sponsorActive" type="checkbox" checked> Yayında göster</label>
-    <button id="sponsorSaveBtn" type="submit" class="px-4 py-2 rounded-lg bg-amber-400 text-slate-950 text-xs font-black">＋ Sponsoru Kaydet</button>
-  </form>
-  <p id="sponsorAdminStatus" class="text-xs text-slate-400">Sponsor eklemek için işletmenin görsel ve web sitesi bağlantısını gir.</p>
-  <div><h3 class="text-xs font-bold text-slate-200 mb-2">Kayıtlı sponsorlar</h3><div id="sponsorAdminList" class="space-y-2 text-xs text-slate-300">Yükleniyor…</div></div>
+
+<div><p class="text-[10px] font-black tracking-widest text-amber-300">GELİR YÖNETİMİ</p><h2 class="text-base font-black">📢 Sponsor reklam yönetimi</h2><p class="text-xs text-slate-400 mt-1">Buradan eklediğin ve aktif ettiğin sponsorlar ana sayfada herkese görünür.</p></div>
+
+<form id="sponsorAdminForm" onsubmit="saveSponsorAd(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+<input id="sponsorTitle" required maxlength="70" placeholder="İşletme / sponsor adı" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
+
+<input id="sponsorImage" type="url" required placeholder="Logo veya reklam görseli URL'si (https://...)" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
+
+<input id="sponsorLink" type="url" required placeholder="Tıklanınca açılacak web sitesi (https://...)" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white sm:col-span-2">
+
+<input id="sponsorDescription" maxlength="140" placeholder="Kısa açıklama (isteğe bağlı)" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white sm:col-span-2">
+
+<label class="flex items-center gap-2 text-xs text-slate-300"><input id="sponsorActive" type="checkbox" checked> Yayında göster</label>
+
+<button id="sponsorSaveBtn" type="submit" class="px-4 py-2 rounded-lg bg-amber-400 text-slate-950 text-xs font-black">＋ Sponsoru Kaydet</button>
+
+</form>
+
+<p id="sponsorAdminStatus" class="text-xs text-slate-400">Sponsor eklemek için işletmenin görsel ve web sitesi bağlantısını gir.</p>
+
+<div><h3 class="text-xs font-bold text-slate-200 mb-2">Kayıtlı sponsorlar</h3><div id="sponsorAdminList" class="space-y-2 text-xs text-slate-300">Yükleniyor…</div></div>
+
 </div>
+
+
 
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
 <div class="lg:col-span-8 space-y-4">
+
 <div class="glass-card home-content-card rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+
 <select id="filterRegion" onchange="syncFilterDistricts();renderRoomsLobby()" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
+
 <option value="">Tüm Yakalar (Avrupa / Anadolu)</option>
+
 <option value="İstanbul - Avrupa Yakası">İstanbul - Avrupa Yakası</option>
+
 <option value="İstanbul - Anadolu Yakası">İstanbul - Anadolu Yakası</option>
+
 </select>
+
 <select id="filterDistrict" onchange="renderRoomsLobby()" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
+
 <option value="">Tüm İlçeler</option>
+
 </select>
+
 <input id="filterPitch" oninput="renderRoomsLobby()" placeholder="Halı saha adı ara..." class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
+
 </div>
+
+
 
 <div class="glass-card home-content-card rounded-2xl p-4 flex flex-col sm:flex-row gap-2">
+
 <input id="directRoomCode" placeholder="Oda kodu veya linki yapıştır (Örn: bolluca-hali-saha)" class="flex-1 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
+
 <button type="button" onclick="joinByRoomCode()" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold">Odaya Gir</button>
+
 </div>
+
 <p id="lobbyJoinStatus" class="text-xs text-amber-300 px-1"></p>
 
+
+
 <div id="roomsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"><p class="text-xs text-slate-400">Odalar yükleniyor…</p></div>
+
 </div>
+
+
 
 <div class="lg:col-span-4 space-y-4">
+
 <div id="accountPanel" class="rounded-2xl border border-slate-700 glass-card home-content-card p-4 sm:p-5">
+
 <div id="accountLoggedOut">
+
 <p class="text-sm font-bold text-white mb-1">Üye Girişi / Kayıt</p>
+
 <p class="text-xs text-slate-400 mb-3">Maç odası kurmak ve kadrodan yer seçmek için hesabınla giriş yap.</p>
+
 <label class="block text-xs text-slate-300 mb-1" for="accountName">Adın / Lakabın</label>
+
 <input id="accountName" maxlength="40" placeholder="Örn: Cüneyt (yalnızca yeni kayıt için)" class="w-full mb-2 px-3 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
+
 <label class="block text-xs text-slate-300 mb-1" for="accountEmail">E-posta</label>
+
 <input id="accountEmail" type="email" autocomplete="email" placeholder="ornek@mail.com" class="w-full mb-2 px-3 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
+
 <label class="block text-xs text-slate-300 mb-1" for="accountPassword">Şifre (en az 6 karakter)</label>
+
 <input id="accountPassword" type="password" minlength="6" autocomplete="current-password" placeholder="Şifren" class="w-full mb-3 px-3 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
+
 <div class="flex flex-wrap gap-2"><button type="button" onclick="registerPlayer()" id="registerBtn" class="px-4 py-2.5 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black">Üye ol</button><button type="button" onclick="loginPlayer()" id="memberLoginBtn" class="px-4 py-2.5 rounded-lg bg-slate-700 text-white text-xs font-bold">Giriş yap</button></div>
+
 <p id="accountMessage" class="text-xs mt-3 text-amber-300"></p>
+
 </div>
+
 <div id="accountLoggedIn" class="hidden space-y-3">
+
 <div class="flex flex-wrap items-center justify-between gap-2">
+
 <div><p class="text-xs text-emerald-300 font-bold">Hesabınla giriş yaptın</p><p id="accountIdentity" class="text-sm font-bold text-white"></p></div>
+
 <button type="button" onclick="logoutPlayer()" class="px-3 py-2 rounded-lg bg-slate-700 text-white text-xs font-bold">Çıkış</button>
+
 </div>
+
 <div class="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
+
 <div><p class="text-xs font-bold text-slate-200">Maç Saati Bildirimleri</p><p id="notifStatusText" class="text-[11px] text-slate-400">İzin durumu kontrol ediliyor…</p></div>
+
 <div class="flex gap-2">
+
 <button type="button" onclick="requestNotificationPermission()" id="notifBtn" class="px-3 py-2 rounded-lg bg-emerald-600 text-white text-xs font-bold">🔔 Bildirimi Aç</button>
+
 <button type="button" onclick="sendLocalTestNotification()" id="testNotifBtn" class="px-3 py-2 rounded-lg bg-slate-700 text-slate-200 text-xs font-bold">🧪 Test Et</button>
+
 </div>
+
 </div>
+
 </div>
+
 </div>
+
 <div id="homeChatPanel" class="glass-card rounded-2xl p-4 sm:p-5">
-  <div class="flex items-center justify-between gap-2 mb-3">
-    <div>
-      <h3 class="text-sm font-black text-white">💬 KadroKur Canlı Sohbet</h3>
-      <p class="text-[11px] text-slate-400">Üyelerle anlık mesajlaş</p>
-    </div>
-    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> CANLI</span>
-  </div>
-  <div id="homeChatMessages" aria-live="polite" class="h-64 overflow-y-auto rounded-xl bg-slate-950/80 border border-slate-700 p-3 space-y-2">
-    <p class="text-xs text-slate-400">Sohbet yükleniyor…</p>
-  </div>
-  <div id="homeChatLoggedOut" class="mt-3 rounded-lg border border-amber-500/25 bg-amber-950/30 p-3 text-xs text-amber-200">
-    Canlı sohbeti görmek ve mesaj yazmak için önce üye girişi yap.
-  </div>
-  <form id="homeChatForm" onsubmit="sendGeneralChatMessage(event)" class="hidden mt-3 space-y-2">
-    <textarea id="homeChatInput" rows="2" maxlength="300" placeholder="Mesajını yaz… (en fazla 300 karakter)" class="w-full resize-y px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white placeholder:text-slate-500"></textarea>
-    <div class="flex items-center justify-between gap-2">
-      <span class="text-[10px] text-slate-500">Saygılı ve maç odaklı sohbet edelim ⚽</span>
-      <button id="homeChatSendBtn" type="submit" class="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black">Gönder</button>
-    </div>
-  </form>
+
+<div class="flex items-center justify-between gap-2 mb-3">
+
+<div>
+
+<h3 class="text-sm font-black text-white">💬 KadroKur Canlı Sohbet</h3>
+
+<p class="text-[11px] text-slate-400">Üyelerle anlık mesajlaş</p>
+
 </div>
+
+<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> CANLI</span>
+
 </div>
+
+<div id="homeChatMessages" aria-live="polite" class="h-64 overflow-y-auto rounded-xl bg-slate-950/80 border border-slate-700 p-3 space-y-2">
+
+<p class="text-xs text-slate-400">Sohbet yükleniyor…</p>
+
 </div>
+
+<div id="homeChatLoggedOut" class="mt-3 rounded-lg border border-amber-500/25 bg-amber-950/30 p-3 text-xs text-amber-200">
+
+Canlı sohbeti görmek ve mesaj yazmak için önce üye girişi yap.
+
+</div>
+
+<form id="homeChatForm" onsubmit="sendGeneralChatMessage(event)" class="hidden mt-3 space-y-2">
+
+<textarea id="homeChatInput" rows="2" maxlength="300" placeholder="Mesajını yaz… (en fazla 300 karakter)" class="w-full resize-y px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white placeholder:text-slate-500"></textarea>
+
+<div class="flex items-center justify-between gap-2">
+
+<span class="text-[10px] text-slate-500">Saygılı ve maç odaklı sohbet edelim ⚽</span>
+
+<button id="homeChatSendBtn" type="submit" class="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black">Gönder</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
 </section>
+
+
 
 <main id="roomView" class="hidden max-w-6xl w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
 <section class="lg:col-span-7 flex flex-col gap-4">
+
 <div class="glass-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+
 <div><h2 id="roomTitleHeading" class="text-lg font-black text-white">Maç Odası</h2><p id="roomMetaText" class="text-xs text-slate-400 mt-0.5"></p><p id="roomCountdown" class="text-xs font-black text-amber-300 mt-2"></p></div>
+
 <div class="flex flex-wrap gap-2">
+
 <button type="button" onclick="copyRoomLink()" class="px-3 py-2 rounded-xl bg-slate-800 text-emerald-300 text-xs font-bold">🔗 Oda Linki</button>
+
 <button type="button" onclick="copyRoomWhatsAppInvite()" class="px-3 py-2 rounded-xl bg-green-600 text-white text-xs font-bold">📲 Gruba Davet Kopyala</button>
+
 </div>
+
 </div>
+
 <div id="roomTeamsDisplay" class="glass-card rounded-2xl p-4 hidden">
-  <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-    <div id="roomHomeTeamDisplay" class="min-w-0 text-center"></div>
-    <div class="text-sm font-black text-slate-500">VS</div>
-    <div id="roomAwayTeamDisplay" class="min-w-0 text-center"></div>
-  </div>
+
+<div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+
+<div id="roomHomeTeamDisplay" class="min-w-0 text-center"></div>
+
+<div class="text-sm font-black text-slate-500">VS</div>
+
+<div id="roomAwayTeamDisplay" class="min-w-0 text-center"></div>
+
 </div>
+
+</div>
+
+
 
 <section class="glass-card rounded-2xl p-4 space-y-4" id="tournamentPanel">
-  <div class="flex flex-wrap items-center justify-between gap-2"><div><h3 class="text-base font-black text-amber-300">🏆 Turnuva Merkezi</h3><p class="text-[11px] text-slate-400">Fikstür, maç sonuçları ve otomatik puan tablosu</p></div><span class="text-[10px] font-bold rounded-full bg-amber-500/15 text-amber-300 px-2 py-1">3 / 1 / 0 PUAN</span></div>
-  <div id="tournamentAdminTools" class="hidden rounded-xl bg-slate-900/80 border border-slate-700 p-3 space-y-2">
-    <p class="text-xs font-bold text-emerald-300">Yönetici • Yeni turnuva maçı ekle</p>
-    <form id="fixtureForm" onsubmit="addTournamentFixture(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-      <input id="fixtureHome" required maxlength="35" placeholder="1. Takım adı" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
-      <input id="fixtureAway" required maxlength="35" placeholder="2. Takım adı" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
-      <input id="fixtureDate" type="date" required class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
-      <input id="fixtureTime" type="time" value="20:00" required class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
-      <button class="sm:col-span-2 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black" type="submit">＋ Fikstüre Maç Ekle</button>
-    </form>
-  </div>
-  <div id="tournamentSummary" class="grid grid-cols-2 sm:grid-cols-3 gap-2"><div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3"><div class="text-[10px] text-slate-400">Turnuva</div><div class="text-lg font-black text-amber-300">Lig Usulü</div></div><div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3"><div class="text-[10px] text-slate-400">Oynanan Maç</div><div id="tournamentPlayedCount" class="text-lg font-black text-emerald-300">0</div></div><div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3 col-span-2 sm:col-span-1"><div class="text-[10px] text-slate-400">Toplam Fikstür</div><div id="tournamentFixtureCount" class="text-lg font-black text-sky-300">0</div></div></div>
-  <div><h4 class="text-xs font-black text-slate-200 mb-2">📅 Turnuva Fikstürü ve Maç Sonuçları</h4><div id="tournamentFixtures" class="space-y-2"><p class="text-xs text-slate-500">Fikstür yükleniyor…</p></div></div>
-  <div><h4 class="text-xs font-black text-slate-200 mb-2">📊 Puan Durumu</h4><div id="tournamentStandings" class="overflow-x-auto"><p class="text-xs text-slate-500">Henüz sonuç girilmedi.</p></div></div>
+
+<div class="flex flex-wrap items-center justify-between gap-2"><div><h3 class="text-base font-black text-amber-300">🏆 Turnuva Merkezi</h3><p class="text-[11px] text-slate-400">Fikstür, maç sonuçları ve otomatik puan tablosu</p></div><span class="text-[10px] font-bold rounded-full bg-amber-500/15 text-amber-300 px-2 py-1">3 / 1 / 0 PUAN</span></div>
+
+<div id="tournamentAdminTools" class="hidden rounded-xl bg-slate-900/80 border border-slate-700 p-3 space-y-2">
+
+<p class="text-xs font-bold text-emerald-300">Yönetici • Yeni turnuva maçı ekle</p>
+
+<form id="fixtureForm" onsubmit="addTournamentFixture(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+<input id="fixtureHome" required maxlength="35" placeholder="1. Takım adı" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
+
+<input id="fixtureAway" required maxlength="35" placeholder="2. Takım adı" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
+
+<input id="fixtureDate" type="date" required class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
+
+<input id="fixtureTime" type="time" value="20:00" required class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
+
+<button class="sm:col-span-2 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black" type="submit">＋ Fikstüre Maç Ekle</button>
+
+</form>
+
+</div>
+
+<div id="tournamentSummary" class="grid grid-cols-2 sm:grid-cols-3 gap-2"><div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3"><div class="text-[10px] text-slate-400">Turnuva</div><div class="text-lg font-black text-amber-300">Lig Usulü</div></div><div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3"><div class="text-[10px] text-slate-400">Oynanan Maç</div><div id="tournamentPlayedCount" class="text-lg font-black text-emerald-300">0</div></div><div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3 col-span-2 sm:col-span-1"><div class="text-[10px] text-slate-400">Toplam Fikstür</div><div id="tournamentFixtureCount" class="text-lg font-black text-sky-300">0</div></div></div>
+
+<div><h4 class="text-xs font-black text-slate-200 mb-2">📅 Turnuva Fikstürü ve Maç Sonuçları</h4><div id="tournamentFixtures" class="space-y-2"><p class="text-xs text-slate-500">Fikstür yükleniyor…</p></div></div>
+
+<div><h4 class="text-xs font-black text-slate-200 mb-2">📊 Puan Durumu</h4><div id="tournamentStandings" class="overflow-x-auto"><p class="text-xs text-slate-500">Henüz sonuç girilmedi.</p></div></div>
+
 </section>
+
+
 
 <div class="flex flex-wrap items-center justify-between gap-2"><h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">🏟️ Canlı Saha Dizilişi</h2><span class="text-[10px] tracking-widest font-black text-emerald-300">3D TACTICAL PITCH</span></div>
+
 <div class="pitch-stage"><div class="pitch-bg pitch-surface rounded-2xl p-4 sm:p-7 relative">
-  <div class="pitch-top-goal"><span>KALE</span></div>
-  <div class="pitch-team-block pitch-green-block"><div class="pitch-team-heading"><span class="pitch-team-dot green-dot"></span><span>1. TAKIM</span><small>YEŞİL YELEK</small></div><div id="greenTeamPitch" class="pitch-player-rows"></div></div>
-  <div class="pitch-midline"><span class="pitch-center-circle"></span><span class="pitch-mid-label">ORTA SAHA</span></div>
-  <div class="pitch-team-block pitch-red-block"><div class="pitch-team-heading"><span class="pitch-team-dot red-dot"></span><span>2. TAKIM</span><small>KIRMIZI YELEK</small></div><div id="redTeamPitch" class="pitch-player-rows"></div></div>
-  <div class="pitch-bottom-goal"><span>KALE</span></div>
-  <div class="pitch-corner c1"></div><div class="pitch-corner c2"></div><div class="pitch-corner c3"></div><div class="pitch-corner c4"></div>
+
+<div class="pitch-top-goal"><span>KALE</span></div>
+
+<div class="pitch-team-block pitch-green-block"><div class="pitch-team-heading"><span class="pitch-team-dot green-dot"></span><span>1. TAKIM</span><small>YEŞİL YELEK</small></div><div id="greenTeamPitch" class="pitch-player-rows"></div></div>
+
+<div class="pitch-midline"><span class="pitch-center-circle"></span><span class="pitch-mid-label">ORTA SAHA</span></div>
+
+<div class="pitch-team-block pitch-red-block"><div class="pitch-team-heading"><span class="pitch-team-dot red-dot"></span><span>2. TAKIM</span><small>KIRMIZI YELEK</small></div><div id="redTeamPitch" class="pitch-player-rows"></div></div>
+
+<div class="pitch-bottom-goal"><span>KALE</span></div>
+
+<div class="pitch-corner c1"></div><div class="pitch-corner c2"></div><div class="pitch-corner c3"></div><div class="pitch-corner c4"></div>
+
 </div></div>
 
+
+
 <div id="adminBar" class="hidden glass-card rounded-xl p-4"><div class="flex flex-wrap justify-between gap-3 mb-3"><b class="text-xs text-amber-300">🛠️ Oda Yönetici Paneli</b><button type="button" onclick="adminLogout()" class="px-3 py-1.5 rounded bg-slate-700 text-xs">Çıkış yap</button></div>
+
 <div class="mt-3 rounded-xl bg-slate-900/90 border border-slate-700 p-3"><p class="text-xs font-bold text-sky-300 mb-2">🗓️ Maç tarihini / saatini düzenle</p><form onsubmit="updateRoomDateTime(event)" class="grid grid-cols-2 sm:grid-cols-4 gap-2"><input id="editRoomDate" type="date" required aria-label="Maç tarihi" class="min-w-0 px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"><input id="editRoomTime" type="time" required aria-label="Maç başlama saati" class="min-w-0 px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"><input id="editRoomEndTime" type="time" required aria-label="Maç bitiş saati" class="min-w-0 px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"><button type="submit" class="px-3 py-2 rounded-lg bg-sky-600 text-white text-xs font-bold">Kaydet</button></form></div>
+
 <div class="flex flex-wrap gap-2"><button type="button" onclick="resetAllPlayers()" class="px-3 py-1.5 rounded bg-red-700 text-xs">Yeni hafta: kadroyu boşalt</button><button type="button" onclick="refreshAdminApplications()" class="px-3 py-1.5 rounded bg-slate-700 text-xs">↻ Başvuruları yenile</button><button type="button" onclick="deleteCurrentRoom()" class="px-3 py-1.5 rounded bg-rose-900 border border-rose-500/50 text-rose-200 text-xs font-bold">🗑️ Bu Odayı Sil</button></div>
 
+
+
 <div class="mt-4 rounded-xl bg-slate-900/90 border border-slate-700 p-3.5">
+
 <h3 class="text-sm font-bold text-emerald-300 mb-2">📢 Özel Bildirim / Duyuru Gönder</h3>
+
 <form onsubmit="sendCustomAdminNotification(event)" class="space-y-2.5">
+
 <div><label class="block text-[11px] font-bold text-slate-300 mb-1" for="customNotifTitle">Bildirim Başlığı</label><input id="customNotifTitle" maxlength="80" value="⚽ Maç Duyurusu" required class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"></div>
+
 <div><label class="block text-[11px] font-bold text-slate-300 mb-1" for="customNotifBody">Bildirim Mesajı</label><textarea id="customNotifBody" rows="2" maxlength="240" required placeholder="Örn: Bu akşam maç 20:00'de, hareket saati 19:15!" class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"></textarea></div>
+
 <div class="flex items-center justify-between gap-2"><span id="customNotifStatus" class="text-[11px] text-slate-400">İstediğiniz mesajı yazıp gönderebilirsiniz.</span><button id="sendCustomNotifBtn" type="submit" class="px-3.5 py-2 rounded-lg bg-emerald-600 text-white text-xs font-bold">📢 Bildirimi Gönder</button></div>
+
 </form>
+
 </div>
+
+
 
 <h3 class="text-sm font-bold mt-4 mb-2">Bekleyen başvurular</h3><div id="pendingApplications" class="space-y-2 text-sm"></div>
+
 <h3 class="text-sm font-bold mt-5 mb-2">Onaylanan oyuncular / ödeme & kadro yönetimi</h3><div id="approvedApplications" class="space-y-2 text-sm"></div></div>
+
 </section>
 
+
+
 <section class="lg:col-span-5 flex flex-col gap-4"><div class="glass-card rounded-2xl p-5 sm:p-6">
+
 <h2 class="text-xl font-black mb-1">Kadroya Katıl & Yerini Ayırt</h2><p id="joinHintText" class="text-xs text-slate-400 mb-4">Boş mevkiyi seçip başvurunu gönder. Başvuru yapmak için hesabınla giriş yap.</p>
+
 <div id="roomLoginPrompt" class="mb-4 rounded-xl border border-amber-500/30 bg-amber-950/30 p-3 text-xs text-amber-200 hidden">
+
 Kadroya başvurmak için önce <button type="button" onclick="goHome()" class="underline font-bold">Odalar / Giriş</button> ekranından hesabına giriş yapmalısın.
+
 </div>
+
 <form id="joinForm" onsubmit="handleJoin(event)" class="space-y-4 hidden">
+
 <div><label class="block text-xs font-bold text-slate-300 mb-1" for="playerName">Adın / Lakabın</label><input id="playerName" required maxlength="40" autocomplete="name" placeholder="Örn: Cüneyt" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm"></div>
+
 <div class="grid grid-cols-2 gap-3"><div><label class="block text-xs font-bold text-slate-300 mb-1" for="teamSelect">Takım Tercihi</label><select id="teamSelect" onchange="updateSlotDropdown()" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm"><option value="green">🟢 Yeşil Takım</option><option value="red">🔴 Kırmızı Takım</option></select></div>
+
 <div><label class="block text-xs font-bold text-slate-300 mb-1" for="slotSelect">Mevki & Pozisyon</label><select id="slotSelect" onchange="updatePrice()" required class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm"><option value="">Pozisyonlar yükleniyor…</option></select></div></div>
+
 <div class="p-4 rounded-xl bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-between"><div><span class="text-xs text-emerald-300 font-semibold block">Kişi Başı Katılım Ücreti</span><span id="priceFeeSummary" class="text-[11px] text-slate-400">Saha Ücreti: 4200 ₺ • 14 Kişi</span></div><div id="priceDisplay" class="text-2xl font-black text-emerald-400">—</div></div>
+
 <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-700"><div class="flex items-center justify-between mb-1"><span id="ibanOwnerLabel" class="text-[11px] font-bold text-slate-400">ÖDEME IBAN</span><button type="button" onclick="copyIban()" class="text-xs font-bold text-emerald-400">📋 IBAN Kopyala</button></div><p id="roomIbanText" class="text-xs sm:text-sm font-mono select-all">TR53 0006 2000 5950 0006 6773 76</p></div>
+
 <button id="joinSubmit" type="submit" class="w-full py-3.5 rounded-xl bg-emerald-500 text-slate-950 font-black text-sm">📝 Başvurumu Gönder</button><p class="text-[11px] text-slate-500">Başvuru, oda yöneticisi onayı ve ödeme onayından ayrı bir işlemdir.</p></form><div id="formMessage" class="hidden mt-3 rounded-lg p-3 text-xs"></div></div>
+
 <div class="glass-card rounded-2xl p-4 flex items-center justify-between gap-3"><div><h3 class="text-sm font-bold">WhatsApp Grubu İçin</h3><p class="text-xs text-slate-400">Güncel kadroyu kopyala.</p></div><button type="button" onclick="copyWhatsAppRoster()" class="px-4 py-2.5 rounded-xl bg-green-600 text-white text-xs font-bold">📲 Kadroyu Kopyala</button></div></section>
+
 </main>
 
-<div id="createRoomModal" class="hidden fixed inset-0 z-50 bg-black/75 p-4 flex items-center justify-center overflow-y-auto"><div class="glass-card rounded-2xl p-6 w-full max-w-lg my-auto"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-black">➕ Yeni Maç Odası Kur</h2><button type="button" onclick="closeCreateRoomModal()" class="text-xl leading-none">×</button></div><p class="text-xs t
+
+
+<div id="createRoomModal" class="hidden fixed inset-0 z-50 bg-black/75 p-4 flex items-center justify-center overflow-y-auto"><div class="glass-card rounded-2xl p-6 w-full max-w-lg my-auto"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-black">➕ Yeni Maç Odası Kur</h2><button type="button" onclick="closeCreateRoomModal()" class="text-xl leading-none">×</button></div><p class="text-xs t 
