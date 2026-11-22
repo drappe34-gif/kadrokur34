@@ -63,7 +63,7 @@ body{font-family:Inter,sans-serif;background:#090d16;color:#f8fafc}.pitch-bg{bac
 <div>
 <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider bg-emerald-500/15 text-emerald-300 border border-emerald-500/25 mb-2">PRO MAÇ YÖNETİMİ</span>
 <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white">Halı Saha Kadro & Maç Merkezi</h1>
-<p class="text-xs sm:text-sm text-slate-300 mt-1.5">İleri tarihli maç odaları kur, tüm ay ve günlerden tarih seç, kişi başı ücreti otomatik hesapla ve WhatsApp grubunda tek tıkla paylaş.</p>
+<p class="text-xs sm:text-sm text-slate-300 mt-1.5">İleri tarihli maç odaları kur, tüm ay ve günlerden tarih seç, kişi başı ücreti otomatik hesapla ve WhatsApp grubunda tek tıkla linkle paylaş.</p>
 </div>
 <div class="flex flex-wrap gap-2 pt-2">
 <button type="button" onclick="switchMainFlow('create')" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black transition">➕ 2. Maç Odası Oluştur</button>
@@ -231,9 +231,14 @@ body{font-family:Inter,sans-serif;background:#090d16;color:#f8fafc}.pitch-bg{bac
 <div class="flex flex-wrap items-start justify-between gap-3">
 <div><h2 id="roomTitleHeading" class="text-lg sm:text-xl font-black text-white">Maç Odası</h2><p id="roomMetaText" class="text-xs text-slate-400 mt-0.5"></p></div>
 <div class="flex flex-wrap gap-2">
-<button type="button" onclick="copyRoomLink()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs font-bold transition">🔗 Oda Linki</button>
-<button type="button" onclick="copyRoomWhatsAppInvite()" class="px-3 py-2 rounded-xl bg-green-600 hover:bg-green-500 text-white text-xs font-bold transition">📲 Gruba Davet Kopyala</button>
+<button type="button" onclick="copyRoomLink()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs font-bold transition">🔗 Link Kopyala</button>
+<button type="button" onclick="shareCurrentRoomWhatsApp()" class="px-3 py-2 rounded-xl bg-green-600 hover:bg-green-500 text-white text-xs font-black transition">📲 WP Paylaş</button>
 </div>
+</div>
+
+<div class="rounded-xl bg-slate-950/90 border border-slate-800 p-2.5 flex items-center justify-between gap-2">
+<span id="roomDirectLinkText" class="text-[11px] font-mono text-emerald-300 truncate select-all"></span>
+<button type="button" onclick="copyRoomLink()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-bold text-slate-200 shrink-0 transition">Kopyala</button>
 </div>
 
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 border-t border-slate-800/80">
@@ -374,7 +379,7 @@ Kadroya başvurmak için önce <button type="button" onclick="goHome()" class="u
 <div class="p-4 rounded-xl bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-between"><div><span class="text-xs text-emerald-300 font-semibold block">Kişi Başı Katılım Ücreti</span><span id="priceFeeSummary" class="text-[11px] text-slate-400">Saha Ücreti: 4200 ₺ • 14 Kişi</span></div><div id="priceDisplay" class="text-2xl font-black text-emerald-400">—</div></div>
 <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-700"><div class="flex items-center justify-between mb-1"><span id="ibanOwnerLabel" class="text-[11px] font-bold text-slate-400">ÖDEME IBAN</span><button type="button" onclick="copyIban()" class="text-xs font-bold text-emerald-400 hover:text-emerald-300">📋 IBAN Kopyala</button></div><p id="roomIbanText" class="text-xs sm:text-sm font-mono select-all">TR53 0006 2000 5950 0006 6773 76</p></div>
 <button id="joinSubmit" type="submit" class="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm transition">📝 Başvurumu Gönder</button><p class="text-[11px] text-slate-500">Başvuru, oda yöneticisi onayı ve ödeme onayından ayrı bir işlemdir.</p></form><div id="formMessage" class="hidden mt-3 rounded-lg p-3 text-xs"></div></div>
-<div class="glass-card rounded-2xl p-4 flex items-center justify-between gap-3"><div><h3 class="text-sm font-bold">WhatsApp Grubu İçin</h3><p class="text-xs text-slate-400">Tarih, saat, kasa ve güncel kadroyu kopyala.</p></div><button onclick="copyWhatsAppRoster()" class="px-4 py-2.5 rounded-xl bg-green-600 hover:bg-green-500 text-white text-xs font-bold transition">📲 Kadroyu Kopyala</button></div></section>
+<div class="glass-card rounded-2xl p-4 flex items-center justify-between gap-3"><div><h3 class="text-sm font-bold">WhatsApp Grubu İçin</h3><p class="text-xs text-slate-400">Tarih, link, kasa ve güncel kadroyu WP'de paylaş.</p></div><div class="flex gap-2 shrink-0"><button type="button" onclick="copyWhatsAppRoster()" class="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition">📋 Kopyala</button><button type="button" onclick="shareCurrentRoomWhatsApp()" class="px-3.5 py-2.5 rounded-xl bg-green-600 hover:bg-green-500 text-white text-xs font-black transition">📲 WP Paylaş</button></div></div></section>
 </main>
 
 <!-- YENİ ODA KURMA MODALI -->
@@ -914,7 +919,7 @@ const expected=String((info&&info.roomPin)||"").trim();
 if(!expected||entered===expected){if(expected)markRoomUnlocked(roomId,expected);const target=roomId;cancelRoomPinModal();openRoom(target,true);}else{errEl.textContent="Oda şifresi hatalı. Tekrar deneyin.";}}
 
 function detachRoomListeners(){if(roomRosterRef){roomRosterRef.off();roomRosterRef=null;}if(teamTacticsRef){teamTacticsRef.off();teamTacticsRef=null;}teamTactics={green:null,red:null};closeTeamTacticRoom();stopRoomApplicationsListener();roster=makeDefaultRoster();}
-function updateRoomHeader(){const info=currentRoomInfo||{};const cap=getTotalCapacityFromInfo(info);const totalPrice=getPitchPriceFromInfo(info);const perPerson=getPerPersonFeeFromInfo(info);document.getElementById("headerBadge").textContent=info.pitchName||"MAÇ ODASI";document.getElementById("headerSubtitle").textContent=[info.region,info.district,info.schedule,`${cap} Kişi • ${formatTl(perPerson)}/kişi`].filter(Boolean).join(" • ")||"Canlı kadro ve başvuru ekranı";document.getElementById("roomTitleHeading").textContent=info.title||(info.pitchName?info.pitchName+" Maçı":"Maç Odası");const loc=[info.region,info.district,info.pitchName].filter(Boolean).join(" / ");document.getElementById("roomMetaText").textContent=`${loc?loc+" • ":""}${info.schedule||"Saat belirtilmedi"} • Kod: ${currentRoomId}`;document.getElementById("priceFeeSummary").textContent=`Saha Ücreti: ${formatTl(totalPrice)} • ${cap} Kişi`;document.getElementById("statPitchTotal").textContent=formatTl(totalPrice);document.getElementById("statPerPerson").textContent=formatTl(perPerson);document.getElementById("roomIbanText").textContent=info.iban||"TR53 0006 2000 5950 0006 6773 76";document.getElementById("ibanOwnerLabel").textContent="ÖDEME IBAN"+(info.ibanOwner?` (${info.ibanOwner.toUpperCase()})`:"");}
+function updateRoomHeader(){const info=currentRoomInfo||{};const cap=getTotalCapacityFromInfo(info);const totalPrice=getPitchPriceFromInfo(info);const perPerson=getPerPersonFeeFromInfo(info);const shareUrl=getRoomShareUrl(currentRoomId);document.getElementById("headerBadge").textContent=info.pitchName||"MAÇ ODASI";document.getElementById("headerSubtitle").textContent=[info.region,info.district,info.schedule,`${cap} Kişi • ${formatTl(perPerson)}/kişi`].filter(Boolean).join(" • ")||"Canlı kadro ve başvuru ekranı";document.getElementById("roomTitleHeading").textContent=info.title||(info.pitchName?info.pitchName+" Maçı":"Maç Odası");const loc=[info.region,info.district,info.pitchName].filter(Boolean).join(" / ");document.getElementById("roomMetaText").textContent=`${loc?loc+" • ":""}${info.schedule||"Saat belirtilmedi"} • Kod: ${currentRoomId}`;document.getElementById("roomDirectLinkText").textContent=shareUrl;document.getElementById("priceFeeSummary").textContent=`Saha Ücreti: ${formatTl(totalPrice)} • ${cap} Kişi`;document.getElementById("statPitchTotal").textContent=formatTl(totalPrice);document.getElementById("statPerPerson").textContent=formatTl(perPerson);document.getElementById("roomIbanText").textContent=info.iban||"TR53 0006 2000 5950 0006 6773 76";document.getElementById("ibanOwnerLabel").textContent="ÖDEME IBAN"+(info.ibanOwner?` (${info.ibanOwner.toUpperCase()})`:"");}
 
 function renderRoomStats(){
   if(!currentRoomInfo)return;
@@ -929,7 +934,7 @@ function renderRoomsLobby(){const listEl=document.getElementById("roomsList");if
 const entries=Object.entries(rooms).filter(([,room])=>{const info=room.info||{};const hayTitle=(info.title||"").toLowerCase();const hayReg=(info.region||"").toLowerCase();const hayDist=(info.district||"").toLowerCase();const hayPitch=(info.pitchName||"").toLowerCase();
 if(rFilter&&!hayReg.includes(rFilter))return false;if(dFilter&&!hayDist.includes(dFilter))return false;if(pFilter&&!hayPitch.includes(pFilter)&&!hayTitle.includes(pFilter))return false;return true;});
 if(!entries.length){listEl.innerHTML=`<div class="col-span-full glass-card rounded-2xl p-6 text-center"><p class="text-sm font-bold text-slate-300">Filtreye uygun maç odası bulunamadı.</p><p class="text-xs text-slate-400 mt-1">Yeni bir maç odası kurup kendi grubunda paylaşabilirsin.</p></div>`;return;}
-listEl.innerHTML=entries.map(([id,room])=>{const info=room.info||{};const cap=getTotalCapacityFromInfo(info);const perPerson=getPerPersonFeeFromInfo(info);const merged=mergeRoster(room.roster||{},info);const filled=merged.filter(isOccupied).length;const locked=!!String(info.roomPin||"").trim();return `<div class="glass-card rounded-2xl p-4 flex flex-col justify-between gap-3"><div><div class="flex items-center justify-between gap-2 mb-1"><div class="flex items-center gap-1.5 flex-wrap"><span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 text-[10px] font-extrabold">${filled}/${cap} DOLU</span><span class="px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 text-[10px] font-extrabold">${perPerson}₺/KİŞİ</span><span class="px-2 py-0.5 rounded ${locked?"bg-amber-500/20 text-amber-300":"bg-slate-800 text-slate-300"} text-[10px] font-extrabold">${locked?"🔒 Şifreli":"🔓 Açık"}</span></div><span class="text-[11px] font-mono text-slate-400">#${esc(id)}</span></div><h3 class="text-base font-black text-white">${esc(info.title||info.pitchName||"Halı Saha Maçı")}</h3><p class="text-xs text-emerald-300 font-semibold mt-0.5">🏟️ ${esc(info.pitchName||"Halı Saha")}</p><p class="text-xs text-slate-400 mt-0.5">📍 ${esc([info.region,info.district].filter(Boolean).join(" / ")||"Bölge belirtilmedi")}</p><p class="text-xs text-slate-400 mt-0.5">📅 ${esc(info.schedule||"Tarih ve saat belirtilmedi")}</p></div><div class="flex gap-2 pt-2 border-t border-slate-800"><button type="button" onclick="openRoom('${esc(id)}')" class="flex-1 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black transition">Odaya Gir</button><button type="button" onclick="copySpecificRoomInvite('${esc(id)}')" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition">Paylaş</button></div></div>`;}).join("");}
+listEl.innerHTML=entries.map(([id,room])=>{const info=room.info||{};const cap=getTotalCapacityFromInfo(info);const perPerson=getPerPersonFeeFromInfo(info);const merged=mergeRoster(room.roster||{},info);const filled=merged.filter(isOccupied).length;const locked=!!String(info.roomPin||"").trim();return `<div class="glass-card rounded-2xl p-4 flex flex-col justify-between gap-3"><div><div class="flex items-center justify-between gap-2 mb-1"><div class="flex items-center gap-1.5 flex-wrap"><span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 text-[10px] font-extrabold">${filled}/${cap} DOLU</span><span class="px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 text-[10px] font-extrabold">${perPerson}₺/KİŞİ</span><span class="px-2 py-0.5 rounded ${locked?"bg-amber-500/20 text-amber-300":"bg-slate-800 text-slate-300"} text-[10px] font-extrabold">${locked?"🔒 Şifreli":"🔓 Açık"}</span></div><span class="text-[11px] font-mono text-slate-400">#${esc(id)}</span></div><h3 class="text-base font-black text-white">${esc(info.title||info.pitchName||"Halı Saha Maçı")}</h3><p class="text-xs text-emerald-300 font-semibold mt-0.5">🏟️ ${esc(info.pitchName||"Halı Saha")}</p><p class="text-xs text-slate-400 mt-0.5">📍 ${esc([info.region,info.district].filter(Boolean).join(" / ")||"Bölge belirtilmedi")}</p><p class="text-xs text-slate-400 mt-0.5">📅 ${esc(info.schedule||"Tarih ve saat belirtilmedi")}</p></div><div class="flex gap-2 pt-2 border-t border-slate-800"><button type="button" onclick="openRoom('${esc(id)}')" class="flex-1 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black transition">Odaya Gir</button><button type="button" onclick="shareRoomWhatsApp('${esc(id)}')" class="px-3.5 py-2 rounded-xl bg-green-600 hover:bg-green-500 text-white text-xs font-black transition">📲 WP Paylaş</button></div></div>`;}).join("");}
 
 function openCreateRoomModal(){if(!currentUser){alert("Yeni maç odası kurmak için önce üye girişi yapın.");return;}restoreCreateFormToModal();if(!document.getElementById("newRoomMatchDate").value)document.getElementById("newRoomMatchDate").value=getTodayIsoDate();syncRoomDayFromDate();syncCreateDistricts("Arnavutköy");populateTimeSlots("20:00 - 21:00");document.getElementById("newRoomPlayerCount").value=String(DEFAULT_PLAYER_COUNT);document.getElementById("newRoomPitchPrice").value=String(DEFAULT_PITCH_PRICE);updateCalculatedPerPersonPreview();document.getElementById("newRoomPin").value="";document.getElementById("createRoomError").textContent="";document.getElementById("createRoomModal").classList.remove("hidden");}
 function closeCreateRoomModal(){document.getElementById("createRoomModal").classList.add("hidden");}
@@ -944,8 +949,59 @@ btn.disabled=true;try{await db.ref("rooms/"+roomId).set({info:roomInfoPayload,ro
 function joinByRoomCode(){const raw=(document.getElementById("directRoomCode").value||"").trim();if(!raw)return;try{if(raw.includes("room=")){const u=new URL(raw);const r=u.searchParams.get("room");if(r)return openRoom(r);}}catch(_){}openRoom(raw.replace(/^#/, ""));}
 function getRoomShareUrl(roomId){const u=new URL(window.location.href);u.searchParams.set("room",roomId);return u.toString();}
 async function copyRoomLink(){if(!currentRoomId)return;const link=getRoomShareUrl(currentRoomId);try{await navigator.clipboard.writeText(link);alert("Oda bağlantısı kopyalandı:\n"+link);}catch(_){alert(link);}}
-async function copySpecificRoomInvite(roomId){const room=rooms[roomId];const info=(room&&room.info)||{};const link=getRoomShareUrl(roomId);const cap=getTotalCapacityFromInfo(info);const perPerson=getPerPersonFeeFromInfo(info);const pinLine=String(info.roomPin||"").trim()?`🔑 Oda Şifresi: ${String(info.roomPin).trim()}`:"";const text=[`⚽ ${info.title||"Halı Saha Maç Odası"}`,`🏟️ Saha: ${info.pitchName||"-"} (${[info.region,info.district].filter(Boolean).join(" / ")})`,`📅 Tarih & Saat: ${info.schedule||"-"} • ${cap} Kişi • ${perPerson}₺/kişi`,pinLine,`🔗 Kadroya Katıl: ${link}`].filter(Boolean).join("\n");try{await navigator.clipboard.writeText(text);alert("WhatsApp davet mesajı kopyalandı!");}catch(_){alert(text);}}
-async function copyRoomWhatsAppInvite(){if(currentRoomId)await copySpecificRoomInvite(currentRoomId);}
+
+function buildRoomInviteText(roomId,info){
+  const link=getRoomShareUrl(roomId);
+  const cap=getTotalCapacityFromInfo(info);
+  const perPerson=getPerPersonFeeFromInfo(info);
+  const pinLine=String(info.roomPin||"").trim()?`🔑 Oda Şifresi: ${String(info.roomPin).trim()}`:"";
+  return [`⚽ ${info.title||"Halı Saha Maç Odası"}`,`🏟️ Saha: ${info.pitchName||"-"} (${[info.region,info.district].filter(Boolean).join(" / ")})`,`📅 Tarih & Saat: ${info.schedule||"-"} • ${cap} Kişi • ${perPerson}₺/kişi`,pinLine,`🔗 Kadro Linki: ${link}`].filter(Boolean).join("\n");
+}
+
+function buildFullRosterShareText(roomId,info,roomRoster){
+  const cap=getTotalCapacityFromInfo(info);
+  const totalPrice=getPitchPriceFromInfo(info);
+  const perPerson=getPerPersonFeeFromInfo(info);
+  const link=getRoomShareUrl(roomId);
+  const lines=[`⚽ ${(info.title||"KADROKUR").toUpperCase()}`,`📅 ${info.pitchName||""} ${info.schedule?"| "+info.schedule:""} | ${cap} Kişi (${perPerson}₺/kişi • Saha: ${totalPrice}₺)`.trim(),""];
+  for(const team of ["green","red"]){
+    lines.push(team==="green"?"🟡🔵 FENERBAHÇE":"🟡🔴 GALATASARAY");
+    for(const s of roomRoster.filter(x=>x.team===team)){
+      lines.push(`${SLOT_LABEL[s.pos]}: ${isOccupied(s)?s.name+(s.paid?" ✅":" ⏳"):"BOŞ ("+getSlotPriceForRoom(info,s.pos)+"₺)"}`);
+    }
+    lines.push("");
+  }
+  lines.push(`🔗 Odaya Katıl: ${link}`);
+  return lines.join("\n");
+}
+
+function openWhatsAppWithText(text){
+  const encoded=encodeURIComponent(text);
+  const waUrl=`https://wa.me/?text=${encoded}`;
+  try{
+    const win=window.open(waUrl,"_blank","noopener,noreferrer");
+    if(!win)window.location.href=waUrl;
+  }catch(_){
+    window.location.href=waUrl;
+  }
+}
+
+function shareRoomWhatsApp(roomId){
+  const room=rooms[roomId]||{};
+  const info=room.info||{};
+  const merged=mergeRoster(room.roster||{},info);
+  const hasPlayers=merged.some(isOccupied);
+  const text=hasPlayers?buildFullRosterShareText(roomId,info,merged):buildRoomInviteText(roomId,info);
+  openWhatsAppWithText(text);
+}
+
+function shareCurrentRoomWhatsApp(){
+  if(!currentRoomId)return;
+  const info=currentRoomInfo||{};
+  const hasPlayers=roster.some(isOccupied);
+  const text=hasPlayers?buildFullRosterShareText(currentRoomId,info,roster):buildRoomInviteText(currentRoomId,info);
+  openWhatsAppWithText(text);
+}
 
 function getDeviceId(){let id=localStorage.getItem("kadrokur_device_id");if(!id){id="dev_"+Math.random().toString(36).slice(2,10)+"_"+Date.now().toString(36);localStorage.setItem("kadrokur_device_id",id);}return id;}
 function updateNotificationUi(){const st=document.getElementById("notifStatusText"),btn=document.getElementById("notifBtn");if(!st||!btn)return;if(!("Notification"in window)){st.textContent="Bu tarayıcı bildirim desteklemiyor.";btn.disabled=true;return;}if(Notification.permission==="granted"){st.textContent="Bildirim izni açık.";btn.textContent="✅ Bildirim Açık";btn.disabled=false;}else if(Notification.permission==="denied"){st.textContent="Bildirim izni engellenmiş.";btn.textContent="🚫 İzin Engelli";btn.disabled=true;}else{st.textContent="Henüz bildirim izni verilmedi.";btn.textContent="🔔 Bildirimi Aç";btn.disabled=false;}}
@@ -992,7 +1048,7 @@ async function removeSlot(id){const s=roster.find(x=>x.id===id);if(!isRoomAdmin|
 async function resetAllPlayers(){if(!isRoomAdmin||!currentRoomId||!confirm("Tüm kadro yuvaları boşaltılsın mı?"))return;try{for(const s of roster)await db.ref(`rooms/${currentRoomId}/roster/${s.id}`).update({name:"",paid:false,status:"empty",applicationId:null,uid:null,email:""});for(const [id,a] of Object.entries(applications))if(a.status==="approved")await db.ref(`rooms/${currentRoomId}/applications/${id}`).update({status:"removed",paid:false});alert("Kadro boşaltıldı.");}catch(e){alert("İşlem başarısız: "+e.message);}}
 
 async function copyIban(){const val=document.getElementById("roomIbanText").textContent;try{await navigator.clipboard.writeText(val);alert("IBAN kopyalandı.");}catch(_){alert(val);}}
-async function copyWhatsAppRoster(){const info=currentRoomInfo||{},cap=getTotalCapacityFromInfo(info),totalPrice=getPitchPriceFromInfo(info),perPerson=getPerPersonFeeFromInfo(info),lines=[`⚽ ${(info.title||"KADROKUR").toUpperCase()}`,`📅 ${info.pitchName||""} ${info.schedule?"| "+info.schedule:""} | ${cap} Kişi (${perPerson}₺/kişi • Saha: ${totalPrice}₺)`.trim(),""];for(const team of ["green","red"]){lines.push(team==="green"?"🟡🔵 FENERBAHÇE":"🟡🔴 GALATASARAY");for(const s of roster.filter(x=>x.team===team)){lines.push(`${SLOT_LABEL[s.pos]}: ${isOccupied(s)?s.name+(s.paid?" ✅":" ⏳"):"BOŞ ("+getSlotPriceForRoom(info,s.pos)+"₺)"}`);}lines.push("");}try{await navigator.clipboard.writeText(lines.join("\n"));alert("Tarih, saat ve kadro kopyalandı!");}catch(_){alert(lines.join("\n"));}}
+async function copyWhatsAppRoster(){if(!currentRoomId)return;const text=buildFullRosterShareText(currentRoomId,currentRoomInfo||{},roster);try{await navigator.clipboard.writeText(text);alert("Kadro ve oda linki kopyalandı!");}catch(_){alert(text);}}
 initFirebase();
 </script>
 </body></html>
