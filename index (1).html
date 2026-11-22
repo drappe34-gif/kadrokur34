@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10b981">
+<link rel="manifest" href="./manifest.json">
+<title>KadroKur | Maç Odaları & Kadro</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+body{font-family:Inter,sans-serif;background:#090d16;color:#f8fafc}.pitch-bg{background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0,rgba(255,255,255,.03) 40px,transparent 40px,transparent 80px),linear-gradient(180deg,#0b2415,#10351f 50%,#0b2415);border:2px solid rgba(74,222,128,.35);box-shadow:0 0 40px rgba(16,185,129,.12)}.glass-card{background:rgba(15,23,42,.84);backdrop-filter:blur(12px);border:1px solid rgba(148,163,184,.18)}button:disabled{opacity:.45;cursor:not-allowed}
+.home-video-backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse at center,#173d2a 0%,#090d16 78%)}
+.home-video-backdrop video{width:100%;height:100%;object-fit:cover;opacity:.48;filter:saturate(1.12) contrast(1.08)}
+.home-video-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,8,16,.78),rgba(3,8,16,.40) 50%,rgba(3,8,16,.78)),linear-gradient(0deg,rgba(3,8,16,.75),transparent 55%,rgba(3,8,16,.35))}
+header,#homeView,#roomView,footer{position:relative;z-index:1}
+body.room-open .home-video-backdrop{display:none}
+#homeChatMessages{scrollbar-width:thin;scrollbar-color:#475569 transparent}
+@media(prefers-reduced-motion:reduce){.home-video-backdrop video{display:none}}
+</style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+<div id="homeVideoBackdrop" class="home-video-backdrop" aria-hidden="true">
+  <video autoplay muted loop playsinline preload="metadata" poster="">
+    <source src="https://res.cloudinary.com/p5kt4ew2/video/upload/hali-saha-4k.mp4" type="video/mp4">
+  </video>
+  <div class="home-video-shade"></div>
+</div>
+<header class="border-b border-slate-800 bg-slate-950/90 sticky top-0 z-30"><div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+<div class="flex items-center gap-3"><button type="button" onclick="goHome()" class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-slate-950 text-lg">KK</button><div><div class="flex items-center gap-2"><button type="button" onclick="goHome()" class="font-black text-lg text-left">Kadro<span class="text-emerald-400">Kur</span></button><span id="headerBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300">MAÇ ODALARI</span></div><p id="headerSubtitle" class="text-xs text-slate-400 mt-1">Bölge, ilçe ve halı saha seç • Kendi maç odanı kurup paylaş</p></div></div>
+<div class="flex items-center gap-2 flex-wrap"><button type="button" onclick="goHome()" id="homeNavBtn" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-emerald-300">🏠 Odalar</button><span id="quotaBadge" class="px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400">Aktif Oda: 0</span><button type="button" onclick="toggleAdminPanel()" id="adminBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-200">🔒 Yönetici Girişi</button></div>
+</div></header>
+
+<section id="homeView" class="max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
+<div class="glass-card rounded-2xl p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+<div><h2 class="text-2xl font-black">Halı Saha Maç Odaları</h2><p class="text-xs sm:text-sm text-slate-400 mt-1">İstanbul Avrupa ve Anadolu yakasına göre oda bul, kendi maç odanı aç ve WhatsApp grubunda paylaş.</p></div>
+<div class="flex flex-wrap gap-2"><button type="button" onclick="openCreateRoomModal()" class="px-4 py-2.5 rounded-xl bg-emerald-500 text-slate-950 text-xs font-black">➕ Yeni Maç Odası Kur</button></div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<div class="lg:col-span-8 space-y-4">
+<div class="glass-card rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+<select id="filterRegion" onchange="syncFilterDistricts();renderRoomsLobby()" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
+<option value="">Tüm Yakalar (Avrupa / Anadolu)</option>
+<option value="İstanbul - Avrupa Yakası">İstanbul - Avrupa Yakası</option>
+<option value="İstanbul - Anadolu Yakası">İstanbul - Anadolu Yakası</option>
+</select>
+<select id="filterDistrict" onchange="renderRoomsLobby()" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
+<option value="">Tüm İlçeler</option>
+</select>
+<input id="filterPitch" oninput="renderRoomsLobby()" placeholder="Halı saha adı ara..." class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
+</div>
+
+<div class="glass-card rounded-2xl p-4 flex flex-col sm:flex-row gap-2">
+<input id="directRoomCode" placeholder="Oda kodu veya linki yapıştır (Örn: bolluca-hali-saha)" class="flex-1 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
+<button type="button" onclick="joinByRoomCode()" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold">Odaya Gir</button>
+</div>
+<p id="lobbyJoinStatus" class="text-xs text-amber-300 px-1"></p>
+
+<div id="roomsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"><p class="text-xs text-slate-400">Odalar yükleniyor…</p></div>
+</div>
+
+<div class="lg:col-span-4 space-y-4">
+<div id="accountPanel" class="rounded-2xl border border-slate-700 glass-card p-4 sm:p-5">
+<div id="accountLoggedOut">
+<p class="text-sm font-bold text-white mb-1">Üye Girişi / Kayıt</p>
+<p class="text-xs text-slate-400 mb-3">Maç odası kurmak ve kadrodan yer seçmek için hesabınla giriş yap.</p>
+<label class="block text-xs text-slate-300 mb-1" for="accountName">Adın / Lakabın</label>
+<input id="accountName" maxlength="40" placeholder="Örn: Cüneyt (yalnızca yeni kayıt için)" class="w-full mb-2 px-3 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
+<label class="block text-xs text-slate-300 mb-1" for="accountEmail">E-posta</label>
+<input id="accountEmail" type="email" autocomplete="email" placeholder="ornek@mail.com" class="w-full mb-2 px-3 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
+<label class="block text-xs text-slate-300 mb-1" for="accountPassword">Şifre (en az 6 karakter)</label>
+<input id="accountPassword" type="password" minlength="6" autocomplete="current-password" placeholder="Şifren" class="w-full mb-3 px-3 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
+<div class="flex flex-wrap gap-2"><button type="button" onclick="registerPlayer()" id="registerBtn" class="px-4 py-2.5 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black">Üye ol</button><button type="button" onclick="loginPlayer()" id="memberLoginBtn" class="px-4 py-2.5 rounded-lg bg-slate-700 text-white text-xs font-bold">Giriş yap</button></div>
+<p id="accountMessage" class="text-xs mt-3 text-amber-300"></p>
+</div>
+<div id="accountLoggedIn" class="hidden space-y-3">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div><p class="text-xs text-emerald-300 font-bold">Hesabınla giriş yaptın</p><p id="accountIdentity" class="text-sm font-bold text-white"></p></div>
+<button type="button" onclick="logoutPlayer()" class="px-3 py-2 rounded-lg bg-slate-700 text-white text-xs font-bold">Çıkış</button>
+</div>
+<div class="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
+<div><p class="text-xs font-bold text-slate-200">Maç Saati Bildirimleri</p><p id="notifStatusText" class="text-[11px] text-slate-400">İzin durumu kontrol ediliyor…</p></div>
+<div class="flex gap-2">
+<button type="button" onclick="requestNotificationPermission()" id="notifBtn" class="px-3 py-2 rounded-lg bg-emerald-600 text-white text-xs font-bold">🔔 Bildirimi Aç</button>
+<button type="button" onclick="sendLocalTestNotification()" id="testNotifBtn" class="px-3 py-2 rounded-lg bg-slate-700 text-slate-200 text-xs font-bold">🧪 Test Et</button>
+</div>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-2xl p-4 sm:p-5">
+  <div class="flex items-center justify-between gap-2 mb-3">
+    <div>
+      <h3 class="text-sm font-black text-white">💬 KadroKur Canlı Sohbet</h3>
+      <p class="text-[11px] text-slate-400">Üyelerle anlık mesajlaş</p>
+    </div>
+    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> CANLI</span>
+  </div>
+  <div id="homeChatMessages" aria-live="polite" class="h-64 overflow-y-auto rounded-xl bg-slate-950/80 border border-slate-700 p-3 space-y-2">
+    <p class="text-xs text-slate-400">Sohbet yükleniyor…</p>
+  </div>
+  <div id="homeChatLoggedOut" class="mt-3 rounded-lg border border-amber-500/25 bg-amber-950/30 p-3 text-xs text-amber-200">
+    Canlı sohbeti görmek ve mesaj yazmak için önce üye girişi yap.
+  </div>
+  <form id="homeChatForm" onsubmit="sendGeneralChatMessage(event)" class="hidden mt-3 space-y-2">
+    <textarea id="homeChatInput" rows="2" maxlength="300" placeholder="Mesajını yaz… (en fazla 300 karakter)" class="w-full resize-y px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white placeholder:text-slate-500"></textarea>
+    <div class="flex items-center justify-between gap-2">
+      <span class="text-[10px] text-slate-500">Saygılı ve maç odaklı sohbet edelim ⚽</span>
+      <button id="homeChatSendBtn" type="submit" class="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black">Gönder</button>
+    </div>
+  </form>
+</div>
+</div>
+</div>
+</section>
+
+<main id="roomView" class="hidden max-w-6xl w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+<section class="lg:col-span-7 flex flex-col gap-4">
+<div class="glass-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+<div><h2 id="roomTitleHeading" class="text-lg font-black text-white">Maç Odası</h2><p id="roomMetaText" class="text-xs text-slate-400 mt-0.5"></p></div>
+<div class="flex flex-wrap gap-2">
+<button type="button" onclick="copyRoomLink()" class="px-3 py-2 rounded-xl bg-slate-800 text-emerald-300 text-xs font-bold">🔗 Oda Linki</button>
+<button type="button" onclick="copyRoomWhatsAppInvite()" class="px-3 py-2 rounded-xl bg-green-600 text-white text-xs font-bold">📲 Gruba Davet Kopyala</button>
+</div>
+</div>
+
+<h2 class="text-sm font-bold uppercase tracking-wider text-slate-300">🏟️ Canlı Saha Dizilişi</h2>
+<div class="pitch-bg rounded-2xl p-4 sm:p-6 relative"><div class="absolute left-0 right-0 top-1/2 border-t border-white/20"></div>
+<div class="mb-6 relative z-10"><div class="text-center mb-3"><span class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-300">🟢 1. TAKIM (YEŞİL YELEK)</span></div><div id="greenTeamPitch" class="space-y-3"></div></div>
+<div class="mt-8 relative z-10"><div id="redTeamPitch" class="space-y-3"></div><div class="text-center mt-3"><span class="px-3 py-1 rounded-full text-xs font-extrabold bg-red-500/20 text-red-300">🔴 2. TAKIM (KIRMIZI YELEK)</span></div></div></div>
+
+<div id="adminBar" class="hidden glass-card rounded-xl p-4"><div class="flex flex-wrap justify-between gap-3 mb-3"><b class="text-xs text-amber-300">🛠️ Oda Yönetici Paneli</b><button type="button" onclick="adminLogout()" class="px-3 py-1.5 rounded bg-slate-700 text-xs">Çıkış yap</button></div>
+<div class="flex flex-wrap gap-2"><button type="button" onclick="resetAllPlayers()" class="px-3 py-1.5 rounded bg-red-700 text-xs">Yeni hafta: kadroyu boşalt</button><button type="button" onclick="refreshAdminApplications()" class="px-3 py-1.5 rounded bg-slate-700 text-xs">↻ Başvuruları yenile</button><button type="button" onclick="deleteCurrentRoom()" class="px-3 py-1.5 rounded bg-rose-900 border border-rose-500/50 text-rose-200 text-xs font-bold">🗑️ Bu Odayı Sil</button></div>
+
+<div class="mt-4 rounded-xl bg-slate-900/90 border border-slate-700 p-3.5">
+<h3 class="text-sm font-bold text-emerald-300 mb-2">📢 Özel Bildirim / Duyuru Gönder</h3>
+<form onsubmit="sendCustomAdminNotification(event)" class="space-y-2.5">
+<div><label class="block text-[11px] font-bold text-slate-300 mb-1" for="customNotifTitle">Bildirim Başlığı</label><input id="customNotifTitle" maxlength="80" value="⚽ Maç Duyurusu" required class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"></div>
+<div><label class="block text-[11px] font-bold text-slate-300 mb-1" for="customNotifBody">Bildirim Mesajı</label><textarea id="customNotifBody" rows="2" maxlength="240" required placeholder="Örn: Bu akşam maç 20:00'de, hareket saati 19:15!" class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"></textarea></div>
+<div class="flex items-center justify-between gap-2"><span id="customNotifStatus" class="text-[11px] text-slate-400">İstediğiniz mesajı yazıp gönderebilirsiniz.</span><button id="sendCustomNotifBtn" type="submit" class="px-3.5 py-2 rounded-lg bg-emerald-600 text-white text-xs font-bold">📢 Bildirimi Gönder</button></div>
+</form>
+</div>
+
+<h3 class="text-sm font-bold mt-4 mb-2">Bekleyen başvurular</h3><div id="pendingApplications" class="space-y-2 text-sm"></div>
+<h3 class="text-sm font-bold mt-5 mb-2">Onaylanan oyuncular / ödeme & kadro yönetimi</h3><div id="approvedApplications" class="space-y-2 text-sm"></div></div>
+</section>
+
+<section class="lg:col-span-5 flex flex-col gap-4"><div class="glass-card rounded-2xl p-5 sm:p-6">
+<h2 class="text-xl font-black mb-1">Kadroya Katıl & Yerini Ayırt</h2><p id="joinHintText" class="text-xs text-slate-400 mb-4">Boş mevkiyi seçip başvurunu gönder. Başvuru yapmak için hesabınla giriş yap.</p>
+<div id="roomLoginPrompt" class="mb-4 rounded-xl border border-amber-500/30 bg-amber-950/30 p-3 text-xs text-amber-200 hidden">
+Kadroya başvurmak için önce <button type="button" onclick="goHome()" class="underline font-bold">Odalar / Giriş</button> ekranından hesabına giriş yapmalısın.
+</div>
+<form id="joinForm" onsubmit="handleJoin(event)" class="space-y-4 hidden">
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="playerName">Adın / Lakabın</label><input id="playerName" required maxlength="40" autocomplete="name" placeholder="Örn: Cüneyt" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm"></div>
+<div class="grid grid-cols-2 gap-3"><div><label class="block text-xs font-bold text-slate-300 mb-1" for="teamSelect">Takım Tercihi</label><select id="teamSelect" onchange="updateSlotDropdown()" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm"><option value="green">🟢 Yeşil Takım</option><option value="red">🔴 Kırmızı Takım</option></select></div>
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="slotSelect">Mevki & Pozisyon</label><select id="slotSelect" onchange="updatePrice()" required class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm"><option value="">Pozisyonlar yükleniyor…</option></select></div></div>
+<div class="p-4 rounded-xl bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-between"><div><span class="text-xs text-emerald-300 font-semibold block">Kişi Başı Katılım Ücreti</span><span id="priceFeeSummary" class="text-[11px] text-slate-400">Saha Ücreti: 4200 ₺ • 14 Kişi</span></div><div id="priceDisplay" class="text-2xl font-black text-emerald-400">—</div></div>
+<div class="p-3.5 rounded-xl bg-slate-900 border border-slate-700"><div class="flex items-center justify-between mb-1"><span id="ibanOwnerLabel" class="text-[11px] font-bold text-slate-400">ÖDEME IBAN</span><button type="button" onclick="copyIban()" class="text-xs font-bold text-emerald-400">📋 IBAN Kopyala</button></div><p id="roomIbanText" class="text-xs sm:text-sm font-mono select-all">TR53 0006 2000 5950 0006 6773 76</p></div>
+<button id="joinSubmit" type="submit" class="w-full py-3.5 rounded-xl bg-emerald-500 text-slate-950 font-black text-sm">📝 Başvurumu Gönder</button><p class="text-[11px] text-slate-500">Başvuru, oda yöneticisi onayı ve ödeme onayından ayrı bir işlemdir.</p></form><div id="formMessage" class="hidden mt-3 rounded-lg p-3 text-xs"></div></div>
+<div class="glass-card rounded-2xl p-4 flex items-center justify-between gap-3"><div><h3 class="text-sm font-bold">WhatsApp Grubu İçin</h3><p class="text-xs text-slate-400">Güncel kadroyu kopyala.</p></div><button type="button" onclick="copyWhatsAppRoster()" class="px-4 py-2.5 rounded-xl bg-green-600 text-white text-xs font-bold">📲 Kadroyu Kopyala</button></div></section>
+</main>
+
+<div id="createRoomModal" class="hidden fixed inset-0 z-50 bg-black/75 p-4 flex items-center justify-center overflow-y-auto"><div class="glass-card rounded-2xl p-6 w-full max-w-lg my-auto"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-black">➕ Yeni Maç Odası Kur</h2><button type="button" onclick="closeCreateRoomModal()" class="text-xl leading-none">×</button></div><p class="text-xs text-slate-400 mb-4">Bölge/yaka, ilçe, halı saha, gün, saat, kişi sayısı ve toplam saha ücretini belirle. Kişi başı ücret otomatik hesaplanır.</p><form onsubmit="createRoom(event)" class="space-y-3">
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomTitle">Oda / Maç Başlığı</label><input id="newRoomTitle" required maxlength="60" placeholder="Örn: Cuma Akşamı Halı Saha" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomRegion">Bölge / İl</label><select id="newRoomRegion" onchange="syncCreateDistricts()" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white">
+<option value="İstanbul - Avrupa Yakası">İstanbul - Avrupa Yakası</option>
+<option value="İstanbul - Anadolu Yakası">İstanbul - Anadolu Yakası</option>
+</select></div>
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomDistrict">İlçe</label><select id="newRoomDistrict" onchange="syncCreatePitches()" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></select></div>
+</div>
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomPitchSelect">Halı Saha İsmi</label><select id="newRoomPitchSelect" onchange="toggleCustomPitchInput()" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></select>
+<input id="newRoomPitchCustom" maxlength="60" placeholder="Halı saha adını yazın..." class="hidden mt-2 w-full px-3 py-2 rounded-xl bg-slate-950 border border-emerald-500/50 text-sm text-white"></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomDay">Maç Günü</label><select id="newRoomDay" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white">
+<option value="Pazartesi">Pazartesi</option>
+<option value="Salı">Salı</option>
+<option value="Çarşamba">Çarşamba</option>
+<option value="Perşembe">Perşembe</option>
+<option value="Cuma" selected>Cuma</option>
+<option value="Cumartesi">Cumartesi</option>
+<option value="Pazar">Pazar</option>
+</select></div>
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomTimeSlot">Saat Aralığı</label><select id="newRoomTimeSlot" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></select></div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomPlayerCount">Kaç Kişi (Toplam Kadro)</label><select id="newRoomPlayerCount" onchange="updateCalculatedPerPersonPreview()" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white">
+<option value="10">10 Kişi (5v5)</option>
+<option value="12">12 Kişi (6v6)</option>
+<option value="14" selected>14 Kişi (7v7)</option>
+<option value="16">16 Kişi (8v8)</option>
+</select></div>
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomPitchPrice">Halı Saha Ücreti (₺)</label><input id="newRoomPitchPrice" type="number" min="0" max="200000" step="1" value="4200" oninput="updateCalculatedPerPersonPreview()" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></div>
+</div>
+<div class="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-between">
+<span class="text-xs font-bold text-emerald-300">Otomatik Kişi Başı Ücret</span>
+<span id="calculatedPerPersonText" class="text-base font-black text-emerald-400">300 ₺ / kişi</span>
+</div>
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomPin">Oda Şifresi (İsteğe Bağlı)</label><input id="newRoomPin" type="text" maxlength="20" placeholder="Boş bırakılırsa herkes girebilir • Örn: 1905 veya sahabiler" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomIbanOwner">IBAN Sahibi</label><input id="newRoomIbanOwner" maxlength="50" placeholder="Örn: Ahmet Yılmaz" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></div>
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomIban">Ödeme IBAN</label><input id="newRoomIban" maxlength="40" placeholder="TR..." class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></div>
+</div>
+<p id="createRoomError" class="text-xs text-red-300"></p>
+<div class="flex justify-end gap-2 pt-2"><button type="button" onclick="closeCreateRoomModal()" class="px-4 py-2 rounded-lg bg-slate-700 text-xs font-bold">İptal</button><button id="createRoomSubmit" type="submit" class="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black">Odayı Oluştur</button></div>
+</form></div></div>
+
+<div id="roomPinModal" class="hidden fixed inset-0 z-50 bg-black/80 p-4 flex items-center justify-center"><div class="glass-card rounded-2xl p-6 w-full max-w-sm"><div class="flex justify-between items-center mb-2"><h2 class="text-lg font-black">🔒 Şifreli Maç Odası</h2><button type="button" onclick="cancelRoomPinModal()" class="text-xl leading-none">×</button></div><p id="roomPinDesc" class="text-xs text-slate-400 mb-4">Bu odaya girmek için oda şifresini girin.</p><form onsubmit="verifyRoomPin(event)" class="space-y-3"><input id="roomPinInput" type="password" required maxlength="20" placeholder="Oda şifresi" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"><p id="roomPinError" class="text-xs text-red-300"></p><div class="flex justify-end gap-2"><button type="button" onclick="cancelRoomPinModal()" class="px-4 py-2 rounded-lg bg-slate-700 text-xs font-bold">Vazgeç</button><button type="submit" class="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black">Giriş Yap</button></div></form></div></div>
+
+<div id="movePlayerModal" class="hidden fixed inset-0 z-50 bg-black/75 p-4 flex items-center justify-center"><div class="glass-card rounded-2xl p-6 w-full max-w-md"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-black">🔄 Yer / Takım Değiştir</h2><button type="button" onclick="closeMoveModal()" class="text-xl leading-none">×</button></div><p id="movePlayerInfo" class="text-xs text-slate-300 mb-4"></p><form onsubmit="confirmMovePlayer(event)" class="space-y-4"><div><label class="block text-xs font-bold text-slate-300 mb-1" for="moveTargetSlot">Yeni Kadro / Mevki</label><select id="moveTargetSlot" required class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm"></select></div><p id="moveError" class="text-xs text-red-300"></p><div class="flex justify-end gap-2"><button type="button" onclick="closeMoveModal()" class="px-4 py-2 rounded-lg bg-slate-700 text-xs font-bold">İptal</button><button id="moveSubmitBtn" type="submit" class="px-4 py-2 rounded-lg bg-amber-500 text-slate-950 text-xs font-black">Taşımayı Onayla</button></div></form></div></div>
+
+<div id="adminLoginModal" class="hidden fixed inset-0 z-50 bg-black/75 p-4 flex items-center justify-center"><div class="glass-card rounded-2xl p-6 w-full max-w-sm"><div class="flex justify-between mb-4"><h2 class="text-lg font-black">Yönetici Girişi</h2><button type="button" onclick="closeAdminLogin()" class="text-xl">×</button></div><form onsubmit="adminLogin(event)" class="space-y-3"><input id="adminEmail" type="email" required placeholder="Yönetici e-posta" class="w-full px-3 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white"><input id="adminPassword" type="password" required placeholder="Şifre" class="w-full px-3 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white"><button id="adminLoginSubmit" type="submit" class="w-full py-2.5 rounded-lg bg-emerald-500 text-slate-950 font-bold text-sm">Giriş yap</button><p id="loginError" class="text-xs text-red-300"></p></form></div></div>
+<footer class="text-center py-4 text-xs text-slate-500 border-t border-slate-900">KadroKur • Çoklu Maç Odası & Kadro Yönetim Platformu</footer>
+<script>
+const firebaseConfig={apiKey:"AIzaSyDI5PGiOBZWEMMz6HSU-6-AYXFCWNW7POc",authDomain:"kadrokur34-b4115.firebaseapp.com",databaseURL:"https://kadrokur34-b4115-default-rtdb.europe-west1.firebasedatabase.app",projectId:"kadrokur34-b4115",storageBucket:"kadrokur34-b4115.firebasestorage.app",messagingSenderId:"846977382574",appId:"1:846977382574:web:d4c1f5811ebfbf20ddd53f"};
+const ADMIN_UIDS=["Q83RJGZIUdOh2uDhF1HfdJFt3sQ2","5WlVfp3r3pfSnfFMR9GZKCzxeih1"];
+const DEFAULT_PITCH_PRICE=4200, DEFAULT_PLAYER_COUNT=14;
+const SLOT_ORDER=["GK","DEF","MID","FWD"], SLOT_LABEL={GK:"Kaleci",DEF:"Defans",MID:"Orta Saha",FWD:"Forvet"};
+const TEAM_FORMATIONS={
+  10:[["GK",1],["DEF",2],["MID",1],["FWD",1]],
+  12:[["GK",1],["DEF",2],["MID",2],["FWD",1]],
+  14:[["GK",1],["DEF",2],["MID",3],["FWD",1]],
+  16:[["GK",1],["DEF",3],["MID",2],["FWD",2]]
+};
+const DAY_INDEX_MAP={"Pazar":0,"Pazartesi":1,"Salı":2,"Çarşamba":3,"Perşembe":4,"Cuma":5,"Cumartesi":6};
+
+const ISTANBUL_LOCATIONS={
+  "İstanbul - Avrupa Yakası":{
+    "Arnavutköy":["Bolluca Halı Saha","Tellioğlu Halı Saha","Baklalı Parkı Halı Sahası","Hadımköy Sosyal Tesis Halı Sahası","Yeniköy Parkı Halı Sahası","Dursunköy Parkı Halı Sahası","Karaburun Parkı Halı Sahası"],
+    "Avcılar":["Avcılar Sahil Halı Saha","Cihangir Spor Tesisi","Firuzköy Halı Saha"],
+    "Bağcılar":["Ayar Halı Saha","Tunçbilek Halı Saha","Üçler Halı Saha","Euro Futbol Halı Saha"],
+    "Bahçelievler":["Bahçelievler Merkez Halı Saha","Şirinevler Spor Tesisi","Soğanlı Halı Saha"],
+    "Bakırköy":["Bakırköy Sahil Halı Saha","Ataköy Spor Tesisi","Yeşilköy Halı Saha"],
+    "Başakşehir":["Euro Futbol Halı Saha","Ergün Pembe Halı Sahaları","Ekol Halı Saha","Özcan Halı Saha","Başakşehir Halı Saha"],
+    "Bayrampaşa":["Bayrampaşa Merkez Halı Saha","Yıldırım Halı Saha"],
+    "Beşiktaş":["Beşiktaş Akat Halı Saha","Etiler Spor Tesisi","Ortaköy Sahil Halı Saha"],
+    "Beylikdüzü":["Beylikdüzü Merkez Halı Saha","Gürpınar Spor Tesisi"],
+    "Beyoğlu":["Beyoğlu Hasköy Halı Saha","Karaköy Spor Tesisi"],
+    "Büyükçekmece":["Büyükçekmece Sahil Halı Saha","Mimaroba Halı Saha"],
+    "Çatalca":["Atatürk Spor Kompleksi","Arena Halı Saha","Merkez Arena","Binkılıç Futbol Halı Saha","Çatalca Merkez Halı Saha"],
+    "Esenler":["Esenler Merkez Halı Saha","Atışalanı Halı Saha"],
+    "Esenyurt":["Esenyurt Merkez Halı Saha","İncirtepe Halı Saha"],
+    "Eyüpsultan":["Eyüpsultan Merkez Halı Saha","Göktürk Spor Tesisi","Alibeyköy Halı Saha"],
+    "Fatih":["Fatih Fındıkzade Halı Saha","Çapa Spor Tesisi"],
+    "Gaziosmanpaşa":["Gaziosmanpaşa Merkez Halı Saha","Küçükköy Halı Saha"],
+    "Kağıthane":["Kağıthane Merkez Halı Saha","Seyrantepe Spor Tesisi","Gültepe Halı Saha"],
+    "Küçükçekmece":["Küçükçekmece Cennet Halı Saha","Sefaköy Spor Tesisi","Halkalı Halı Saha"],
+    "Sarıyer":["Sarıyer Merkez Halı Saha","Maslak Spor Tesisi","Tarabya Halı Saha"],
+    "Silivri":["Silivri Sahil Halı Saha","Selimpaşa Halı Saha"],
+    "Şişli":["Şişli Mecidiyeköy Halı Saha","Bomonti Spor Tesisi","Feriköy Halı Saha"],
+    "Zeytinburnu":["Zeytinburnu Merkez Halı Saha","Veliefendi Spor Tesisi"]
+  },
+  "İstanbul - Anadolu Yakası":{
+    "Adalar":["Büyükada Merkez Halı Saha","Heybeliada Spor Tesisi"],
+    "Ataşehir":["Atapark Halı Saha","Ataşehir Doğa Lise Arena","Küçükbakkalköy Spor Tesisi"],
+    "Beykoz":["Beykoz Kavacık Halı Saha","Paşabahçe Spor Tesisi","Riva Halı Saha"],
+    "Çekmeköy":["Çekmeköy Taşdelen Halı Saha","Alemdağ Spor Tesisi","Madenler Halı Saha"],
+    "Kadıköy":["Kadıköy Fikirtepe Halı Saha","Göztepe Spor Tesisi","Kozyatağı Halı Saha"],
+    "Kartal":["Kartal Sahil Halı Saha","Soğanlık Spor Tesisi","Uğur Mumcu Halı Saha"],
+    "Maltepe":["Maltepe Sahil Halı Saha","Kaan Halı Saha","İdealtepe Spor Tesisi"],
+    "Pendik":["Pendik Sahil Halı Saha","Kurtköy Spor Tesisi","Yenişehir Halı Saha"],
+    "Sancaktepe":["Sancaktepe Samandıra Halı Saha","Sarıgazi Spor Tesisi"],
+    "Sultanbeyli":["Sultanbeyli Merkez Halı Saha","Hasanpaşa Halı Saha"],
+    "Şile":["Şile Merkez Halı Saha","Ağva Spor Tesisi"],
+    "Tuzla":["Tuzla Sahil Halı Saha","İçmeler Spor Tesisi"],
+    "Ümraniye":["Stadyum Halı Saha","Ümraniye Çarşı Halı Saha","Dudullu Spor Tesisi"],
+    "Üsküdar":["Vezir Spor Halı Saha","Ekspres Halı Saha","Ufuk Halı Saha Tesisleri","Galeri 2000 Halı Saha & Otopark","Küçüksu Halı Saha","Şampiyon Halı Saha","Cengiz Halı Saha","Cüneyt Çakır Ünalan Halı Saha","Selimiye Spor Halı Saha","Şahin Spor Halı Saha","Uçar Halı Saha","Unipro Halı Saha","Üsküdar Lisesi Halı Saha"]
+  }
+};
+
+function normalizePlayerCount(val){const n=Number(val);return [10,12,14,16].includes(n)?n:DEFAULT_PLAYER_COUNT;}
+function getTotalCapacityFromInfo(info){return normalizePlayerCount(info&&info.playerCount);}
+function getPitchPriceFromInfo(info){const n=Number(info&&info.pitchPrice);return Number.isFinite(n)&&n>=0?n:DEFAULT_PITCH_PRICE;}
+function getPerPersonFeeFromInfo(info){const cap=getTotalCapacityFromInfo(info);const total=getPitchPriceFromInfo(info);return cap>0?Math.round(total/cap):0;}
+function getSlotPriceForRoom(info,pos){if(info&&info.prices&&Number.isFinite(Number(info.prices[pos]))&&Number(info.prices[pos])>=0){return Number(info.prices[pos]);}return getPerPersonFeeFromInfo(info);}
+
+function updateCalculatedPerPersonPreview(){
+  const capEl=document.getElementById("newRoomPlayerCount");
+  const priceEl=document.getElementById("newRoomPitchPrice");
+  const outEl=document.getElementById("calculatedPerPersonText");
+  if(!capEl||!priceEl||!outEl)return;
+  const cap=normalizePlayerCount(capEl.value);
+  const rawPrice=Number(priceEl.value);
+  const total=Number.isFinite(rawPrice)&&rawPrice>=0?rawPrice:0;
+  const perPerson=cap>0?Math.round(total/cap):0;
+  outEl.textContent=`${perPerson} ₺ / kişi`;
+}
+
+function computeExpireAtMs(matchDay,timeSlot){
+  try{
+    const m=String(timeSlot||"").match(/(\d{1,2}):(\d{2})/);
+    if(!m)return null;
+    const startH=Number(m[1]),startM=Number(m[2]);
+    if(!Number.isFinite(startH)||!Number.isFinite(startM))return null;
+    const targetDay=DAY_INDEX_MAP[matchDay];
+    const now=new Date();
+    const candidate=new Date(now.getFullYear(),now.getMonth(),now.getDate(),startH,startM,0,0);
+    if(typeof targetDay==="number"){
+      const diffDays=(targetDay-now.getDay()+7)%7;
+      candidate.setDate(candidate.getDate()+diffDays);
+      if(diffDays===0&&candidate.getTime()+30*60*1000<=now.getTime()){
+        candidate.setDate(candidate.getDate()+7);
+      }
+    }
+    return candidate.getTime()+30*60*1000;
+  }catch(_){return null;}
+}
+
+function populateTimeSlots(defaultSlot="20:00 - 21:00"){const sel=document.getElementById("newRoomTimeSlot");if(!sel)return;const pad=n=>String(n).padStart(2,"0");const slots=[];for(let mins=0;mins<24*60;mins+=30){const sH=Math.floor(mins/60),sM=mins%60;const eMins=mins+60,eH=Math.floor(eMins/60)%24,eM=eMins%60;slots.push(`${pad(sH)}:${pad(sM)} - ${pad(eH)}:${pad(eM)}`);}sel.innerHTML=slots.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join("");if(slots.includes(defaultSlot))sel.value=defaultSlot;}
+function makeDefaultRoster(info=null){const cap=getTotalCapacityFromInfo(info);const form=TEAM_FORMATIONS[cap]||TEAM_FORMATIONS[DEFAULT_PLAYER_COUNT];const a=[];for(const team of ["green","red"]){const p=team==="green"?"g":"r";let idx=0;form.forEach(([pos,count])=>{for(let n=1;n<=count;n++){idx+=1;const id=p+idx;a.push({id,team,pos,label:SLOT_LABEL[pos],name:"",paid:false,status:"empty",applicationId:null});}});}return a;}
+function makeDefaultRosterMap(info=null){const m={};for(const s of makeDefaultRoster(info))m[s.id]={name:"",paid:false,status:"empty",applicationId:null};return m;}
+
+let app,auth,db,rooms={},currentRoomId=null,currentRoomInfo=null,roster=makeDefaultRoster(),applications={},isAdmin=false,isRoomAdmin=false,currentUser=null,movingContext=null,broadcastListener=null,initialBroadcastSeen=false,roomRosterRef=null,roomAppsRef=null,pendingPinRoomId=null,expiryTimer=null,generalChatRef=null;
+
+function extractRoomIdFromInput(rawInput){
+  const str=String(rawInput||"").trim();
+  if(!str)return "";
+  try{
+    if(str.includes("room=")){
+      const part=str.split("room=")[1].split(/[&#?]/)[0];
+      if(part)return decodeURIComponent(part).trim().replace(/[.$#[\]]/g,"");
+    }
+  }catch(_){}
+  return str.replace(/^#/, "").replace(/\/+$/, "").split("/").pop().trim().replace(/[.$#[\]]/g,"");
+}
+
+function getInitialRoomFromLocation(){
+  try{
+    const params=new URLSearchParams(window.location.search);
+    const qRoom=params.get("room");
+    if(qRoom&&qRoom.trim())return qRoom.trim();
+    const hm=String(window.location.hash||"").match(/room=([^&]+)/i);
+    if(hm&&hm[1])return decodeURIComponent(hm[1]).trim();
+    const hrefMatch=String(window.location.href||"").match(/[?&]room=([^&#]+)/i);
+    if(hrefMatch&&hrefMatch[1])return decodeURIComponent(hrefMatch[1]).trim();
+  }catch(_){}
+  return "";
+}
+
+function getUnlockedRooms(){try{return JSON.parse(sessionStorage.getItem("kadrokur_unlocked_rooms")||"{}");}catch(_){return {};}}
+function markRoomUnlocked(roomId,pin){try{const map=getUnlockedRooms();map[roomId]=String(pin);sessionStorage.setItem("kadrokur_unlocked_rooms",JSON.stringify(map));}catch(_){}}
+function hasRoomPinAccess(roomId,info){const requiredPin=String((info&&info.roomPin)??"").trim();if(!requiredPin)return true;if(currentUser&&(ADMIN_UIDS.includes(currentUser.uid)||(info&&info.ownerUid===currentUser.uid)))return true;const unlocked=getUnlockedRooms();return String(unlocked[roomId]??"")===requiredPin;}
+
+function syncFilterDistricts(){const reg=document.getElementById("filterRegion").value,distSel=document.getElementById("filterDistrict"),prev=distSel.value;const districts=reg&&ISTANBUL_LOCATIONS[reg]?Object.keys(ISTANBUL_LOCATIONS[reg]):[...new Set([...Object.keys(ISTANBUL_LOCATIONS["İstanbul - Avrupa Yakası"]),...Object.keys(ISTANBUL_LOCATIONS["İstanbul - Anadolu Yakası"])])].sort((a,b)=>a.localeCompare(b,"tr"));distSel.innerHTML='<option value="">Tüm İlçeler</option>'+districts.map(d=>`<option value="${esc(d)}">${esc(d)}</option>`).join("");if(districts.includes(prev))distSel.value=prev;}
+function syncCreateDistricts(preferredDistrict="Arnavutköy"){const reg=document.getElementById("newRoomRegion").value,distSel=document.getElementById("newRoomDistrict");const districts=Object.keys(ISTANBUL_LOCATIONS[reg]||{});distSel.innerHTML=districts.map(d=>`<option value="${esc(d)}">${esc(d)}</option>`).join("");if(preferredDistrict&&districts.includes(preferredDistrict))distSel.value=preferredDistrict;syncCreatePitches();}
+function syncCreatePitches(){const reg=document.getElementById("newRoomRegion").value,dist=document.getElementById("newRoomDistrict").value,pitchSel=document.getElementById("newRoomPitchSelect");const pitches=(ISTANBUL_LOCATIONS[reg]&&ISTANBUL_LOCATIONS[reg][dist])||[];pitchSel.innerHTML=pitches.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join("")+'<option value="__CUSTOM__">✍️ Diğer (Halı saha adını kendim yazacağım)</option>';toggleCustomPitchInput();}
+function toggleCustomPitchInput(){const pitchSel=document.getElementById("newRoomPitchSelect"),customInp=document.getElementById("newRoomPitchCustom");const isCustom=pitchSel.value==="__CUSTOM__";customInp.classList.toggle("hidden",!isCustom);customInp.required=isCustom;if(isCustom)customInp.focus();}
+
+function showMessage(m,ok=true){const b=document.getElementById("formMessage");b.textContent=m;b.className="mt-3 rounded-lg p-3 text-xs "+(ok?"bg-emerald-950 text-emerald-300 border border-emerald-700":"bg-red-950 text-red-300 border border-red-700");}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function isOccupied(s){return !!(s&&s.name&&s.status!=="empty");}
+function mergeRoster(data,info=null){const base=makeDefaultRoster(info);return base.map(d=>{const v=data&&data[d.id]&&typeof data[d.id]==="object"?data[d.id]:{};const name=typeof v.name==="string"?v.name:"";const status=name?(v.status&&v.status!=="empty"?v.status:"approved"):"empty";return {...d,...v,id:d.id,team:d.team,pos:d.pos,label:d.label,name,status,paid:name?v.paid===true:false,applicationId:name?(v.applicationId||null):null};});}
+function computeRoomAdmin(){isRoomAdmin=!!currentUser&&(ADMIN_UIDS.includes(currentUser.uid)||(!!currentRoomInfo&&currentRoomInfo.ownerUid===currentUser.uid));document.getElementById("adminBar").classList.toggle("hidden",!isRoomAdmin);if(!isRoomAdmin)closeMoveModal();if(isRoomAdmin&&currentRoomId)startRoomApplicationsListener();else stopRoomApplicationsListener();}
+
+async function deleteCurrentRoom(){if(!isRoomAdmin||!currentRoomId)return;const title=(currentRoomInfo&&currentRoomInfo.title)||currentRoomId;if(!confirm(`"${title}" maç odası kalıcı olarak silinsin mi?`))return;try{await db.ref("rooms/"+currentRoomId).remove();alert("Maç odası silindi.");goHome();}catch(e){alert("Oda silinemedi: "+e.message);}}
+
+async function sweepExpiredRooms(){try{if(!db||!currentUser||!rooms||typeof rooms!=="object")return;const now=Date.now();for(const [roomId,room] of Object.entries(rooms)){const info=(room&&room.info)||{};const exp=Number(info.expireAt);const canDelete=isAdmin||(info.ownerUid&&info.ownerUid===currentUser.uid);if(canDelete&&Number.isFinite(exp)&&exp>0&&now>=exp){try{await db.ref("rooms/"+roomId).remove();if(currentRoomId===roomId){goHome();}}catch(_){}}}}catch(_){}}
+
+function syncAuthUiState(u){
+  currentUser=u||null;
+  isAdmin=!!u&&ADMIN_UIDS.includes(u.uid);
+  document.getElementById("adminBtn").textContent=isAdmin?"🔓 Sistem Admini":"🔒 Yönetici Girişi";
+  document.getElementById("accountLoggedOut").classList.toggle("hidden",!!u);
+  document.getElementById("accountLoggedIn").classList.toggle("hidden",!u);
+  document.getElementById("roomLoginPrompt").classList.toggle("hidden",!!u);
+  document.getElementById("joinForm").classList.toggle("hidden",!u);
+  if(u){
+    document.getElementById("accountIdentity").textContent=u.email||"Üye hesabı";
+    if(db){
+      const pName=document.getElementById("playerName");
+      if(pName&&!pName.value)db.ref("users/"+u.uid+"/name").once("value").then(x=>{if(x.val()&&!pName.value)pName.value=x.val();}).catch(()=>{});
+      if("Notification"in window&&Notification.permission==="granted")saveDeviceSubscriptionState("granted").catch(()=>{});
+    }
+    startBroadcastListener();
+    startGeneralChatListener();
+  }else{
+    stopBroadcastListener();
+    stopGeneralChatListener();
+  }
+  updateNotificationUi();
+  computeRoomAdmin();
+  if(currentRoomId)renderAll();
+}
+
+function initFirebase(){
+  try{
+    syncFilterDistricts();
+    syncCreateDistricts("Arnavutköy");
+    populateTimeSlots("20:00 - 21:00");
+    updateCalculatedPerPersonPreview();
+    if(!firebase.apps.length)app=firebase.initializeApp(firebaseConfig);
+    else app=firebase.app();
+    auth=firebase.auth();
+    db=firebase.database();
+    updateNotificationUi();
+    syncAuthUiState(auth.currentUser||null);
+    auth.onAuthStateChanged(u=>{syncAuthUiState(u||null);},err=>{document.getElementById("accountMessage").textContent=err.message;});
+
+    const initialRoom=getInitialRoomFromLocation();
+    let initialRoomHandled=false;
+
+    db.ref("rooms").on("value",snap=>{
+      rooms=snap.val()||{};
+      document.getElementById("quotaBadge").textContent=`Aktif Oda: ${Object.keys(rooms).length}`;
+      renderRoomsLobby();
+      if(currentRoomId){
+        if(rooms[currentRoomId]){
+          currentRoomInfo=rooms[currentRoomId].info||{};
+          updateRoomHeader();
+          roster=mergeRoster((rooms[currentRoomId].roster)||{},currentRoomInfo);
+          renderAll();
+        }
+      }else if(initialRoom&&!initialRoomHandled){
+        initialRoomHandled=true;
+        openRoom(initialRoom);
+      }
+      sweepExpiredRooms();
+    },e=>{
+      console.error(e);
+      document.getElementById("lobbyJoinStatus").textContent="Odalar okunamadı: "+e.message;
+    });
+
+    if(!expiryTimer)expiryTimer=setInterval(sweepExpiredRooms,30000);
+
+    if(initialRoom){
+      setTimeout(()=>{
+        if(!currentRoomId&&!initialRoomHandled){
+          initialRoomHandled=true;
+          openRoom(initialRoom);
+        }
+      },400);
+    }
+  }catch(e){
+    console.error(e);
+    document.getElementById("accountMessage").textContent="Bağlantı başlatılamadı: "+e.message;
+  }
+}
+
+function goHome(){
+  document.body.classList.remove("room-open");
+  const homeVideo=document.querySelector("#homeVideoBackdrop video");
+  if(homeVideo){const playPromise=homeVideo.play();if(playPromise&&playPromise.catch)playPromise.catch(()=>{});}
+  currentRoomId=null;currentRoomInfo=null;detachRoomListeners();
+  try{if(window.location.protocol!=="file:"){const url=new URL(window.location.href);url.searchParams.delete("room");window.history.replaceState({},"",url.toString());}}catch(_){}
+  document.getElementById("roomView").classList.add("hidden");
+  document.getElementById("homeView").classList.remove("hidden");
+  document.getElementById("homeNavBtn").classList.add("hidden");
+  document.getElementById("headerBadge").textContent="MAÇ ODALARI";
+  document.getElementById("headerSubtitle").textContent="Bölge, ilçe ve halı saha seç • Kendi maç odanı kurup paylaş";
+  document.getElementById("quotaBadge").textContent=`Aktif Oda: ${Object.keys(rooms).length}`;
+  document.getElementById("lobbyJoinStatus").textContent="";
+  renderRoomsLobby();
+}
+
+async function openRoom(roomId,bypassPin=false){
+  const cleanId=extractRoomIdFromInput(roomId);
+  const statusEl=document.getElementById("lobbyJoinStatus");
+  if(!cleanId){
+    if(statusEl)statusEl.textContent="Geçerli bir oda kodu veya linki girin.";
+    return;
+  }
+  if(!db){
+    if(statusEl)statusEl.textContent="Veritabanı hazır değil, tekrar deneyin.";
+    return;
+  }
+  if(statusEl)statusEl.textContent="Odaya bağlanılıyor…";
+
+  let roomObj=(rooms&&rooms[cleanId])||null;
+  let info=(roomObj&&roomObj.info)||null;
+  let initialRoster=(roomObj&&roomObj.roster)||null;
+
+  try{
+    const snap=await db.ref("rooms/"+cleanId).once("value");
+    if(snap.exists()){
+      const val=snap.val()||{};
+      roomObj=val;
+      info=val.info||{};
+      initialRoster=val.roster||{};
+      rooms[cleanId]=val;
+    }else{
+      roomObj=null;
+    }
+  }catch(err){
+    if(statusEl)statusEl.textContent="Odaya erişilemedi: "+err.message;
+    return;
+  }
+
+  if(!roomObj||typeof roomObj!=="object"){
+    if(statusEl)statusEl.textContent=`"${cleanId}" kodlu maç odası bulunamadı.`;
+    return;
+  }
+  if(!info||typeof info!=="object"){
+    info={title:cleanId,pitchName:cleanId,schedule:""};
+  }
+
+  if(!bypassPin&&!hasRoomPinAccess(cleanId,info)){
+    if(statusEl)statusEl.textContent="";
+    openRoomPinModal(cleanId,info);
+    return;
+  }
+
+  if(statusEl)statusEl.textContent="";
+  currentRoomId=cleanId;
+  document.body.classList.add("room-open");
+  const homeVideo=document.querySelector("#homeVideoBackdrop video");
+  if(homeVideo)homeVideo.pause();
+  currentRoomInfo=info;
+  roster=mergeRoster(initialRoster||{},currentRoomInfo);
+  detachRoomListeners();
+
+  try{if(window.location.protocol!=="file:"){const url=new URL(window.location.href);url.searchParams.set("room",cleanId);window.history.replaceState({},"",url.toString());}}catch(_){}
+
+  document.getElementById("homeView").classList.add("hidden");
+  document.getElementById("roomView").classList.remove("hidden");
+  document.getElementById("homeNavBtn").classList.remove("hidden");
+  updateRoomHeader();
+  computeRoomAdmin();
+  renderAll();
+
+  db.ref("rooms/"+cleanId+"/info").on("value",snap=>{
+    if(!snap.exists()){goHome();return;}
+    currentRoomInfo=snap.val()||{title:"Maç Odası",region:"",district:"",pitchName:"",schedule:"",iban:"TR53 0006 2000 5950 0006 6773 76",ibanOwner:"Oda Sahibi"};
+    updateRoomHeader();
+    roster=mergeRoster(roster.reduce((m,x)=>{if(isOccupied(x))m[x.id]=x;return m;},{}),currentRoomInfo);
+    computeRoomAdmin();
+    renderAll();
+    sweepExpiredRooms();
+  },()=>{});
+  roomRosterRef=db.ref("rooms/"+cleanId+"/roster");
+  roomRosterRef.on("value",s=>{
+    roster=mergeRoster(s.val()||{},currentRoomInfo);
+    renderAll();
+  },e=>showMessage("Kadro okuma hatası: "+e.message,false));
+}
+
+function openRoomPinModal(roomId,info){pendingPinRoomId=roomId;document.getElementById("roomPinInput").value="";document.getElementById("roomPinError").textContent="";const title=(info&&info.title)||roomId;document.getElementById("roomPinDesc").textContent=`"${title}" odası şifre korumalıdır. Giriş şifresini yazın.`;document.getElementById("roomPinModal").classList.remove("hidden");document.getElementById("roomPinInput").focus();}
+function cancelRoomPinModal(){pendingPinRoomId=null;document.getElementById("roomPinModal").classList.add("hidden");}
+async function verifyRoomPin(e){e.preventDefault();const roomId=pendingPinRoomId;if(!roomId)return;const entered=document.getElementById("roomPinInput").value.trim(),errEl=document.getElementById("roomPinError");errEl.textContent="";
+let info=(rooms[roomId]&&rooms[roomId].info)||null;
+if(!info){try{const snap=await db.ref("rooms/"+roomId+"/info").once("value");info=snap.val()||{};}catch(x){errEl.textContent="Oda bilgisi alınamadı: "+x.message;return;}}
+const expected=String((info&&info.roomPin)??"").trim();
+if(!expected||entered===expected){if(expected)markRoomUnlocked(roomId,expected);const target=roomId;cancelRoomPinModal();openRoom(target,true);}else{errEl.textContent="Oda şifresi hatalı. Tekrar deneyin.";}}
+
+function detachRoomListeners(){if(roomRosterRef){roomRosterRef.off();roomRosterRef=null;}stopRoomApplicationsListener();roster=makeDefaultRoster();}
+function updateRoomHeader(){const info=currentRoomInfo||{};const cap=getTotalCapacityFromInfo(info);const totalPrice=getPitchPriceFromInfo(info);const perPerson=getPerPersonFeeFromInfo(info);document.getElementById("headerBadge").textContent=info.pitchName||"MAÇ ODASI";document.getElementById("headerSubtitle").textContent=[info.region,info.district,info.schedule,`${cap} Kişi • ${perPerson}₺/kişi`].filter(Boolean).join(" • ")||"Canlı kadro ve başvuru ekranı";document.getElementById("roomTitleHeading").textContent=info.title||(info.pitchName?info.pitchName+" Maçı":"Maç Odası");const loc=[info.region,info.district,info.pitchName].filter(Boolean).join(" / ");document.getElementById("roomMetaText").textContent=`${loc?loc+" • ":""}${info.schedule||"Saat belirtilmedi"} • Oda Kodu: ${currentRoomId}`;document.getElementById("priceFeeSummary").textContent=`Saha Ücreti: ${totalPrice} ₺ • ${cap} Kişi`;document.getElementById("roomIbanText").textContent=info.iban||"TR53 0006 2000 5950 0006 6773 76";document.getElementById("ibanOwnerLabel").textContent="ÖDEME IBAN"+(info.ibanOwner?` (${info.ibanOwner.toUpperCase()})`:"");}
+
+function renderRoomsLobby(){const listEl=document.getElementById("roomsList");if(!listEl)return;const rFilter=(document.getElementById("filterRegion")?.value||"").trim().toLowerCase();const dFilter=(document.getElementById("filterDistrict")?.value||"").trim().toLowerCase();const pFilter=(document.getElementById("filterPitch")?.value||"").trim().toLowerCase();
+const entries=Object.entries(rooms).filter(([,room])=>{const info=(room&&room.info)||{};const hayTitle=(info.title||"").toLowerCase();const hayReg=(info.region||"").toLowerCase();const hayDist=(info.district||"").toLowerCase();const hayPitch=(info.pitchName||"").toLowerCase();
+if(rFilter&&!hayReg.includes(rFilter))return false;if(dFilter&&!hayDist.includes(dFilter))return false;if(pFilter&&!hayPitch.includes(pFilter)&&!hayTitle.includes(pFilter))return false;return true;});
+if(!entries.length){listEl.innerHTML=`<div class="col-span-full glass-card rounded-2xl p-6 text-center"><p class="text-sm font-bold text-slate-300">Filtreye uygun maç odası bulunamadı.</p><p class="text-xs text-slate-400 mt-1">Yeni bir maç odası kurup kendi grubunda paylaşabilirsin.</p></div>`;return;}
+listEl.innerHTML=entries.map(([id,room])=>{const info=(room&&room.info)||{};const cap=getTotalCapacityFromInfo(info);const perPerson=getPerPersonFeeFromInfo(info);const merged=mergeRoster((room&&room.roster)||{},info);const filled=merged.filter(isOccupied).length;const locked=!!String(info.roomPin??"").trim();return `<div class="glass-card rounded-2xl p-4 flex flex-col justify-between gap-3"><div><div class="flex items-center justify-between gap-2 mb-1"><div class="flex items-center gap-1.5 flex-wrap"><span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 text-[10px] font-extrabold">${filled}/${cap} DOLU</span><span class="px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 text-[10px] font-extrabold">${perPerson}₺/KİŞİ</span><span class="px-2 py-0.5 rounded ${locked?"bg-amber-500/20 text-amber-300":"bg-slate-800 text-slate-300"} text-[10px] font-extrabold">${locked?"🔒 Şifreli":"🔓 Açık"}</span></div><span class="text-[11px] font-mono text-slate-400">#${esc(id)}</span></div><h3 class="text-base font-black text-white">${esc(info.title||info.pitchName||"Halı Saha Maçı")}</h3><p class="text-xs text-emerald-300 font-semibold mt-0.5">🏟️ ${esc(info.pitchName||"Halı Saha")}</p><p class="text-xs text-slate-400 mt-0.5">📍 ${esc([info.region,info.district].filter(Boolean).join(" / ")||"Bölge belirtilmedi")}</p><p class="text-xs text-slate-400 mt-0.5">📅 ${esc(info.schedule||"Gün ve saat belirtilmedi")}</p></div><div class="flex gap-2 pt-2 border-t border-slate-800"><button type="button" onclick="openRoom('${esc(id)}')" class="flex-1 py-2 rounded-xl bg-emerald-500 text-slate-950 text-xs font-black">Odaya Gir</button><button type="button" onclick="copyRoomInviteById('${esc(id)}')" class="px-3 py-2 rounded-xl bg-green-700 text-white text-xs font-bold">📲 Paylaş</button></div></div>`;}).join("");}
+
+function openCreateRoomModal(){if(!currentUser){alert("Yeni maç odası kurmak için önce üye girişi yapın.");return;}syncCreateDistricts("Arnavutköy");populateTimeSlots("20:00 - 21:00");document.getElementById("newRoomPlayerCount").value=String(DEFAULT_PLAYER_COUNT);document.getElementById("newRoomPitchPrice").value=String(DEFAULT_PITCH_PRICE);updateCalculatedPerPersonPreview();document.getElementById("newRoomPin").value="";document.getElementById("createRoomError").textContent="";document.getElementById("createRoomModal").classList.remove("hidden");}
+function closeCreateRoomModal(){document.getElementById("createRoomModal").classList.add("hidden");}
+function slugifyRoom(str){return String(str||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,20);}
+
+async function createRoom(e){
+  e.preventDefault();
+  const err=document.getElementById("createRoomError");
+  err.textContent="";
+  const activeAuthUser=(auth&&auth.currentUser)||currentUser;
+  if(!activeAuthUser){err.textContent="Oda kurmak için önce üye girişi yapmalısınız.";return;}
+  const btn=document.getElementById("createRoomSubmit");
+  const title=document.getElementById("newRoomTitle").value.trim();
+  const region=document.getElementById("newRoomRegion").value.trim();
+  const district=document.getElementById("newRoomDistrict").value.trim();
+  const pitchSelVal=document.getElementById("newRoomPitchSelect").value;
+  const pitchCustomVal=document.getElementById("newRoomPitchCustom").value.trim();
+  const pitchName=pitchSelVal==="__CUSTOM__"?pitchCustomVal:pitchSelVal;
+  const matchDay=document.getElementById("newRoomDay").value.trim();
+  const timeSlot=document.getElementById("newRoomTimeSlot").value.trim();
+  const schedule=[matchDay,timeSlot].filter(Boolean).join(" • ");
+  const expireAt=computeExpireAtMs(matchDay,timeSlot);
+  const playerCount=normalizePlayerCount(document.getElementById("newRoomPlayerCount").value);
+  const pitchPrice=Math.max(0,Number(document.getElementById("newRoomPitchPrice").value)||0);
+  const roomPin=document.getElementById("newRoomPin").value.trim();
+  const ibanOwner=document.getElementById("newRoomIbanOwner").value.trim();
+  const iban=document.getElementById("newRoomIban").value.trim();
+  if(!title||!region||!district||!pitchName||!schedule){err.textContent="Lütfen tüm zorunlu alanları seçin veya doldurun.";return;}
+  const baseSlug=slugifyRoom(pitchName||title)||"mac";
+  const roomId=baseSlug+"-"+Math.random().toString(36).slice(2,6);
+  const roomInfoPayload={
+    title,region,district,pitchName,schedule,matchDay,timeSlot,expireAt,
+    playerCount,pitchPrice,roomPin,
+    ibanOwner:ibanOwner||"Oda Sahibi",
+    iban:iban||"TR53 0006 2000 5950 0006 6773 76",
+    ownerUid:activeAuthUser.uid,
+    ownerEmail:activeAuthUser.email||"",
+    createdAt:firebase.database.ServerValue.TIMESTAMP
+  };
+  const roomPayload={info:roomInfoPayload,roster:makeDefaultRosterMap(roomInfoPayload)};
+  btn.disabled=true;
+  try{
+    await db.ref("rooms/"+roomId).set(roomPayload);
+    rooms[roomId]=roomPayload;
+    if(roomPin)markRoomUnlocked(roomId,roomPin);
+    closeCreateRoomModal();
+    await openRoom(roomId,true);
+  }catch(x){
+    err.textContent="Oda oluşturulamadı: "+x.message;
+  }finally{
+    btn.disabled=false;
+  }
+}
+
+function joinByRoomCode(){const raw=(document.getElementById("directRoomCode").value||"").trim();if(!raw){document.getElementById("lobbyJoinStatus").textContent="Lütfen oda kodu veya linki yapıştırın.";return;}openRoom(raw);}
+
+function getRoomShareUrl(roomId){
+  const cleanId=extractRoomIdFromInput(roomId);
+  try{
+    if(window.location.protocol==="http:"||window.location.protocol==="https:"){
+      const u=new URL(window.location.href);
+      u.searchParams.set("room",cleanId);
+      return u.toString();
+    }
+  }catch(_){}
+  return `?room=${encodeURIComponent(cleanId)}`;
+}
+
+async function copyRoomLink(){if(!currentRoomId)return;const link=getRoomShareUrl(currentRoomId);try{await navigator.clipboard.writeText(link);alert("Oda linki kopyalandı:\n"+link);}catch(_){alert(link);}}
+
+function buildRoomInviteText(roomId,info){
+  const cleanId=extractRoomIdFromInput(roomId);
+  const link=getRoomShareUrl(cleanId);
+  const cap=getTotalCapacityFromInfo(info);
+  const perPerson=getPerPersonFeeFromInfo(info);
+  const pinLine=String(info.roomPin??"").trim()?`🔑 Oda Şifresi: ${String(info.roomPin).trim()}`:"";
+  return [`⚽ ${info.title||"Halı Saha Maç Odası"}`,`🏟️ Saha: ${info.pitchName||"-"} (${[info.region,info.district].filter(Boolean).join(" / ")})`,`📅 Zaman: ${info.schedule||"-"} • ${cap} Kişi • ${perPerson}₺/kişi`,pinLine,`🔗 Oda Linki: ${link}`,`🏷️ Oda Kodu: ${cleanId}`].filter(Boolean).join("\n");
+}
+
+async function copyRoomInviteById(roomId){const cleanId=extractRoomIdFromInput(roomId);const room=rooms[cleanId]||{};const text=buildRoomInviteText(cleanId,room.info||{});try{await navigator.clipboard.writeText(text);alert("WhatsApp davet mesajı kopyalandı!");}catch(_){alert(text);}}
+async function copyRoomWhatsAppInvite(){if(!currentRoomId)return;const text=buildRoomInviteText(currentRoomId,currentRoomInfo||{});try{await navigator.clipboard.writeText(text);alert("WhatsApp davet mesajı kopyalandı!");}catch(_){alert(text);}}
+
+function getDeviceId(){let id=localStorage.getItem("kadrokur_device_id");if(!id){id="dev_"+Math.random().toString(36).slice(2,10)+"_"+Date.now().toString(36);localStorage.setItem("kadrokur_device_id",id);}return id;}
+function updateNotificationUi(){const st=document.getElementById("notifStatusText"),btn=document.getElementById("notifBtn");if(!st||!btn)return;if(!("Notification"in window)){st.textContent="Bu tarayıcı bildirim desteklemiyor.";btn.disabled=true;return;}if(Notification.permission==="granted"){st.textContent="Bildirim izni açık.";btn.textContent="✅ Bildirim Açık";btn.disabled=false;}else if(Notification.permission==="denied"){st.textContent="Bildirim izni engellenmiş.";btn.textContent="🚫 İzin Engelli";btn.disabled=true;}else{st.textContent="Henüz bildirim izni verilmedi.";btn.textContent="🔔 Bildirimi Aç";btn.disabled=false;}}
+async function saveDeviceSubscriptionState(permissionState){if(!currentUser||!db)return;const devId=getDeviceId();await db.ref("notificationDevices/"+currentUser.uid+"/"+devId).set({uid:currentUser.uid,email:currentUser.email||"",permission:permissionState,userAgent:navigator.userAgent||"",updatedAt:firebase.database.ServerValue.TIMESTAMP});}
+async function requestNotificationPermission(){if(!("Notification"in window)){alert("Bu cihaz/tarayıcı bildirim desteklemiyor.");return;}if(!currentUser){alert("Önce hesabınıza giriş yapın.");return;}const btn=document.getElementById("notifBtn");btn.disabled=true;try{const perm=await Notification.requestPermission();await saveDeviceSubscriptionState(perm);updateNotificationUi();if(perm==="granted"){sendLocalTestNotification();}else if(perm==="denied"){alert("Bildirim izni reddedildi.");}}catch(e){alert("Bildirim izni alınamadı: "+e.message);}finally{updateNotificationUi();}}
+function sendLocalTestNotification(title="⚽ KadroKur | Maç Hatırlatması",body="Test bildirimi başarılı."){if(!("Notification"in window)||Notification.permission!=="granted"){alert("Önce bildirim iznine onay verin.");return;}try{new Notification(title,{body,tag:"kadrokur-notif-"+Date.now()});}catch(e){alert("Bildirim gösterilemedi: "+e.message);}}
+
+async function sendCustomAdminNotification(e){e.preventDefault();if(!isRoomAdmin||!currentUser){alert("Oda yöneticisi girişi gerekli.");return;}const titleEl=document.getElementById("customNotifTitle"),bodyEl=document.getElementById("customNotifBody"),statusEl=document.getElementById("customNotifStatus"),btn=document.getElementById("sendCustomNotifBtn");const title=titleEl.value.trim(),body=bodyEl.value.trim();if(!title||!body){statusEl.textContent="Başlık ve mesaj boş olamaz.";return;}btn.disabled=true;statusEl.textContent="Gönderiliyor…";try{await db.ref("broadcasts/latest").set({title,body,roomId:currentRoomId||"",sentBy:currentUser.email||currentUser.uid,sentAt:firebase.database.ServerValue.TIMESTAMP});if("Notification"in window&&Notification.permission==="granted"){sendLocalTestNotification(title,body);}bodyEl.value="";statusEl.textContent="Bildirim gönderildi.";}catch(err){statusEl.textContent="Gönderilemedi: "+err.message;}finally{btn.disabled=false;}}
+function startBroadcastListener(){if(broadcastListener||!db||!currentUser)return;initialBroadcastSeen=false;broadcastListener=db.ref("broadcasts/latest");broadcastListener.on("value",snap=>{const val=snap.val();if(!val){initialBroadcastSeen=true;return;}if(!initialBroadcastSeen){initialBroadcastSeen=true;return;}if("Notification"in window&&Notification.permission==="granted"){try{new Notification(val.title||"⚽ KadroKur",{body:val.body||"",tag:"kadrokur-broadcast-"+(val.sentAt||Date.now())});}catch(_){}}},()=>{});}
+function stopBroadcastListener(){if(broadcastListener){broadcastListener.off();broadcastListener=null;}initialBroadcastSeen=false;}
+
+function renderGeneralChatMessages(data){
+  const box=document.getElementById("homeChatMessages");
+  if(!box)return;
+  const entries=Object.entries(data||{}).map(([id,m])=>({id,...(m||{})})).filter(m=>m.text&&m.sender).sort((a,b)=>Number(a.createdAt||0)-Number(b.createdAt||0));
+  if(!entries.length){
+    box.innerHTML='<p class="text-xs text-slate-400 text-center py-8">Henüz mesaj yok. İlk mesajı sen gönder! ⚽</p>';
+    return;
+  }
+  box.innerHTML=entries.map(m=>{
+    const stamp=Number(m.createdAt);
+    const time=Number.isFinite(stamp)&&stamp>0?new Date(stamp).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}):"";
+    const mine=!!currentUser&&m.uid===currentUser.uid;
+    return `<div class="flex ${mine?"justify-end":"justify-start"}"><div class="max-w-[90%] rounded-xl px-3 py-2 ${mine?"bg-emerald-900/80 border border-emerald-700/60":"bg-slate-800/90 border border-slate-700"}"><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-extrabold ${mine?"text-emerald-300":"text-sky-300"}">${esc(m.sender)}</span><span class="text-[9px] text-slate-500">${esc(time)}</span></div><p class="text-xs text-slate-100 whitespace-pre-wrap break-words">${esc(m.text)}</p></div></div>`;
+  }).join("");
+  box.scrollTop=box.scrollHeight;
+}
+function startGeneralChatListener(){
+  if(generalChatRef||!db||!currentUser)return;
+  const form=document.getElementById("homeChatForm"),loggedOut=document.getElementById("homeChatLoggedOut");
+  if(form)form.classList.remove("hidden");
+  if(loggedOut)loggedOut.classList.add("hidden");
+  generalChatRef=db.ref("general_chat").limitToLast(60);
+  generalChatRef.on("value",snap=>renderGeneralChatMessages(snap.val()||{}),err=>{
+    const box=document.getElementById("homeChatMessages");
+    if(box)box.innerHTML=`<p class="text-xs text-rose-300">Sohbet yüklenemedi: ${esc(err.message||"Bağlantı hatası")}</p>`;
+  });
+}
+function stopGeneralChatListener(){
+  if(generalChatRef){generalChatRef.off();generalChatRef=null;}
+  const form=document.getElementById("homeChatForm"),loggedOut=document.getElementById("homeChatLoggedOut"),box=document.getElementById("homeChatMessages");
+  if(form)form.classList.add("hidden");
+  if(loggedOut)loggedOut.classList.remove("hidden");
+  if(box)box.innerHTML='<p class="text-xs text-slate-400 text-center py-8">Sohbeti görmek için üye girişi yap.</p>';
+}
+async function sendGeneralChatMessage(e){
+  e.preventDefault();
+  if(!currentUser||!db){alert("Mesaj göndermek için önce giriş yapmalısın.");return;}
+  const input=document.getElementById("homeChatInput"),btn=document.getElementById("homeChatSendBtn");
+  const message=String(input.value||"").trim();
+  if(!message)return;
+  if(message.length>300){alert("Mesaj en fazla 300 karakter olabilir.");return;}
+  btn.disabled=true;
+  try{
+    let sender=(currentUser.displayName||"").trim();
+    if(!sender){
+      try{const profile=await db.ref("users/"+currentUser.uid+"/name").once("value");sender=String(profile.val()||"").trim();}catch(_){}
+    }
+    if(!sender)sender=(currentUser.email||"Üye").split("@")[0].slice(0,50);
+    const ref=db.ref("general_chat").push();
+    await ref.set({sender,uid:currentUser.uid,text:message,createdAt:firebase.database.ServerValue.TIMESTAMP});
+    input.value="";
+  }catch(err){
+    alert("Mesaj gönderilemedi: "+err.message);
+  }finally{btn.disabled=false;input.focus();}
+}
+
+function renderPitchRow(slots,info){return `<div class="flex justify-center gap-2 sm:gap-4 flex-wrap">${slots.map(s=>{const full=isOccupied(s),team=s.team==="green",border=team?"border-emerald-400/60 bg-emerald-950/75":"border-red-400/60 bg-red-950/75",badge=team?"bg-emerald-500 text-slate-950":"bg-red-500 text-white",slotFee=getSlotPriceForRoom(info,s.pos);if(!full)return `<button type="button" onclick="selectSlotOnPitch('${s.team}','${s.id}')" class="w-24 sm:w-28 p-2 rounded-xl border border-dashed border-white/30 hover:border-emerald-400/70 bg-black/35 text-center transition"><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-800">${s.pos} • ${slotFee}₺</span><div class="text-xs font-bold text-slate-300 mt-1.5">+ BOŞ YER</div></button>`;return `<div class="w-24 sm:w-28 p-2 rounded-xl border ${border} text-center"><div class="flex justify-between text-[10px] mb-1"><span class="font-black px-1.5 py-0.5 rounded ${badge}">${s.pos}</span><span>${s.paid?"✅":"⏳"}</span></div><div class="text-xs font-extrabold truncate">${esc(s.name)}</div>${isRoomAdmin?`<div class="flex justify-center gap-1.5 mt-1"><button type="button" onclick="openMoveModal('${s.id}',${s.applicationId?`'${s.applicationId}'`:"null"})" class="text-[9px] text-sky-300 underline">Taşı</button><button type="button" onclick="removeSlot('${s.id}')" class="text-[9px] text-amber-300 underline">Çıkar</button></div>`:""}</div>`;}).join("")}</div>`;}
+function renderTeam(team,info){const a=roster.filter(s=>s.team===team);const order=team==="red"?[...SLOT_ORDER].reverse():SLOT_ORDER;return order.map(pos=>renderPitchRow(a.filter(s=>s.pos===pos),info)).join("");}
+function renderAll(){if(!currentRoomId)return;const cap=getTotalCapacityFromInfo(currentRoomInfo);document.getElementById("greenTeamPitch").innerHTML=renderTeam("green",currentRoomInfo);document.getElementById("redTeamPitch").innerHTML=renderTeam("red",currentRoomInfo);document.getElementById("quotaBadge").textContent=`Dolu Kontenjan: ${roster.filter(isOccupied).length} / ${cap}`;updateSlotDropdown();if(isRoomAdmin)renderApplications();}
+function updateSlotDropdown(){const team=document.getElementById("teamSelect").value,sel=document.getElementById("slotSelect"),old=sel.value;const empty=roster.filter(s=>s.team===team&&!isOccupied(s)&&s.status==="empty").sort((a,b)=>SLOT_ORDER.indexOf(a.pos)-SLOT_ORDER.indexOf(b.pos)||a.id.localeCompare(b.id));sel.innerHTML=empty.length?empty.map(s=>`<option value="${s.id}">${SLOT_LABEL[s.pos]} (${s.pos}) · ${getSlotPriceForRoom(currentRoomInfo,s.pos)} ₺ · Boş</option>`).join(""):'<option value="">Bu takımda boş mevki yok</option>';if(empty.some(s=>s.id===old))sel.value=old;updatePrice();}
+function updatePrice(){const s=roster.find(x=>x.id===document.getElementById("slotSelect").value);document.getElementById("priceDisplay").textContent=s?(getSlotPriceForRoom(currentRoomInfo,s.pos)+" ₺"):"—";}
+function selectSlotOnPitch(team,id){if(!currentUser){alert("Başvuru yapmak için önce hesabına giriş yap.");return;}document.getElementById("teamSelect").value=team;updateSlotDropdown();document.getElementById("slotSelect").value=id;updatePrice();document.getElementById("playerName").focus();}
+
+async function handleJoin(e){e.preventDefault();if(!currentUser||!currentRoomId){showMessage("Başvuru yapmadan önce giriş yapmalısın.",false);return;}const b=document.getElementById("joinSubmit"),name=document.getElementById("playerName").value.trim(),slot=roster.find(s=>s.id===document.getElementById("slotSelect").value);if(!name)return showMessage("Lütfen adını gir.",false);if(!slot||isOccupied(slot)||slot.status!=="empty")return showMessage("Bu mevki uygun değil.",false);b.disabled=true;b.textContent="Başvuru gönderiliyor…";try{const ref=db.ref(`rooms/${currentRoomId}/applications`).push();await ref.set({uid:currentUser.uid,email:currentUser.email||"",slotId:slot.id,name,team:slot.team,pos:slot.pos,price:getSlotPriceForRoom(currentRoomInfo,slot.pos),status:"pending",paid:false,createdAt:firebase.database.ServerValue.TIMESTAMP});document.getElementById("playerName").value="";showMessage("Başvurun bu maç odasına kaydedildi. Oda yöneticisi onayı bekleniyor.");}catch(err){showMessage("Başvuru kaydedilemedi: "+err.message,false);}finally{b.disabled=false;b.textContent="📝 Başvurumu Gönder";updateSlotDropdown();}}
+
+async function registerPlayer(){const name=document.getElementById("accountName").value.trim(),email=document.getElementById("accountEmail").value.trim(),password=document.getElementById("accountPassword").value,msg=document.getElementById("accountMessage");msg.textContent="";if(!name||name.length>40){msg.textContent="Lütfen adını/lakabını gir (en fazla 40 karakter).";return;}if(!email||password.length<6){msg.textContent="Geçerli e-posta ve en az 6 karakterli şifre gir.";return;}const b=document.getElementById("registerBtn");b.disabled=true;try{const cred=await auth.createUserWithEmailAndPassword(email,password);try{await db.ref("users/"+cred.user.uid).set({name,email:cred.user.email||email,createdAt:firebase.database.ServerValue.TIMESTAMP});}catch(_){}syncAuthUiState(cred.user);msg.textContent="Hesabın oluşturuldu ve giriş yapıldı.";}catch(e){msg.textContent="Kayıt hatası: "+e.message;}finally{b.disabled=false;}}
+async function loginPlayer(){const email=document.getElementById("accountEmail").value.trim(),password=document.getElementById("accountPassword").value,msg=document.getElementById("accountMessage");msg.textContent="";if(!email||!password){msg.textContent="E-posta ve şifreni gir.";return;}const b=document.getElementById("memberLoginBtn");b.disabled=true;try{const cred=await auth.signInWithEmailAndPassword(email,password);syncAuthUiState(cred.user);msg.textContent="Giriş başarılı.";}catch(e){msg.textContent="Giriş hatası: "+e.message;}finally{b.disabled=false;}}
+async function logoutPlayer(){try{await auth.signOut();syncAuthUiState(null);}catch(e){document.getElementById("accountMessage").textContent=e.message;}}
+function toggleAdminPanel(){if(isRoomAdmin){document.getElementById("adminBar").scrollIntoView({behavior:"smooth"});return;}document.getElementById("loginError").textContent="";document.getElementById("adminLoginModal").classList.remove("hidden");}
+function closeAdminLogin(){document.getElementById("adminLoginModal").classList.add("hidden");}
+async function adminLogin(e){e.preventDefault();const b=document.getElementById("adminLoginSubmit"),err=document.getElementById("loginError");b.disabled=true;err.textContent="";try{const cred=await auth.signInWithEmailAndPassword(document.getElementById("adminEmail").value.trim(),document.getElementById("adminPassword").value);syncAuthUiState(cred.user);document.getElementById("adminPassword").value="";closeAdminLogin();}catch(x){err.textContent="Giriş başarısız: "+x.message;}finally{b.disabled=false;}}
+async function adminLogout(){await auth.signOut();syncAuthUiState(null);}
+
+function startRoomApplicationsListener(){if(roomAppsRef||!currentRoomId||!currentUser)return;roomAppsRef=db.ref(`rooms/${currentRoomId}/applications`);roomAppsRef.on("value",s=>{applications=s.val()||{};renderApplications();},()=>{});}
+function stopRoomApplicationsListener(){if(roomAppsRef){roomAppsRef.off();roomAppsRef=null;}applications={};renderApplications();}
+function refreshAdminApplications(){if(isRoomAdmin&&currentRoomId)db.ref(`rooms/${currentRoomId}/applications`).once("value").then(s=>{applications=s.val()||{};renderApplications();}).catch(e=>alert("Başvurular okunamadı: "+e.message));}
+function renderApplications(){const p=document.getElementById("pendingApplications"),aBox=document.getElementById("approvedApplications");if(!isRoomAdmin){p.innerHTML="Oda yöneticisi yetkisi gerekli.";aBox.innerHTML="Oda yöneticisi yetkisi gerekli.";return;}const entries=Object.entries(applications),pending=entries.filter(([,a])=>a.status==="pending"),approved=entries.filter(([,a])=>a.status==="approved");p.innerHTML=pending.length?pending.map(([id,a])=>`<div class="rounded-lg bg-slate-900 border border-slate-700 p-3 flex flex-wrap justify-between gap-2"><div><b>${esc(a.name)}</b><div class="text-xs text-slate-400">${a.team==="green"?"Yeşil":"Kırmızı"} · ${SLOT_LABEL[a.pos]||a.pos} · ${getSlotPriceForRoom(currentRoomInfo,a.pos)} ₺</div></div><div class="flex gap-2"><button type="button" onclick="approveApplication('${id}')" class="px-3 py-2 rounded bg-emerald-600 text-xs font-bold">Kabul et</button><button type="button" onclick="rejectApplication('${id}')" class="px-3 py-2 rounded bg-red-700 text-xs font-bold">Reddet</button></div></div>`).join(""):"<p class='text-xs text-slate-500'>Bekleyen başvuru yok.</p>";aBox.innerHTML=approved.length?approved.map(([id,a])=>{const s=roster.find(x=>x.id===a.slotId),paid=!!(s&&s.paid),curTeam=s?s.team:a.team,curPos=s?s.pos:a.pos,curSlotId=s?s.id:a.slotId;return `<div class="rounded-lg bg-slate-900 border border-slate-700 p-3 flex flex-wrap justify-between gap-2"><div><b>${esc(a.name)}</b><div class="text-xs text-slate-400">${curTeam==="green"?"Yeşil":"Kırmızı"} · ${SLOT_LABEL[curPos]||curPos} · ${getSlotPriceForRoom(currentRoomInfo,curPos)} ₺</div><div class="text-xs ${paid?"text-emerald-300":"text-amber-300"}">${paid?"Ödeme onaylandı":"Ödeme bekliyor"}</div></div><div class="flex flex-wrap gap-2">${paid?`<button type="button" onclick="undoPayment('${id}')" class="px-2 py-2 bg-amber-700 rounded text-xs font-bold">Geri al</button>`:`<button type="button" onclick="confirmPayment('${id}')" class="px-2 py-2 bg-emerald-600 rounded text-xs font-bold">Ödemeyi onayla</button>`}<button type="button" onclick="openMoveModal('${curSlotId}','${id}')" class="px-2 py-2 bg-sky-700 rounded text-xs font-bold">Yer / takım değiştir</button><button type="button" onclick="removeApprovedPlayer('${id}')" class="px-2 py-2 bg-red-700 rounded text-xs font-bold">Çıkar</button></div></div>`;}).join(""):"<p class='text-xs text-slate-500'>Henüz onaylanmış başvuru yok.</p>";}
+
+function openMoveModal(sourceSlotId,appId=null){if(!isRoomAdmin)return;const src=roster.find(x=>x.id===sourceSlotId);if(!src||!isOccupied(src)){alert("Taşınacak oyuncu bulunamadı.");return;}const available=roster.filter(x=>x.id!==sourceSlotId&&!isOccupied(x)&&x.status==="empty").sort((a,b)=>(a.team===b.team?0:a.team==="green"?-1:1)||SLOT_ORDER.indexOf(a.pos)-SLOT_ORDER.indexOf(b.pos)||a.id.localeCompare(b.id));if(!available.length){alert("Taşınabilecek boş kadro yeri bulunmuyor.");return;}movingContext={sourceSlotId,appId:appId||src.applicationId||null};document.getElementById("movePlayerInfo").innerHTML=`<b>${esc(src.name)}</b> şu an <b>${src.team==="green"?"Yeşil":"Kırmızı"} · ${SLOT_LABEL[src.pos]} (${src.pos})</b> mevkiinde.`;document.getElementById("moveTargetSlot").innerHTML=available.map(x=>`<option value="${x.id}">${x.team==="green"?"🟢 Yeşil Takım":"🔴 Kırmızı Takım"} · ${SLOT_LABEL[x.pos]} (${x.pos}) · ${getSlotPriceForRoom(currentRoomInfo,x.pos)} ₺</option>`).join("");document.getElementById("moveError").textContent="";document.getElementById("movePlayerModal").classList.remove("hidden");}
+function closeMoveModal(){movingContext=null;document.getElementById("movePlayerModal").classList.add("hidden");}
+async function confirmMovePlayer(e){e.preventDefault();if(!isRoomAdmin||!movingContext||!currentRoomId)return;const targetSlotId=document.getElementById("moveTargetSlot").value,errBox=document.getElementById("moveError"),btn=document.getElementById("moveSubmitBtn");errBox.textContent="";if(!targetSlotId||targetSlotId===movingContext.sourceSlotId){errBox.textContent="Lütfen farklı ve boş bir mevki seç.";return;}btn.disabled=true;try{const basePath=`rooms/${currentRoomId}`;const srcSnap=await db.ref(`${basePath}/roster/${movingContext.sourceSlotId}`).once("value"),srcVal=srcSnap.val();if(!srcVal||!srcVal.name||srcVal.status==="empty")throw new Error("Kaynak mevki artık dolu değil.");const dstSnap=await db.ref(`${basePath}/roster/${targetSlotId}`).once("value"),dstVal=dstSnap.val();if(!dstVal||dstVal.name||(dstVal.status&&dstVal.status!=="empty"))throw new Error("Seçilen yeni mevki artık boş değil.");const dstMeta=roster.find(x=>x.id===targetSlotId);if(!dstMeta)throw new Error("Hedef kadro bilgisi bulunamadı.");const linkedAppId=movingContext.appId||srcVal.applicationId||null;await db.ref(`${basePath}/roster/${targetSlotId}`).update({name:srcVal.name,paid:srcVal.paid===true,status:"approved",applicationId:linkedAppId});await db.ref(`${basePath}/roster/${movingContext.sourceSlotId}`).update({name:"",paid:false,status:"empty",applicationId:null});if(linkedAppId){const appSnap=await db.ref(`${basePath}/applications/${linkedAppId}`).once("value");if(appSnap.exists()){await db.ref(`${basePath}/applications/${linkedAppId}`).update({slotId:targetSlotId,team:dstMeta.team,pos:dstMeta.pos,price:getSlotPriceForRoom(currentRoomInfo,dstMeta.pos),movedAt:firebase.database.ServerValue.TIMESTAMP});}}closeMoveModal();alert("Oyuncunun yeri/takımı güncellendi.");}catch(err){errBox.textContent="Taşıma başarısız: "+err.message;}finally{btn.disabled=false;}}
+
+async function approveApplication(id){const a=applications[id];if(!isRoomAdmin||!a||!currentRoomId)return;try{const ref=db.ref(`rooms/${currentRoomId}/roster/${a.slotId}`),s=(await ref.once("value")).val();if(!s||s.status!=="empty"||s.name){alert("Bu mevki artık boş değil.");return;}await ref.update({name:a.name,paid:false,status:"approved",applicationId:id});await db.ref(`rooms/${currentRoomId}/applications/${id}`).update({status:"approved",paid:false,reviewedAt:firebase.database.ServerValue.TIMESTAMP});alert("Başvuru kabul edildi.");}catch(e){alert("Onay başarısız: "+e.message);}}
+async function rejectApplication(id){if(!isRoomAdmin||!applications[id]||!currentRoomId)return;try{await db.ref(`rooms/${currentRoomId}/applications/${id}`).update({status:"rejected",reviewedAt:firebase.database.ServerValue.TIMESTAMP});}catch(e){alert(e.message);}}
+async function confirmPayment(id){const a=applications[id];if(!isRoomAdmin||!a||!currentRoomId)return;try{await db.ref(`rooms/${currentRoomId}/roster/${a.slotId}`).update({paid:true});await db.ref(`rooms/${currentRoomId}/applications/${id}`).update({paid:true,paidAt:firebase.database.ServerValue.TIMESTAMP});}catch(e){alert("Ödeme onaylanamadı: "+e.message);}}
+async function undoPayment(id){const a=applications[id];if(!isRoomAdmin||!a||!currentRoomId)return;try{await db.ref(`rooms/${currentRoomId}/roster/${a.slotId}`).update({paid:false});await db.ref(`rooms/${currentRoomId}/applications/${id}`).update({paid:false,paidAt:null});}catch(e){alert(e.message);}}
+async function removeApprovedPlayer(id){const a=applications[id];if(!isRoomAdmin||!a||!currentRoomId||!confirm(a.name+" kadrodan çıkarılsın mı?"))return;try{await db.ref(`rooms/${currentRoomId}/roster/${a.slotId}`).update({name:"",paid:false,status:"empty",applicationId:null});await db.ref(`rooms/${currentRoomId}/applications/${id}`).update({status:"removed",paid:false});}catch(e){alert(e.message);}}
+async function removeSlot(id){const s=roster.find(x=>x.id===id);if(!isRoomAdmin||!s||!currentRoomId||!confirm(s.name+" çıkarılsın mı?"))return;try{await db.ref(`rooms/${currentRoomId}/roster/${id}`).update({name:"",paid:false,status:"empty",applicationId:null});if(s.applicationId)await db.ref(`rooms/${currentRoomId}/applications/${s.applicationId}`).update({status:"removed",paid:false});}catch(e){alert(e.message);}}
+async function resetAllPlayers(){if(!isRoomAdmin||!currentRoomId||!confirm("Tüm kadro yuvaları boşaltılsın mı?"))return;try{for(const s of roster)await db.ref(`rooms/${currentRoomId}/roster/${s.id}`).update({name:"",paid:false,status:"empty",applicationId:null});for(const [id,a] of Object.entries(applications))if(a.status==="approved")await db.ref(`rooms/${currentRoomId}/applications/${id}`).update({status:"removed",paid:false});alert("Kadro boşaltıldı.");}catch(e){alert("İşlem başarısız: "+e.message);}}
+
+async function copyIban(){const val=document.getElementById("roomIbanText").textContent;try{await navigator.clipboard.writeText(val);alert("IBAN kopyalandı.");}catch(_){alert(val);}}
+async function copyWhatsAppRoster(){if(!currentRoomId)return;const info=currentRoomInfo||{},cap=getTotalCapacityFromInfo(info),totalPrice=getPitchPriceFromInfo(info),perPerson=getPerPersonFeeFromInfo(info),link=getRoomShareUrl(currentRoomId);const lines=[`⚽ ${(info.title||"KADROKUR").toUpperCase()}`,`📅 ${info.pitchName||""} ${info.schedule?"| "+info.schedule:""} | ${cap} Kişi (${perPerson}₺/kişi • Saha: ${totalPrice}₺)`.trim(),""];for(const team of ["green","red"]){lines.push(team==="green"?"🟢 1. TAKIM (YEŞİL YELEK)":"🔴 2. TAKIM (KIRMIZI YELEK)");for(const s of roster.filter(x=>x.team===team))lines.push(`${SLOT_LABEL[s.pos]}: ${isOccupied(s)?s.name+(s.paid?" ✅":" ⏳"):"BOŞ ("+getSlotPriceForRoom(info,s.pos)+"₺)"}`);lines.push("");}lines.push(`🔗 Oda Linki: ${link}`);lines.push(`🏷️ Oda Kodu: ${currentRoomId}`);const text=lines.join("\n");try{await navigator.clipboard.writeText(text);alert("Kadro ve oda linki kopyalandı!");}catch(_){alert(text);}}
+initFirebase();
+</script>
+</body></html>
