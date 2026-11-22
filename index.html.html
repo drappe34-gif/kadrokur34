@@ -11,10 +11,23 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
-body{font-family:Inter,sans-serif;background:#090d16;color:#f8fafc}.pitch-bg{background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0,rgba(255,255,255,.03) 40px,transparent 40px,transparent 80px),linear-gradient(180deg,#0b2415,#10351f 50%,#0b2415);border:2px solid rgba(74,222,128,.35);box-shadow:0 0 40px rgba(16,185,129,.12)}.glass-card{background:rgba(15,23,42,.92);backdrop-filter:blur(12px);border:1px solid rgba(148,163,184,.15)}button:disabled{opacity:.45;cursor:not-allowed}
+body{font-family:Inter,sans-serif;background:#090d16;color:#f8fafc}.pitch-bg{background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0,rgba(255,255,255,.03) 40px,transparent 40px,transparent 80px),linear-gradient(180deg,#0b2415,#10351f 50%,#0b2415);border:2px solid rgba(74,222,128,.35);box-shadow:0 0 40px rgba(16,185,129,.12)}.glass-card{background:rgba(15,23,42,.84);backdrop-filter:blur(12px);border:1px solid rgba(148,163,184,.18)}button:disabled{opacity:.45;cursor:not-allowed}
+.home-video-backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse at center,#173d2a 0%,#090d16 78%)}
+.home-video-backdrop video{width:100%;height:100%;object-fit:cover;opacity:.48;filter:saturate(1.12) contrast(1.08)}
+.home-video-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,8,16,.78),rgba(3,8,16,.40) 50%,rgba(3,8,16,.78)),linear-gradient(0deg,rgba(3,8,16,.75),transparent 55%,rgba(3,8,16,.35))}
+header,#homeView,#roomView,footer{position:relative;z-index:1}
+body.room-open .home-video-backdrop{display:none}
+#homeChatMessages{scrollbar-width:thin;scrollbar-color:#475569 transparent}
+@media(prefers-reduced-motion:reduce){.home-video-backdrop video{display:none}}
 </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
+<div id="homeVideoBackdrop" class="home-video-backdrop" aria-hidden="true">
+  <video autoplay muted loop playsinline preload="metadata" poster="">
+    <source src="./hali-saha-4k.mp4" type="video/mp4">
+  </video>
+  <div class="home-video-shade"></div>
+</div>
 <header class="border-b border-slate-800 bg-slate-950/90 sticky top-0 z-30"><div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
 <div class="flex items-center gap-3"><button type="button" onclick="goHome()" class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-slate-950 text-lg">KK</button><div><div class="flex items-center gap-2"><button type="button" onclick="goHome()" class="font-black text-lg text-left">Kadro<span class="text-emerald-400">Kur</span></button><span id="headerBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300">MAÇ ODALARI</span></div><p id="headerSubtitle" class="text-xs text-slate-400 mt-1">Bölge, ilçe ve halı saha seç • Kendi maç odanı kurup paylaş</p></div></div>
 <div class="flex items-center gap-2 flex-wrap"><button type="button" onclick="goHome()" id="homeNavBtn" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-emerald-300">🏠 Odalar</button><span id="quotaBadge" class="px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400">Aktif Oda: 0</span><button type="button" onclick="toggleAdminPanel()" id="adminBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-200">🔒 Yönetici Girişi</button></div>
@@ -76,6 +89,28 @@ body{font-family:Inter,sans-serif;background:#090d16;color:#f8fafc}.pitch-bg{bac
 </div>
 </div>
 </div>
+</div>
+<div class="glass-card rounded-2xl p-4 sm:p-5">
+  <div class="flex items-center justify-between gap-2 mb-3">
+    <div>
+      <h3 class="text-sm font-black text-white">💬 KadroKur Canlı Sohbet</h3>
+      <p class="text-[11px] text-slate-400">Üyelerle anlık mesajlaş</p>
+    </div>
+    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> CANLI</span>
+  </div>
+  <div id="homeChatMessages" aria-live="polite" class="h-64 overflow-y-auto rounded-xl bg-slate-950/80 border border-slate-700 p-3 space-y-2">
+    <p class="text-xs text-slate-400">Sohbet yükleniyor…</p>
+  </div>
+  <div id="homeChatLoggedOut" class="mt-3 rounded-lg border border-amber-500/25 bg-amber-950/30 p-3 text-xs text-amber-200">
+    Canlı sohbeti görmek ve mesaj yazmak için önce üye girişi yap.
+  </div>
+  <form id="homeChatForm" onsubmit="sendGeneralChatMessage(event)" class="hidden mt-3 space-y-2">
+    <textarea id="homeChatInput" rows="2" maxlength="300" placeholder="Mesajını yaz… (en fazla 300 karakter)" class="w-full resize-y px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white placeholder:text-slate-500"></textarea>
+    <div class="flex items-center justify-between gap-2">
+      <span class="text-[10px] text-slate-500">Saygılı ve maç odaklı sohbet edelim ⚽</span>
+      <button id="homeChatSendBtn" type="submit" class="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black">Gönder</button>
+    </div>
+  </form>
 </div>
 </div>
 </div>
@@ -277,7 +312,7 @@ function populateTimeSlots(defaultSlot="20:00 - 21:00"){const sel=document.getEl
 function makeDefaultRoster(info=null){const cap=getTotalCapacityFromInfo(info);const form=TEAM_FORMATIONS[cap]||TEAM_FORMATIONS[DEFAULT_PLAYER_COUNT];const a=[];for(const team of ["green","red"]){const p=team==="green"?"g":"r";let idx=0;form.forEach(([pos,count])=>{for(let n=1;n<=count;n++){idx+=1;const id=p+idx;a.push({id,team,pos,label:SLOT_LABEL[pos],name:"",paid:false,status:"empty",applicationId:null});}});}return a;}
 function makeDefaultRosterMap(info=null){const m={};for(const s of makeDefaultRoster(info))m[s.id]={name:"",paid:false,status:"empty",applicationId:null};return m;}
 
-let app,auth,db,rooms={},currentRoomId=null,currentRoomInfo=null,roster=makeDefaultRoster(),applications={},isAdmin=false,isRoomAdmin=false,currentUser=null,movingContext=null,broadcastListener=null,initialBroadcastSeen=false,roomRosterRef=null,roomAppsRef=null,pendingPinRoomId=null,expiryTimer=null;
+let app,auth,db,rooms={},currentRoomId=null,currentRoomInfo=null,roster=makeDefaultRoster(),applications={},isAdmin=false,isRoomAdmin=false,currentUser=null,movingContext=null,broadcastListener=null,initialBroadcastSeen=false,roomRosterRef=null,roomAppsRef=null,pendingPinRoomId=null,expiryTimer=null,generalChatRef=null;
 
 function extractRoomIdFromInput(rawInput){
   const str=String(rawInput||"").trim();
@@ -339,8 +374,10 @@ function syncAuthUiState(u){
       if("Notification"in window&&Notification.permission==="granted")saveDeviceSubscriptionState("granted").catch(()=>{});
     }
     startBroadcastListener();
+    startGeneralChatListener();
   }else{
     stopBroadcastListener();
+    stopGeneralChatListener();
   }
   updateNotificationUi();
   computeRoomAdmin();
@@ -402,6 +439,9 @@ function initFirebase(){
 }
 
 function goHome(){
+  document.body.classList.remove("room-open");
+  const homeVideo=document.querySelector("#homeVideoBackdrop video");
+  if(homeVideo){const playPromise=homeVideo.play();if(playPromise&&playPromise.catch)playPromise.catch(()=>{});}
   currentRoomId=null;currentRoomInfo=null;detachRoomListeners();
   try{if(window.location.protocol!=="file:"){const url=new URL(window.location.href);url.searchParams.delete("room");window.history.replaceState({},"",url.toString());}}catch(_){}
   document.getElementById("roomView").classList.add("hidden");
@@ -463,6 +503,9 @@ async function openRoom(roomId,bypassPin=false){
 
   if(statusEl)statusEl.textContent="";
   currentRoomId=cleanId;
+  document.body.classList.add("room-open");
+  const homeVideo=document.querySelector("#homeVideoBackdrop video");
+  if(homeVideo)homeVideo.pause();
   currentRoomInfo=info;
   roster=mergeRoster(initialRoster||{},currentRoomInfo);
   detachRoomListeners();
@@ -599,6 +642,62 @@ function sendLocalTestNotification(title="⚽ KadroKur | Maç Hatırlatması",bo
 async function sendCustomAdminNotification(e){e.preventDefault();if(!isRoomAdmin||!currentUser){alert("Oda yöneticisi girişi gerekli.");return;}const titleEl=document.getElementById("customNotifTitle"),bodyEl=document.getElementById("customNotifBody"),statusEl=document.getElementById("customNotifStatus"),btn=document.getElementById("sendCustomNotifBtn");const title=titleEl.value.trim(),body=bodyEl.value.trim();if(!title||!body){statusEl.textContent="Başlık ve mesaj boş olamaz.";return;}btn.disabled=true;statusEl.textContent="Gönderiliyor…";try{await db.ref("broadcasts/latest").set({title,body,roomId:currentRoomId||"",sentBy:currentUser.email||currentUser.uid,sentAt:firebase.database.ServerValue.TIMESTAMP});if("Notification"in window&&Notification.permission==="granted"){sendLocalTestNotification(title,body);}bodyEl.value="";statusEl.textContent="Bildirim gönderildi.";}catch(err){statusEl.textContent="Gönderilemedi: "+err.message;}finally{btn.disabled=false;}}
 function startBroadcastListener(){if(broadcastListener||!db||!currentUser)return;initialBroadcastSeen=false;broadcastListener=db.ref("broadcasts/latest");broadcastListener.on("value",snap=>{const val=snap.val();if(!val){initialBroadcastSeen=true;return;}if(!initialBroadcastSeen){initialBroadcastSeen=true;return;}if("Notification"in window&&Notification.permission==="granted"){try{new Notification(val.title||"⚽ KadroKur",{body:val.body||"",tag:"kadrokur-broadcast-"+(val.sentAt||Date.now())});}catch(_){}}},()=>{});}
 function stopBroadcastListener(){if(broadcastListener){broadcastListener.off();broadcastListener=null;}initialBroadcastSeen=false;}
+
+function renderGeneralChatMessages(data){
+  const box=document.getElementById("homeChatMessages");
+  if(!box)return;
+  const entries=Object.entries(data||{}).map(([id,m])=>({id,...(m||{})})).filter(m=>m.text&&m.sender).sort((a,b)=>Number(a.createdAt||0)-Number(b.createdAt||0));
+  if(!entries.length){
+    box.innerHTML='<p class="text-xs text-slate-400 text-center py-8">Henüz mesaj yok. İlk mesajı sen gönder! ⚽</p>';
+    return;
+  }
+  box.innerHTML=entries.map(m=>{
+    const stamp=Number(m.createdAt);
+    const time=Number.isFinite(stamp)&&stamp>0?new Date(stamp).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}):"";
+    const mine=!!currentUser&&m.uid===currentUser.uid;
+    return `<div class="flex ${mine?"justify-end":"justify-start"}"><div class="max-w-[90%] rounded-xl px-3 py-2 ${mine?"bg-emerald-900/80 border border-emerald-700/60":"bg-slate-800/90 border border-slate-700"}"><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-extrabold ${mine?"text-emerald-300":"text-sky-300"}">${esc(m.sender)}</span><span class="text-[9px] text-slate-500">${esc(time)}</span></div><p class="text-xs text-slate-100 whitespace-pre-wrap break-words">${esc(m.text)}</p></div></div>`;
+  }).join("");
+  box.scrollTop=box.scrollHeight;
+}
+function startGeneralChatListener(){
+  if(generalChatRef||!db||!currentUser)return;
+  const form=document.getElementById("homeChatForm"),loggedOut=document.getElementById("homeChatLoggedOut");
+  if(form)form.classList.remove("hidden");
+  if(loggedOut)loggedOut.classList.add("hidden");
+  generalChatRef=db.ref("general_chat").limitToLast(60);
+  generalChatRef.on("value",snap=>renderGeneralChatMessages(snap.val()||{}),err=>{
+    const box=document.getElementById("homeChatMessages");
+    if(box)box.innerHTML=`<p class="text-xs text-rose-300">Sohbet yüklenemedi: ${esc(err.message||"Bağlantı hatası")}</p>`;
+  });
+}
+function stopGeneralChatListener(){
+  if(generalChatRef){generalChatRef.off();generalChatRef=null;}
+  const form=document.getElementById("homeChatForm"),loggedOut=document.getElementById("homeChatLoggedOut"),box=document.getElementById("homeChatMessages");
+  if(form)form.classList.add("hidden");
+  if(loggedOut)loggedOut.classList.remove("hidden");
+  if(box)box.innerHTML='<p class="text-xs text-slate-400 text-center py-8">Sohbeti görmek için üye girişi yap.</p>';
+}
+async function sendGeneralChatMessage(e){
+  e.preventDefault();
+  if(!currentUser||!db){alert("Mesaj göndermek için önce giriş yapmalısın.");return;}
+  const input=document.getElementById("homeChatInput"),btn=document.getElementById("homeChatSendBtn");
+  const message=String(input.value||"").trim();
+  if(!message)return;
+  if(message.length>300){alert("Mesaj en fazla 300 karakter olabilir.");return;}
+  btn.disabled=true;
+  try{
+    let sender=(currentUser.displayName||"").trim();
+    if(!sender){
+      try{const profile=await db.ref("users/"+currentUser.uid+"/name").once("value");sender=String(profile.val()||"").trim();}catch(_){}
+    }
+    if(!sender)sender=(currentUser.email||"Üye").split("@")[0].slice(0,50);
+    const ref=db.ref("general_chat").push();
+    await ref.set({sender,uid:currentUser.uid,text:message,createdAt:firebase.database.ServerValue.TIMESTAMP});
+    input.value="";
+  }catch(err){
+    alert("Mesaj gönderilemedi: "+err.message);
+  }finally{btn.disabled=false;input.focus();}
+}
 
 function renderPitchRow(slots,info){return `<div class="flex justify-center gap-2 sm:gap-4 flex-wrap">${slots.map(s=>{const full=isOccupied(s),team=s.team==="green",border=team?"border-emerald-400/60 bg-emerald-950/75":"border-red-400/60 bg-red-950/75",badge=team?"bg-emerald-500 text-slate-950":"bg-red-500 text-white",slotFee=getSlotPriceForRoom(info,s.pos);if(!full)return `<button type="button" onclick="selectSlotOnPitch('${s.team}','${s.id}')" class="w-24 sm:w-28 p-2 rounded-xl border border-dashed border-white/30 hover:border-emerald-400/70 bg-black/35 text-center transition"><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-800">${s.pos} • ${slotFee}₺</span><div class="text-xs font-bold text-slate-300 mt-1.5">+ BOŞ YER</div></button>`;return `<div class="w-24 sm:w-28 p-2 rounded-xl border ${border} text-center"><div class="flex justify-between text-[10px] mb-1"><span class="font-black px-1.5 py-0.5 rounded ${badge}">${s.pos}</span><span>${s.paid?"✅":"⏳"}</span></div><div class="text-xs font-extrabold truncate">${esc(s.name)}</div>${isRoomAdmin?`<div class="flex justify-center gap-1.5 mt-1"><button type="button" onclick="openMoveModal('${s.id}',${s.applicationId?`'${s.applicationId}'`:"null"})" class="text-[9px] text-sky-300 underline">Taşı</button><button type="button" onclick="removeSlot('${s.id}')" class="text-[9px] text-amber-300 underline">Çıkar</button></div>`:""}</div>`;}).join("")}</div>`;}
 function renderTeam(team,info){const a=roster.filter(s=>s.team===team);const order=team==="red"?[...SLOT_ORDER].reverse():SLOT_ORDER;return order.map(pos=>renderPitchRow(a.filter(s=>s.pos===pos),info)).join("");}
