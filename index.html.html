@@ -26,17 +26,6 @@ header,#homeView,#roomView,footer{position:relative;z-index:1}
 @media(max-width:640px){.home-menu-link{padding:.5rem .65rem;font-size:10px}.home-hero{min-height:430px}}
 body.room-open .home-video-backdrop{display:none}
 #homeChatMessages{scrollbar-width:thin;scrollbar-color:#475569 transparent}
-#floatingChatPanel{position:fixed;right:22px;bottom:94px;width:min(380px,calc(100vw - 28px));z-index:70;box-shadow:0 24px 80px rgba(0,0,0,.55)}
-#floatingChatToggle{position:fixed;right:22px;bottom:22px;z-index:71;width:60px;height:60px;border-radius:999px;box-shadow:0 12px 35px rgba(16,185,129,.35)}
-.chat-open #floatingChatToggle{background:#334155;color:#fff}
-.team-crest{width:38px;height:38px;object-fit:contain;flex:none;background:rgba(255,255,255,.96);border-radius:10px;padding:3px}
-.team-crest-small{width:30px;height:30px;object-fit:contain;flex:none;background:rgba(255,255,255,.96);border-radius:8px;padding:2px}
-.matchup-strip{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:12px;padding:10px;border:1px solid rgba(148,163,184,.16);border-radius:14px;background:rgba(2,6,23,.42)}
-.matchup-team{display:flex;align-items:center;gap:7px;min-width:0;flex:1}
-.matchup-team.away{justify-content:flex-end;text-align:right}
-.matchup-name{font-size:11px;font-weight:900;color:#f8fafc;line-height:1.2;overflow-wrap:anywhere}
-.matchup-vs{font-size:10px;font-weight:900;color:#6ee7b7;letter-spacing:.12em}
-@media(max-width:480px){#floatingChatPanel{right:14px;bottom:86px}#floatingChatToggle{right:14px;bottom:14px;width:56px;height:56px}}
 @media(prefers-reduced-motion:reduce){.home-video-backdrop video{display:none}}
 </style>
 </head>
@@ -49,7 +38,7 @@ body.room-open .home-video-backdrop{display:none}
 </div>
 <header class="home-header border-b border-slate-800 sticky top-0 z-30"><div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
 <div class="flex items-center gap-3"><button type="button" onclick="goHome()" class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-slate-950 text-lg">KK</button><div><div class="flex items-center gap-2"><button type="button" onclick="goHome()" class="font-black text-lg text-left">Kadro<span class="text-emerald-400">Kur</span></button><span id="headerBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300">MAÇ ODALARI</span></div><p id="headerSubtitle" class="text-xs text-slate-400 mt-1">Bölge, ilçe ve halı saha seç • Kendi maç odanı kurup paylaş</p></div></div>
-<div class="flex items-center gap-2 flex-wrap"><nav class="hidden md:flex items-center gap-1 mr-2"><button type="button" class="home-menu-link" onclick="document.getElementById('roomsList').scrollIntoView({behavior:'smooth'})">MAÇLAR</button><button type="button" class="home-menu-link" onclick="document.getElementById('accountPanel').scrollIntoView({behavior:'smooth'})">ÜYELİK</button><button type="button" class="home-menu-link" onclick="toggleFloatingChat(true)">SOHBET</button></nav><button type="button" onclick="goHome()" id="homeNavBtn" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-emerald-300">🏠 Odalar</button><span id="quotaBadge" class="px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400">Aktif Oda: 0</span><button type="button" onclick="toggleAdminPanel()" id="adminBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-200">🔒 Yönetici Girişi</button></div>
+<div class="flex items-center gap-2 flex-wrap"><nav class="hidden md:flex items-center gap-1 mr-2"><button type="button" class="home-menu-link" onclick="document.getElementById('roomsList').scrollIntoView({behavior:'smooth'})">MAÇLAR</button><button type="button" class="home-menu-link" onclick="document.getElementById('accountPanel').scrollIntoView({behavior:'smooth'})">ÜYELİK</button><button type="button" class="home-menu-link" aria-label="Canlı sohbet" title="Canlı sohbet" onclick="document.getElementById('homeChatPanel').scrollIntoView({behavior:'smooth'})">💬</button></nav><button type="button" onclick="goHome()" id="homeNavBtn" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-emerald-300">🏠 Odalar</button><span id="quotaBadge" class="px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400">Aktif Oda: 0</span><button type="button" onclick="toggleAdminPanel()" id="adminBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-200">🔒 Yönetici Girişi</button></div>
 </div></header>
 
 <section id="homeView" class="max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
@@ -117,7 +106,28 @@ body.room-open .home-video-backdrop{display:none}
 </div>
 </div>
 </div>
-
+<div id="homeChatPanel" class="glass-card rounded-2xl p-4 sm:p-5">
+  <div class="flex items-center justify-between gap-2 mb-3">
+    <div>
+      <h3 class="text-sm font-black text-white">💬 KadroKur Canlı Sohbet</h3>
+      <p class="text-[11px] text-slate-400">Üyelerle anlık mesajlaş</p>
+    </div>
+    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> CANLI</span>
+  </div>
+  <div id="homeChatMessages" aria-live="polite" class="h-64 overflow-y-auto rounded-xl bg-slate-950/80 border border-slate-700 p-3 space-y-2">
+    <p class="text-xs text-slate-400">Sohbet yükleniyor…</p>
+  </div>
+  <div id="homeChatLoggedOut" class="mt-3 rounded-lg border border-amber-500/25 bg-amber-950/30 p-3 text-xs text-amber-200">
+    Canlı sohbeti görmek ve mesaj yazmak için önce üye girişi yap.
+  </div>
+  <form id="homeChatForm" onsubmit="sendGeneralChatMessage(event)" class="hidden mt-3 space-y-2">
+    <textarea id="homeChatInput" rows="2" maxlength="300" placeholder="Mesajını yaz… (en fazla 300 karakter)" class="w-full resize-y px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white placeholder:text-slate-500"></textarea>
+    <div class="flex items-center justify-between gap-2">
+      <span class="text-[10px] text-slate-500">Saygılı ve maç odaklı sohbet edelim ⚽</span>
+      <button id="homeChatSendBtn" type="submit" class="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black">Gönder</button>
+    </div>
+  </form>
+</div>
 </div>
 </div>
 </section>
@@ -125,12 +135,28 @@ body.room-open .home-video-backdrop{display:none}
 <main id="roomView" class="hidden max-w-6xl w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 <section class="lg:col-span-7 flex flex-col gap-4">
 <div class="glass-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
-<div class="min-w-0"><h2 id="roomTitleHeading" class="text-lg font-black text-white">Maç Odası</h2><p id="roomMetaText" class="text-xs text-slate-400 mt-0.5"></p><div id="roomMatchupDisplay" class="max-w-xl"></div></div>
+<div><h2 id="roomTitleHeading" class="text-lg font-black text-white">Maç Odası</h2><p id="roomMetaText" class="text-xs text-slate-400 mt-0.5"></p><p id="roomCountdown" class="text-xs font-black text-amber-300 mt-2"></p></div>
 <div class="flex flex-wrap gap-2">
 <button type="button" onclick="copyRoomLink()" class="px-3 py-2 rounded-xl bg-slate-800 text-emerald-300 text-xs font-bold">🔗 Oda Linki</button>
 <button type="button" onclick="copyRoomWhatsAppInvite()" class="px-3 py-2 rounded-xl bg-green-600 text-white text-xs font-bold">📲 Gruba Davet Kopyala</button>
 </div>
 </div>
+
+<section class="glass-card rounded-2xl p-4 space-y-4" id="tournamentPanel">
+  <div class="flex flex-wrap items-center justify-between gap-2"><div><h3 class="text-base font-black text-amber-300">🏆 Turnuva Merkezi</h3><p class="text-[11px] text-slate-400">Fikstür, maç sonuçları ve otomatik puan tablosu</p></div><span class="text-[10px] font-bold rounded-full bg-amber-500/15 text-amber-300 px-2 py-1">3 / 1 / 0 PUAN</span></div>
+  <div id="tournamentAdminTools" class="hidden rounded-xl bg-slate-900/80 border border-slate-700 p-3 space-y-2">
+    <p class="text-xs font-bold text-emerald-300">Yönetici • Yeni turnuva maçı ekle</p>
+    <form id="fixtureForm" onsubmit="addTournamentFixture(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <input id="fixtureHome" required maxlength="35" placeholder="1. Takım adı" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
+      <input id="fixtureAway" required maxlength="35" placeholder="2. Takım adı" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
+      <input id="fixtureDate" type="date" required class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
+      <input id="fixtureTime" type="time" value="20:00" required class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
+      <button class="sm:col-span-2 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black" type="submit">＋ Fikstüre Maç Ekle</button>
+    </form>
+  </div>
+  <div><h4 class="text-xs font-black text-slate-200 mb-2">📅 Turnuva Fikstürü</h4><div id="tournamentFixtures" class="space-y-2"><p class="text-xs text-slate-500">Fikstür yükleniyor…</p></div></div>
+  <div><h4 class="text-xs font-black text-slate-200 mb-2">📊 Puan Durumu</h4><div id="tournamentStandings" class="overflow-x-auto"><p class="text-xs text-slate-500">Henüz sonuç girilmedi.</p></div></div>
+</section>
 
 <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300">🏟️ Canlı Saha Dizilişi</h2>
 <div class="pitch-bg rounded-2xl p-4 sm:p-6 relative"><div class="absolute left-0 right-0 top-1/2 border-t border-white/20"></div>
@@ -138,6 +164,7 @@ body.room-open .home-video-backdrop{display:none}
 <div class="mt-8 relative z-10"><div id="redTeamPitch" class="space-y-3"></div><div class="text-center mt-3"><span class="px-3 py-1 rounded-full text-xs font-extrabold bg-red-500/20 text-red-300">🔴 2. TAKIM (KIRMIZI YELEK)</span></div></div></div>
 
 <div id="adminBar" class="hidden glass-card rounded-xl p-4"><div class="flex flex-wrap justify-between gap-3 mb-3"><b class="text-xs text-amber-300">🛠️ Oda Yönetici Paneli</b><button type="button" onclick="adminLogout()" class="px-3 py-1.5 rounded bg-slate-700 text-xs">Çıkış yap</button></div>
+<div class="mt-3 rounded-xl bg-slate-900/90 border border-slate-700 p-3"><p class="text-xs font-bold text-sky-300 mb-2">🗓️ Maç tarihini / saatini düzenle</p><form onsubmit="updateRoomDateTime(event)" class="grid grid-cols-2 sm:grid-cols-4 gap-2"><input id="editRoomDate" type="date" required aria-label="Maç tarihi" class="min-w-0 px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"><input id="editRoomTime" type="time" required aria-label="Maç başlama saati" class="min-w-0 px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"><input id="editRoomEndTime" type="time" required aria-label="Maç bitiş saati" class="min-w-0 px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"><button type="submit" class="px-3 py-2 rounded-lg bg-sky-600 text-white text-xs font-bold">Kaydet</button></form></div>
 <div class="flex flex-wrap gap-2"><button type="button" onclick="resetAllPlayers()" class="px-3 py-1.5 rounded bg-red-700 text-xs">Yeni hafta: kadroyu boşalt</button><button type="button" onclick="refreshAdminApplications()" class="px-3 py-1.5 rounded bg-slate-700 text-xs">↻ Başvuruları yenile</button><button type="button" onclick="deleteCurrentRoom()" class="px-3 py-1.5 rounded bg-rose-900 border border-rose-500/50 text-rose-200 text-xs font-bold">🗑️ Bu Odayı Sil</button></div>
 
 <div class="mt-4 rounded-xl bg-slate-900/90 border border-slate-700 p-3.5">
@@ -180,21 +207,9 @@ Kadroya başvurmak için önce <button type="button" onclick="goHome()" class="u
 <div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomPitchSelect">Halı Saha İsmi</label><select id="newRoomPitchSelect" onchange="toggleCustomPitchInput()" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></select>
 <input id="newRoomPitchCustom" maxlength="60" placeholder="Halı saha adını yazın..." class="hidden mt-2 w-full px-3 py-2 rounded-xl bg-slate-950 border border-emerald-500/50 text-sm text-white"></div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomHomeTeam">🏠 Ev Sahibi Takım</label><select id="newRoomHomeTeam" required class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white" onchange="updateTeamPreview()"></select></div>
-<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomAwayTeam">✈️ Deplasman Takımı</label><select id="newRoomAwayTeam" required class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white" onchange="updateTeamPreview()"></select></div>
-</div>
-<div id="createMatchupPreview" class="matchup-strip"><span class="text-xs text-slate-400">Ev sahibi ve deplasman takımlarını seç</span></div>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomDay">Maç Günü</label><select id="newRoomDay" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white">
-<option value="Pazartesi">Pazartesi</option>
-<option value="Salı">Salı</option>
-<option value="Çarşamba">Çarşamba</option>
-<option value="Perşembe">Perşembe</option>
-<option value="Cuma" selected>Cuma</option>
-<option value="Cumartesi">Cumartesi</option>
-<option value="Pazar">Pazar</option>
-</select></div>
-<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomTimeSlot">Saat Aralığı</label><select id="newRoomTimeSlot" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></select></div>
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomDate">Maç Tarihi</label><input id="newRoomDate" type="date" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></div>
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomTime">Maç Başlama</label><input id="newRoomTime" type="time" value="20:00" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></div>
+<div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomEndTime">Maç Bitiş</label><input id="newRoomEndTime" type="time" value="21:00" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></div>
 </div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 <div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomPlayerCount">Kaç Kişi (Toplam Kadro)</label><select id="newRoomPlayerCount" onchange="updateCalculatedPerPersonPreview()" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white">
@@ -223,19 +238,6 @@ Kadroya başvurmak için önce <button type="button" onclick="goHome()" class="u
 <div id="movePlayerModal" class="hidden fixed inset-0 z-50 bg-black/75 p-4 flex items-center justify-center"><div class="glass-card rounded-2xl p-6 w-full max-w-md"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-black">🔄 Yer / Takım Değiştir</h2><button type="button" onclick="closeMoveModal()" class="text-xl leading-none">×</button></div><p id="movePlayerInfo" class="text-xs text-slate-300 mb-4"></p><form onsubmit="confirmMovePlayer(event)" class="space-y-4"><div><label class="block text-xs font-bold text-slate-300 mb-1" for="moveTargetSlot">Yeni Kadro / Mevki</label><select id="moveTargetSlot" required class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm"></select></div><p id="moveError" class="text-xs text-red-300"></p><div class="flex justify-end gap-2"><button type="button" onclick="closeMoveModal()" class="px-4 py-2 rounded-lg bg-slate-700 text-xs font-bold">İptal</button><button id="moveSubmitBtn" type="submit" class="px-4 py-2 rounded-lg bg-amber-500 text-slate-950 text-xs font-black">Taşımayı Onayla</button></div></form></div></div>
 
 <div id="adminLoginModal" class="hidden fixed inset-0 z-50 bg-black/75 p-4 flex items-center justify-center"><div class="glass-card rounded-2xl p-6 w-full max-w-sm"><div class="flex justify-between mb-4"><h2 class="text-lg font-black">Yönetici Girişi</h2><button type="button" onclick="closeAdminLogin()" class="text-xl">×</button></div><form onsubmit="adminLogin(event)" class="space-y-3"><input id="adminEmail" type="email" required placeholder="Yönetici e-posta" class="w-full px-3 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white"><input id="adminPassword" type="password" required placeholder="Şifre" class="w-full px-3 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white"><button id="adminLoginSubmit" type="submit" class="w-full py-2.5 rounded-lg bg-emerald-500 text-slate-950 font-bold text-sm">Giriş yap</button><p id="loginError" class="text-xs text-red-300"></p></form></div></div>
-<div id="floatingChatPanel" class="hidden glass-card rounded-2xl p-4 sm:p-5">
-  <div class="flex items-center justify-between gap-2 mb-3">
-    <div><h3 class="text-sm font-black text-white">💬 KadroKur Canlı Sohbet</h3><p class="text-[11px] text-slate-400">Üyelerle anlık mesajlaş</p></div>
-    <div class="flex items-center gap-3"><span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> CANLI</span><button type="button" onclick="toggleFloatingChat(false)" aria-label="Sohbeti kapat" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-200 text-lg">×</button></div>
-  </div>
-  <div id="homeChatMessages" aria-live="polite" class="h-64 overflow-y-auto rounded-xl bg-slate-950/80 border border-slate-700 p-3 space-y-2"><p class="text-xs text-slate-400">Sohbet yükleniyor…</p></div>
-  <div id="homeChatLoggedOut" class="mt-3 rounded-lg border border-amber-500/25 bg-amber-950/30 p-3 text-xs text-amber-200">Canlı sohbeti görmek ve mesaj yazmak için önce üye girişi yap.</div>
-  <form id="homeChatForm" onsubmit="sendGeneralChatMessage(event)" class="hidden mt-3 space-y-2">
-    <textarea id="homeChatInput" rows="2" maxlength="300" placeholder="Mesajını yaz… (en fazla 300 karakter)" class="w-full resize-y px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white placeholder:text-slate-500"></textarea>
-    <div class="flex items-center justify-between gap-2"><span class="text-[10px] text-slate-500">Saygılı ve maç odaklı sohbet edelim ⚽</span><button id="homeChatSendBtn" type="submit" class="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black">Gönder</button></div>
-  </form>
-</div>
-<button id="floatingChatToggle" type="button" onclick="toggleFloatingChat()" aria-label="Canlı sohbeti aç" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-2xl font-black flex items-center justify-center">💬</button>
 <footer class="text-center py-4 text-xs text-slate-500 border-t border-slate-900">KadroKur • Çoklu Maç Odası & Kadro Yönetim Platformu</footer>
 <script>
 const firebaseConfig={apiKey:"AIzaSyDI5PGiOBZWEMMz6HSU-6-AYXFCWNW7POc",authDomain:"kadrokur34-b4115.firebaseapp.com",databaseURL:"https://kadrokur34-b4115-default-rtdb.europe-west1.firebasedatabase.app",projectId:"kadrokur34-b4115",storageBucket:"kadrokur34-b4115.firebasestorage.app",messagingSenderId:"846977382574",appId:"1:846977382574:web:d4c1f5811ebfbf20ddd53f"};
@@ -249,35 +251,6 @@ const TEAM_FORMATIONS={
   16:[["GK",1],["DEF",3],["MID",2],["FWD",2]]
 };
 const DAY_INDEX_MAP={"Pazar":0,"Pazartesi":1,"Salı":2,"Çarşamba":3,"Perşembe":4,"Cuma":5,"Cumartesi":6};
-
-const SUPER_LEAGUE_TEAMS=[
-  {id:"galatasaray",name:"Galatasaray",short:"GS",api:645,color:"#b3132b"},
-  {id:"fenerbahce",name:"Fenerbahçe",short:"FB",api:611,color:"#123b82"},
-  {id:"besiktas",name:"Beşiktaş",short:"BJK",api:549,color:"#111827"},
-  {id:"trabzonspor",name:"Trabzonspor",short:"TS",api:998,color:"#7d1734"},
-  {id:"basaksehir",name:"Başakşehir",short:"İBFK",api:564,color:"#e87522"},
-  {id:"kasimpasa",name:"Kasımpaşa",short:"KAS",api:1004,color:"#174b8c"},
-  {id:"eyupspor",name:"Eyüpspor",short:"EYP",api:3586,color:"#6d287d"},
-  {id:"alanyaspor",name:"Alanyaspor",short:"ALN",api:996,color:"#e46b25"},
-  {id:"amed",name:"Amed Sportif",short:"AMED",api:3607,color:"#16834b"},
-  {id:"corum",name:"Çorum FK",short:"ÇFK",api:3588,color:"#a51e2d"},
-  {id:"erzurumspor",name:"Erzurumspor FK",short:"ERZ",api:1005,color:"#2385c6"},
-  {id:"gaziantep",name:"Gaziantep FK",short:"GFK",api:3573,color:"#a51f35"},
-  {id:"genclerbirligi",name:"Gençlerbirliği",short:"GB",api:1000,color:"#b51f2b"},
-  {id:"goztepe",name:"Göztepe",short:"GÖZ",api:994,color:"#c51e32"},
-  {id:"kocaelispor",name:"Kocaelispor",short:"KOC",api:1006,color:"#16804b"},
-  {id:"konyaspor",name:"Konyaspor",short:"KON",api:607,color:"#16814b"},
-  {id:"samsunspor",name:"Samsunspor",short:"SAM",api:3602,color:"#c51f34"},
-  {id:"rizespor",name:"Çaykur Rizespor",short:"RİZ",api:1001,color:"#16834c"}
-];
-function getTeamById(id){return SUPER_LEAGUE_TEAMS.find(t=>t.id===id)||null;}
-function teamLogoUrl(team){return team&&team.api?`https://media.api-sports.io/football/teams/${team.api}.png`:"";}
-function teamLogoMarkup(team,small=false){if(!team)return "";const size=small?"team-crest-small":"team-crest";return `<img class="${size}" src="${teamLogoUrl(team)}" alt="${esc(team.name)} logosu" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="${size} items-center justify-center text-[9px] font-black text-white" style="display:none;background:${team.color}">${esc(team.short)}</span>`;}
-function teamSelectOptions(selected=""){return SUPER_LEAGUE_TEAMS.map(t=>`<option value="${t.id}" ${t.id===selected?"selected":""}>${t.name}</option>`).join("");}
-function initTeamSelectors(){const home=document.getElementById("newRoomHomeTeam"),away=document.getElementById("newRoomAwayTeam");if(!home||!away)return;home.innerHTML=teamSelectOptions("galatasaray");away.innerHTML=teamSelectOptions("fenerbahce");updateTeamPreview();}
-function updateTeamPreview(){const home=getTeamById(document.getElementById("newRoomHomeTeam")?.value),away=getTeamById(document.getElementById("newRoomAwayTeam")?.value),box=document.getElementById("createMatchupPreview");if(!box)return;if(home&&away&&home.id===away.id){box.innerHTML='<span class="text-xs text-rose-300">Ev sahibi ve deplasman takımları farklı olmalı.</span>';return;}box.innerHTML=home&&away?`<div class="matchup-team">${teamLogoMarkup(home,true)}<span class="matchup-name">${esc(home.name)}</span></div><span class="matchup-vs">VS</span><div class="matchup-team away"><span class="matchup-name">${esc(away.name)}</span>${teamLogoMarkup(away,true)}</div>`:"";}
-function renderMatchup(info,compact=false){const home=getTeamById(info?.homeTeamId),away=getTeamById(info?.awayTeamId);if(!home&&!away)return "";return `<div class="matchup-strip"><div class="matchup-team">${teamLogoMarkup(home,true)}<span class="matchup-name">${esc(home?.name||info.homeTeamName||"Ev Sahibi")}</span></div><span class="matchup-vs">VS</span><div class="matchup-team away"><span class="matchup-name">${esc(away?.name||info.awayTeamName||"Deplasman")}</span>${teamLogoMarkup(away,true)}</div></div>`;}
-
 
 const ISTANBUL_LOCATIONS={
   "İstanbul - Avrupa Yakası":{
@@ -405,7 +378,7 @@ function showMessage(m,ok=true){const b=document.getElementById("formMessage");b
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function isOccupied(s){return !!(s&&s.name&&s.status!=="empty");}
 function mergeRoster(data,info=null){const base=makeDefaultRoster(info);return base.map(d=>{const v=data&&data[d.id]&&typeof data[d.id]==="object"?data[d.id]:{};const name=typeof v.name==="string"?v.name:"";const status=name?(v.status&&v.status!=="empty"?v.status:"approved"):"empty";return {...d,...v,id:d.id,team:d.team,pos:d.pos,label:d.label,name,status,paid:name?v.paid===true:false,applicationId:name?(v.applicationId||null):null};});}
-function computeRoomAdmin(){isRoomAdmin=!!currentUser&&(ADMIN_UIDS.includes(currentUser.uid)||(!!currentRoomInfo&&currentRoomInfo.ownerUid===currentUser.uid));document.getElementById("adminBar").classList.toggle("hidden",!isRoomAdmin);if(!isRoomAdmin)closeMoveModal();if(isRoomAdmin&&currentRoomId)startRoomApplicationsListener();else stopRoomApplicationsListener();}
+function computeRoomAdmin(){isRoomAdmin=!!currentUser&&(ADMIN_UIDS.includes(currentUser.uid)||(!!currentRoomInfo&&currentRoomInfo.ownerUid===currentUser.uid));document.getElementById("adminBar").classList.toggle("hidden",!isRoomAdmin);const tt=document.getElementById("tournamentAdminTools");if(tt)tt.classList.toggle("hidden",!isRoomAdmin);if(!isRoomAdmin)closeMoveModal();if(isRoomAdmin&&currentRoomId)startRoomApplicationsListener();else stopRoomApplicationsListener();}
 
 async function deleteCurrentRoom(){if(!isRoomAdmin||!currentRoomId)return;const title=(currentRoomInfo&&currentRoomInfo.title)||currentRoomId;if(!confirm(`"${title}" maç odası kalıcı olarak silinsin mi?`))return;try{await db.ref("rooms/"+currentRoomId).remove();alert("Maç odası silindi.");goHome();}catch(e){alert("Oda silinemedi: "+e.message);}}
 
@@ -442,6 +415,7 @@ function initFirebase(){
     syncFilterDistricts();
     syncCreateDistricts("Arnavutköy");
     populateTimeSlots("20:00 - 21:00");
+    const dateInput=document.getElementById("newRoomDate");if(dateInput&&!dateInput.value)dateInput.value=localDateInputValue(new Date());
     updateCalculatedPerPersonPreview();
     if(!firebase.apps.length)app=firebase.initializeApp(firebaseConfig);
     else app=firebase.app();
@@ -464,6 +438,7 @@ function initFirebase(){
           updateRoomHeader();
           roster=mergeRoster((rooms[currentRoomId].roster)||{},currentRoomInfo);
           renderAll();
+          renderTournament();
         }
       }else if(initialRoom&&!initialRoomHandled){
         initialRoomHandled=true;
@@ -476,6 +451,7 @@ function initFirebase(){
     });
 
     if(!expiryTimer)expiryTimer=setInterval(sweepExpiredRooms,30000);
+    if(!window.kadrokurCountdownTimer)window.kadrokurCountdownTimer=setInterval(()=>{if(currentRoomId){const info=currentRoomInfo||{};const cd=document.getElementById("roomCountdown");if(cd)cd.textContent=countdownText(info);renderRoomsLobby();}},1000);
 
     if(initialRoom){
       setTimeout(()=>{
@@ -597,16 +573,25 @@ const expected=String((info&&info.roomPin)??"").trim();
 if(!expected||entered===expected){if(expected)markRoomUnlocked(roomId,expected);const target=roomId;cancelRoomPinModal();openRoom(target,true);}else{errEl.textContent="Oda şifresi hatalı. Tekrar deneyin.";}}
 
 function detachRoomListeners(){if(roomRosterRef){roomRosterRef.off();roomRosterRef=null;}stopRoomApplicationsListener();roster=makeDefaultRoster();}
-function updateRoomHeader(){const info=currentRoomInfo||{};const cap=getTotalCapacityFromInfo(info);const totalPrice=getPitchPriceFromInfo(info);const perPerson=getPerPersonFeeFromInfo(info);document.getElementById("headerBadge").textContent=info.pitchName||"MAÇ ODASI";document.getElementById("headerSubtitle").textContent=[info.region,info.district,info.schedule,`${cap} Kişi • ${perPerson}₺/kişi`].filter(Boolean).join(" • ")||"Canlı kadro ve başvuru ekranı";document.getElementById("roomTitleHeading").textContent=info.title||(info.pitchName?info.pitchName+" Maçı":"Maç Odası");const loc=[info.region,info.district,info.pitchName].filter(Boolean).join(" / ");document.getElementById("roomMetaText").textContent=`${loc?loc+" • ":""}${info.schedule||"Saat belirtilmedi"} • ${info.homeTeamName||"Ev Sahibi"} - ${info.awayTeamName||"Deplasman"} • Oda Kodu: ${currentRoomId}`;
-const matchup=document.getElementById("roomMatchupDisplay");if(matchup)matchup.innerHTML=renderMatchup(info);document.getElementById("priceFeeSummary").textContent=`Saha Ücreti: ${totalPrice} ₺ • ${cap} Kişi`;document.getElementById("roomIbanText").textContent=info.iban||"TR53 0006 2000 5950 0006 6773 76";document.getElementById("ibanOwnerLabel").textContent="ÖDEME IBAN"+(info.ibanOwner?` (${info.ibanOwner.toUpperCase()})`:"");}
+function localDateInputValue(d){const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);return x.toISOString().slice(0,10);}
+function roomDateTimeValue(info){if(info&&info.matchDateTime)return String(info.matchDateTime).slice(0,16);if(info&&info.matchDate&&info.matchTime)return `${info.matchDate}T${info.matchTime}`;return "";}
+function roomDateTimeMs(info){if(info&&Number.isFinite(Number(info.matchAt)))return Number(info.matchAt);const v=roomDateTimeValue(info);const n=v?new Date(v).getTime():NaN;return Number.isFinite(n)?n:0;}
+function roomEndTimeMs(info){const explicit=Number(info&&info.matchEndAt);if(Number.isFinite(explicit)&&explicit>0)return explicit;const start=roomDateTimeMs(info);return start?start+60*60*1000:0;}
+function roomTimeRangeLabel(info){const start=roomDateTimeMs(info),end=roomEndTimeMs(info);if(!start)return "";const fmt=n=>new Date(n).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});return `Başlama: ${fmt(start)} • Bitiş: ${fmt(end)}`;}
+function formatMatchDateTime(v){if(!v)return "";const d=new Date(v);if(!Number.isFinite(d.getTime()))return "";return d.toLocaleDateString("tr-TR",{day:"2-digit",month:"long",year:"numeric",weekday:"long"})+" • "+d.toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});}
+function roomDateTimeLabel(info){const value=roomDateTimeValue(info);return value?`${formatMatchDateTime(value)} • ${roomTimeRangeLabel(info)}`:"";}
+function countdownText(info){const target=roomDateTimeMs(info);if(!target)return "";const now=Date.now(),diff=target-now,end=roomEndTimeMs(info);if(now>=end)return "🏁 MAÇ BİTTİ";if(now>=target){const left=end-now,mins=Math.floor(left/60000),secs=Math.floor(left%60000/1000);return `🔴 MAÇ BAŞLADI • Bitişe ${mins} dk ${secs} sn`;}const days=Math.floor(diff/86400000),hours=Math.floor(diff%86400000/3600000),mins=Math.floor(diff%3600000/60000),secs=Math.floor(diff%60000/1000);return `⏳ MAÇ BAŞLAMASINA: ${days?days+" gün ":""}${hours} sa ${mins} dk ${secs} sn`;}
+async function updateRoomDateTime(e){e.preventDefault();if(!isRoomAdmin||!currentRoomId)return;const date=document.getElementById("editRoomDate").value,time=document.getElementById("editRoomTime").value,endTime=document.getElementById("editRoomEndTime").value;if(!date||!time||!endTime)return;const value=`${date}T${time}`,stamp=new Date(value).getTime(),endStamp=new Date(`${date}T${endTime}`).getTime();if(!Number.isFinite(stamp)||!Number.isFinite(endStamp)||endStamp<=stamp){alert("Bitiş saati, başlama saatinden sonra olmalı.");return;}try{const schedule=formatMatchDateTime(value);await db.ref(`rooms/${currentRoomId}/info`).update({matchDate:date,matchTime:time,matchEndTime:endTime,matchDateTime:value,matchAt:stamp,matchEndAt:endStamp,schedule,expireAt:endStamp+24*60*60*1000,updatedAt:firebase.database.ServerValue.TIMESTAMP});alert("Maç başlama ve bitiş saatleri güncellendi. Herkese anında yansıyacak.");}catch(err){alert("Tarih/saat güncellenemedi: "+err.message);}}
+
+function updateRoomHeader(){const info=currentRoomInfo||{};const cap=getTotalCapacityFromInfo(info);const totalPrice=getPitchPriceFromInfo(info);const perPerson=getPerPersonFeeFromInfo(info);document.getElementById("headerBadge").textContent=info.pitchName||"MAÇ ODASI";document.getElementById("headerSubtitle").textContent=[info.region,info.district,info.schedule,`${cap} Kişi • ${perPerson}₺/kişi`].filter(Boolean).join(" • ")||"Canlı kadro ve başvuru ekranı";document.getElementById("roomTitleHeading").textContent=info.title||(info.pitchName?info.pitchName+" Maçı":"Maç Odası");const loc=[info.region,info.district,info.pitchName].filter(Boolean).join(" / ");const dateText=roomDateTimeLabel(info);document.getElementById("roomMetaText").textContent=`${loc?loc+" • ":""}${dateText||info.schedule||"Tarih ve saat belirtilmedi"} • Oda Kodu: ${currentRoomId}`;document.getElementById("priceFeeSummary").textContent=`Saha Ücreti: ${totalPrice} ₺ • ${cap} Kişi`;document.getElementById("roomIbanText").textContent=info.iban||"TR53 0006 2000 5950 0006 6773 76";document.getElementById("ibanOwnerLabel").textContent="ÖDEME IBAN"+(info.ibanOwner?` (${info.ibanOwner.toUpperCase()})`:"");const cd=document.getElementById("roomCountdown");if(cd)cd.textContent=countdownText(info);const d=document.getElementById("editRoomDate"),t=document.getElementById("editRoomTime"),et=document.getElementById("editRoomEndTime");if(d&&t&&et){const dt=roomDateTimeValue(info);d.value=dt?dt.slice(0,10):"";t.value=dt?dt.slice(11,16):"";const end=Number(info.matchEndAt)||roomEndTimeMs(info);et.value=info.matchEndTime||(end?new Date(end).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit",hour12:false}):"21:00");}renderTournament();}
 
 function renderRoomsLobby(){const listEl=document.getElementById("roomsList");if(!listEl)return;const rFilter=(document.getElementById("filterRegion")?.value||"").trim().toLowerCase();const dFilter=(document.getElementById("filterDistrict")?.value||"").trim().toLowerCase();const pFilter=(document.getElementById("filterPitch")?.value||"").trim().toLowerCase();
 const entries=Object.entries(rooms).filter(([,room])=>{const info=(room&&room.info)||{};const hayTitle=(info.title||"").toLowerCase();const hayReg=(info.region||"").toLowerCase();const hayDist=(info.district||"").toLowerCase();const hayPitch=(info.pitchName||"").toLowerCase();
-if(rFilter&&!hayReg.includes(rFilter))return false;if(dFilter&&!hayDist.includes(dFilter))return false;if(pFilter&&!hayPitch.includes(pFilter)&&!hayTitle.includes(pFilter))return false;return true;});
+if(rFilter&&!hayReg.includes(rFilter))return false;if(dFilter&&!hayDist.includes(dFilter))return false;if(pFilter&&!hayPitch.includes(pFilter)&&!hayTitle.includes(pFilter))return false;return true;}).sort((a,b)=>{const ta=roomDateTimeMs((a[1]||{}).info||{}),tb=roomDateTimeMs((b[1]||{}).info||{});return (ta||Number.MAX_SAFE_INTEGER)-(tb||Number.MAX_SAFE_INTEGER);});
 if(!entries.length){listEl.innerHTML=`<div class="col-span-full glass-card rounded-2xl p-6 text-center"><p class="text-sm font-bold text-slate-300">Filtreye uygun maç odası bulunamadı.</p><p class="text-xs text-slate-400 mt-1">Yeni bir maç odası kurup kendi grubunda paylaşabilirsin.</p></div>`;return;}
-listEl.innerHTML=entries.map(([id,room])=>{const info=(room&&room.info)||{};const cap=getTotalCapacityFromInfo(info);const perPerson=getPerPersonFeeFromInfo(info);const merged=mergeRoster((room&&room.roster)||{},info);const filled=merged.filter(isOccupied).length;const locked=!!String(info.roomPin??"").trim();return `<div class="glass-card rounded-2xl p-4 flex flex-col justify-between gap-3"><div><div class="flex items-center justify-between gap-2 mb-1"><div class="flex items-center gap-1.5 flex-wrap"><span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 text-[10px] font-extrabold">${filled}/${cap} DOLU</span><span class="px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 text-[10px] font-extrabold">${perPerson}₺/KİŞİ</span><span class="px-2 py-0.5 rounded ${locked?"bg-amber-500/20 text-amber-300":"bg-slate-800 text-slate-300"} text-[10px] font-extrabold">${locked?"🔒 Şifreli":"🔓 Açık"}</span></div><span class="text-[11px] font-mono text-slate-400">#${esc(id)}</span></div><h3 class="text-base font-black text-white">${esc(info.title||info.pitchName||"Halı Saha Maçı")}</h3>${renderMatchup(info,true)}<p class="text-xs text-emerald-300 font-semibold mt-0.5">🏟️ ${esc(info.pitchName||"Halı Saha")}</p><p class="text-xs text-slate-400 mt-0.5">📍 ${esc([info.region,info.district].filter(Boolean).join(" / ")||"Bölge belirtilmedi")}</p><p class="text-xs text-slate-400 mt-0.5">📅 ${esc(info.schedule||"Gün ve saat belirtilmedi")}</p></div><div class="flex gap-2 pt-2 border-t border-slate-800"><button type="button" onclick="openRoom('${esc(id)}')" class="flex-1 py-2 rounded-xl bg-emerald-500 text-slate-950 text-xs font-black">Odaya Gir</button><button type="button" onclick="copyRoomInviteById('${esc(id)}')" class="px-3 py-2 rounded-xl bg-green-700 text-white text-xs font-bold">📲 Paylaş</button></div></div>`;}).join("");}
+listEl.innerHTML=entries.map(([id,room])=>{const info=(room&&room.info)||{};const cap=getTotalCapacityFromInfo(info);const perPerson=getPerPersonFeeFromInfo(info);const merged=mergeRoster((room&&room.roster)||{},info);const filled=merged.filter(isOccupied).length;const locked=!!String(info.roomPin??"").trim();return `<div class="glass-card rounded-2xl p-4 flex flex-col justify-between gap-3"><div><div class="flex items-center justify-between gap-2 mb-1"><div class="flex items-center gap-1.5 flex-wrap"><span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 text-[10px] font-extrabold">${filled}/${cap} DOLU</span><span class="px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 text-[10px] font-extrabold">${perPerson}₺/KİŞİ</span><span class="px-2 py-0.5 rounded ${locked?"bg-amber-500/20 text-amber-300":"bg-slate-800 text-slate-300"} text-[10px] font-extrabold">${locked?"🔒 Şifreli":"🔓 Açık"}</span></div><span class="text-[11px] font-mono text-slate-400">#${esc(id)}</span></div><h3 class="text-base font-black text-white">${esc(info.title||info.pitchName||"Halı Saha Maçı")}</h3><p class="text-xs text-emerald-300 font-semibold mt-0.5">🏟️ ${esc(info.pitchName||"Halı Saha")}</p><p class="text-xs text-slate-400 mt-0.5">📍 ${esc([info.region,info.district].filter(Boolean).join(" / ")||"Bölge belirtilmedi")}</p><p class="text-xs text-slate-300 mt-0.5">📅 ${esc(roomDateTimeLabel(info)||info.schedule||"Tarih ve saat belirtilmedi")}</p><p class="text-[11px] text-amber-300 mt-1 font-bold">${esc(countdownText(info))}</p></div><div class="flex gap-2 pt-2 border-t border-slate-800"><button type="button" onclick="openRoom('${esc(id)}')" class="flex-1 py-2 rounded-xl bg-emerald-500 text-slate-950 text-xs font-black">Odaya Gir</button><button type="button" onclick="copyRoomInviteById('${esc(id)}')" class="px-3 py-2 rounded-xl bg-green-700 text-white text-xs font-bold">📲 Paylaş</button></div></div>`;}).join("");}
 
-function openCreateRoomModal(){if(!currentUser){alert("Yeni maç odası kurmak için önce üye girişi yapın.");return;}initTeamSelectors();syncCreateDistricts("Arnavutköy");populateTimeSlots("20:00 - 21:00");document.getElementById("newRoomPlayerCount").value=String(DEFAULT_PLAYER_COUNT);document.getElementById("newRoomPitchPrice").value=String(DEFAULT_PITCH_PRICE);updateCalculatedPerPersonPreview();document.getElementById("newRoomPin").value="";document.getElementById("createRoomError").textContent="";document.getElementById("createRoomModal").classList.remove("hidden");}
+function openCreateRoomModal(){if(!currentUser){alert("Yeni maç odası kurmak için önce üye girişi yapın.");return;}syncCreateDistricts("Arnavutköy");populateTimeSlots("20:00 - 21:00");document.getElementById("newRoomDate").value=localDateInputValue(new Date());document.getElementById("newRoomTime").value="20:00";document.getElementById("newRoomEndTime").value="21:00";document.getElementById("newRoomPlayerCount").value=String(DEFAULT_PLAYER_COUNT);document.getElementById("newRoomPitchPrice").value=String(DEFAULT_PITCH_PRICE);updateCalculatedPerPersonPreview();document.getElementById("newRoomPin").value="";document.getElementById("createRoomError").textContent="";document.getElementById("createRoomModal").classList.remove("hidden");}
 function closeCreateRoomModal(){document.getElementById("createRoomModal").classList.add("hidden");}
 function slugifyRoom(str){return String(str||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,20);}
 
@@ -623,24 +608,24 @@ async function createRoom(e){
   const pitchSelVal=document.getElementById("newRoomPitchSelect").value;
   const pitchCustomVal=document.getElementById("newRoomPitchCustom").value.trim();
   const pitchName=pitchSelVal==="__CUSTOM__"?pitchCustomVal:pitchSelVal;
-  const matchDay=document.getElementById("newRoomDay").value.trim();
-  const timeSlot=document.getElementById("newRoomTimeSlot").value.trim();
-  const schedule=[matchDay,timeSlot].filter(Boolean).join(" • ");
-  const expireAt=computeExpireAtMs(matchDay,timeSlot);
+  const matchDate=document.getElementById("newRoomDate").value;
+  const matchTime=document.getElementById("newRoomTime").value;
+  const matchEndTime=document.getElementById("newRoomEndTime").value;
+  const matchDateTime=matchDate&&matchTime?`${matchDate}T${matchTime}`:"";
+  const matchAt=matchDateTime?new Date(matchDateTime).getTime():NaN;
+  const matchEndAt=matchDate&&matchEndTime?new Date(`${matchDate}T${matchEndTime}`).getTime():NaN;
+  const schedule=formatMatchDateTime(matchDateTime);
+  const expireAt=Number.isFinite(matchEndAt)?matchEndAt+24*60*60*1000:null;
   const playerCount=normalizePlayerCount(document.getElementById("newRoomPlayerCount").value);
   const pitchPrice=Math.max(0,Number(document.getElementById("newRoomPitchPrice").value)||0);
   const roomPin=document.getElementById("newRoomPin").value.trim();
   const ibanOwner=document.getElementById("newRoomIbanOwner").value.trim();
   const iban=document.getElementById("newRoomIban").value.trim();
-  const homeTeam=getTeamById(document.getElementById("newRoomHomeTeam").value);
-  const awayTeam=getTeamById(document.getElementById("newRoomAwayTeam").value);
-  if(!title||!region||!district||!pitchName||!schedule||!homeTeam||!awayTeam){err.textContent="Lütfen tüm zorunlu alanları seçin veya doldurun.";return;}
-  if(homeTeam.id===awayTeam.id){err.textContent="Ev sahibi ve deplasman takımları farklı olmalı.";return;}
+  if(!title||!region||!district||!pitchName||!matchDate||!matchTime||!matchEndTime||!Number.isFinite(matchAt)||!Number.isFinite(matchEndAt)||matchEndAt<=matchAt){err.textContent="Maç bitiş saati, başlama saatinden sonra olmalı.";return;}
   const baseSlug=slugifyRoom(pitchName||title)||"mac";
   const roomId=baseSlug+"-"+Math.random().toString(36).slice(2,6);
   const roomInfoPayload={
-    title,region,district,pitchName,schedule,matchDay,timeSlot,expireAt,
-    homeTeamId:homeTeam.id,homeTeamName:homeTeam.name,awayTeamId:awayTeam.id,awayTeamName:awayTeam.name,
+    title,region,district,pitchName,schedule,matchDate,matchTime,matchEndTime,matchDateTime,matchAt,matchEndAt,expireAt,
     playerCount,pitchPrice,roomPin,
     ibanOwner:ibanOwner||"Oda Sahibi",
     iban:iban||"TR53 0006 2000 5950 0006 6773 76",
@@ -685,7 +670,7 @@ function buildRoomInviteText(roomId,info){
   const cap=getTotalCapacityFromInfo(info);
   const perPerson=getPerPersonFeeFromInfo(info);
   const pinLine=String(info.roomPin??"").trim()?`🔑 Oda Şifresi: ${String(info.roomPin).trim()}`:"";
-  return [`⚽ ${info.title||"Halı Saha Maç Odası"}`,`🏟️ Saha: ${info.pitchName||"-"} (${[info.region,info.district].filter(Boolean).join(" / ")})`,`🏟️ Maç: ${info.homeTeamName||"Ev Sahibi"} - ${info.awayTeamName||"Deplasman"}`,`📅 Zaman: ${info.schedule||"-"} • ${cap} Kişi • ${perPerson}₺/kişi`,pinLine,`🔗 Oda Linki: ${link}`,`🏷️ Oda Kodu: ${cleanId}`].filter(Boolean).join("\n");
+  return [`⚽ ${info.title||"Halı Saha Maç Odası"}`,`🏟️ Saha: ${info.pitchName||"-"} (${[info.region,info.district].filter(Boolean).join(" / ")})`,`📅 Zaman: ${info.schedule||"-"} • ${cap} Kişi • ${perPerson}₺/kişi`,pinLine,`🔗 Oda Linki: ${link}`,`🏷️ Oda Kodu: ${cleanId}`].filter(Boolean).join("\n");
 }
 
 async function copyRoomInviteById(roomId){const cleanId=extractRoomIdFromInput(roomId);const room=rooms[cleanId]||{};const text=buildRoomInviteText(cleanId,room.info||{});try{await navigator.clipboard.writeText(text);alert("WhatsApp davet mesajı kopyalandı!");}catch(_){alert(text);}}
@@ -701,7 +686,6 @@ async function sendCustomAdminNotification(e){e.preventDefault();if(!isRoomAdmin
 function startBroadcastListener(){if(broadcastListener||!db||!currentUser)return;initialBroadcastSeen=false;broadcastListener=db.ref("broadcasts/latest");broadcastListener.on("value",snap=>{const val=snap.val();if(!val){initialBroadcastSeen=true;return;}if(!initialBroadcastSeen){initialBroadcastSeen=true;return;}if("Notification"in window&&Notification.permission==="granted"){try{new Notification(val.title||"⚽ KadroKur",{body:val.body||"",tag:"kadrokur-broadcast-"+(val.sentAt||Date.now())});}catch(_){}}},()=>{});}
 function stopBroadcastListener(){if(broadcastListener){broadcastListener.off();broadcastListener=null;}initialBroadcastSeen=false;}
 
-function toggleFloatingChat(force){const panel=document.getElementById("floatingChatPanel"),btn=document.getElementById("floatingChatToggle");if(!panel||!btn)return;const open=typeof force==="boolean"?force:panel.classList.contains("hidden");panel.classList.toggle("hidden",!open);document.body.classList.toggle("chat-open",open);btn.textContent=open?"×":"💬";btn.setAttribute("aria-label",open?"Sohbeti kapat":"Canlı sohbeti aç");if(open){const box=document.getElementById("homeChatMessages");if(box)box.scrollTop=box.scrollHeight;if(currentUser)setTimeout(()=>document.getElementById("homeChatInput")?.focus(),80);}}
 function renderGeneralChatMessages(data){
   const box=document.getElementById("homeChatMessages");
   if(!box)return;
@@ -758,6 +742,14 @@ async function sendGeneralChatMessage(e){
   }finally{btn.disabled=false;input.focus();}
 }
 
+function tournamentRef(){return currentRoomId?db.ref(`rooms/${currentRoomId}/tournament/matches`):null;}
+function renderTournament(){const tools=document.getElementById("tournamentAdminTools");if(!tools)return;tools.classList.toggle("hidden",!isRoomAdmin);const matches=(rooms[currentRoomId]&&rooms[currentRoomId].tournament&&rooms[currentRoomId].tournament.matches)||{};const entries=Object.entries(matches).map(([id,m])=>({id,...(m||{})})).sort((a,b)=>(Number(a.matchAt)||new Date(a.dateTime||0).getTime()||0)-(Number(b.matchAt)||new Date(b.dateTime||0).getTime()||0));const box=document.getElementById("tournamentFixtures");if(!entries.length)box.innerHTML='<p class="text-xs text-slate-500">Henüz fikstür yok. Yönetici ilk maçı ekleyebilir.</p>';else box.innerHTML=entries.map(m=>{const played=m.status==="played";const score=played?`${Number(m.homeScore)||0} - ${Number(m.awayScore)||0}`:"VS";const dt=m.dateTime?formatMatchDateTime(m.dateTime):"Tarih belirlenmedi";return `<div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3"><div class="flex items-center justify-between gap-2"><span class="text-[10px] text-slate-400">${esc(dt)}</span><span class="text-[9px] font-bold ${played?"text-emerald-300":"text-amber-300"}">${played?"TAMAMLANDI":"PLANLANDI"}</span></div><div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 mt-2"><b class="text-xs text-white">${esc(m.home||"Takım 1")}</b><strong class="text-lg text-emerald-300 tabular-nums">${score}</strong><b class="text-xs text-white text-right">${esc(m.away||"Takım 2")}</b></div>${isRoomAdmin?`<div class="flex flex-wrap gap-2 mt-2"><button type="button" onclick="editFixtureDateTime('${m.id}')" class="text-[10px] text-sky-300 underline">Tarih/saat</button><button type="button" onclick="enterFixtureResult('${m.id}')" class="text-[10px] text-emerald-300 underline">${played?"Skoru düzenle":"Sonuç gir"}</button><button type="button" onclick="deleteFixture('${m.id}')" class="text-[10px] text-rose-300 underline">Sil</button></div>`:""}</div>`;}).join("");
+const stats={};const get=t=>stats[t]||(stats[t]={team:t,played:0,wins:0,draws:0,losses:0,gf:0,ga:0,points:0});entries.filter(m=>m.status==="played").forEach(m=>{const a=get(m.home),b=get(m.away),x=Number(m.homeScore)||0,y=Number(m.awayScore)||0;a.played++;b.played++;a.gf+=x;a.ga+=y;b.gf+=y;b.ga+=x;if(x>y){a.wins++;a.points+=3;b.losses++;}else if(y>x){b.wins++;b.points+=3;a.losses++;}else{a.draws++;b.draws++;a.points++;b.points++;}});const rows=Object.values(stats).sort((a,b)=>b.points-a.points||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf||a.team.localeCompare(b.team,"tr"));const sb=document.getElementById("tournamentStandings");sb.innerHTML=rows.length?`<table class="w-full text-[10px] text-left"><thead class="text-slate-400"><tr><th class="p-2"># / Takım</th><th class="p-2">O</th><th class="p-2">G</th><th class="p-2">B</th><th class="p-2">M</th><th class="p-2">A:Y</th><th class="p-2">P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="border-t border-slate-700"><td class="p-2 font-bold text-white">${i+1}. ${esc(r.team)}</td><td class="p-2">${r.played}</td><td class="p-2 text-emerald-300">${r.wins}</td><td class="p-2">${r.draws}</td><td class="p-2 text-rose-300">${r.losses}</td><td class="p-2">${r.gf}:${r.ga}</td><td class="p-2 font-black text-amber-300">${r.points}</td></tr>`).join("")}</tbody></table>`:'<p class="text-xs text-slate-500">Puan tablosu maç sonuçları girildikçe otomatik oluşur.</p>';}
+async function addTournamentFixture(e){e.preventDefault();if(!isRoomAdmin||!currentRoomId)return;const home=document.getElementById("fixtureHome").value.trim(),away=document.getElementById("fixtureAway").value.trim(),date=document.getElementById("fixtureDate").value,time=document.getElementById("fixtureTime").value;if(!home||!away||home.toLowerCase()===away.toLowerCase()||!date||!time){alert("İki farklı takım, tarih ve saat girin.");return;}try{const ref=tournamentRef().push();await ref.set({home,away,dateTime:`${date}T${time}`,matchAt:new Date(`${date}T${time}`).getTime(),status:"scheduled",createdAt:firebase.database.ServerValue.TIMESTAMP,createdBy:currentUser.uid});e.target.reset();document.getElementById("fixtureTime").value="20:00";}catch(err){alert("Fikstür eklenemedi: "+err.message);}}
+async function enterFixtureResult(id){if(!isRoomAdmin||!currentRoomId)return;const m=((rooms[currentRoomId]||{}).tournament||{}).matches||{};const f=m[id];if(!f)return;const a=prompt(`${f.home} kaç gol attı?`,f.homeScore??"");if(a===null)return;const b=prompt(`${f.away} kaç gol attı?`,f.awayScore??"");if(b===null)return;if(a.trim()===""||b.trim()===""||!Number.isInteger(Number(a))||!Number.isInteger(Number(b))||Number(a)<0||Number(b)<0){alert("Skorlar sıfır veya daha büyük tam sayı olmalı.");return;}try{await tournamentRef().child(id).update({homeScore:Number(a),awayScore:Number(b),status:"played",playedAt:firebase.database.ServerValue.TIMESTAMP});}catch(err){alert("Sonuç kaydedilemedi: "+err.message);}}
+async function editFixtureDateTime(id){if(!isRoomAdmin||!currentRoomId)return;const m=(((rooms[currentRoomId]||{}).tournament||{}).matches||{})[id];if(!m)return;const date=prompt("Maç tarihi (YYYY-AA-GG)",(m.dateTime||"").slice(0,10));if(date===null)return;const time=prompt("Maç saati (SS:DD)",(m.dateTime||"").slice(11,16));if(time===null)return;const dt=`${date}T${time}`;if(!Number.isFinite(new Date(dt).getTime())){alert("Tarih veya saat geçersiz.");return;}try{await tournamentRef().child(id).update({dateTime:dt,matchAt:new Date(dt).getTime()});}catch(err){alert("Güncellenemedi: "+err.message);}}
+async function deleteFixture(id){if(!isRoomAdmin||!confirm("Bu fikstür maçı silinsin mi?"))return;try{await tournamentRef().child(id).remove();}catch(err){alert("Silinemedi: "+err.message);}}
+
 function renderPitchRow(slots,info){return `<div class="flex justify-center gap-2 sm:gap-4 flex-wrap">${slots.map(s=>{const full=isOccupied(s),team=s.team==="green",border=team?"border-emerald-400/60 bg-emerald-950/75":"border-red-400/60 bg-red-950/75",badge=team?"bg-emerald-500 text-slate-950":"bg-red-500 text-white",slotFee=getSlotPriceForRoom(info,s.pos);if(!full)return `<button type="button" onclick="selectSlotOnPitch('${s.team}','${s.id}')" class="w-24 sm:w-28 p-2 rounded-xl border border-dashed border-white/30 hover:border-emerald-400/70 bg-black/35 text-center transition"><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-800">${s.pos} • ${slotFee}₺</span><div class="text-xs font-bold text-slate-300 mt-1.5">+ BOŞ YER</div></button>`;return `<div class="w-24 sm:w-28 p-2 rounded-xl border ${border} text-center"><div class="flex justify-between text-[10px] mb-1"><span class="font-black px-1.5 py-0.5 rounded ${badge}">${s.pos}</span><span>${s.paid?"✅":"⏳"}</span></div><div class="text-xs font-extrabold truncate">${esc(s.name)}</div>${isRoomAdmin?`<div class="flex justify-center gap-1.5 mt-1"><button type="button" onclick="openMoveModal('${s.id}',${s.applicationId?`'${s.applicationId}'`:"null"})" class="text-[9px] text-sky-300 underline">Taşı</button><button type="button" onclick="removeSlot('${s.id}')" class="text-[9px] text-amber-300 underline">Çıkar</button></div>`:""}</div>`;}).join("")}</div>`;}
 function renderTeam(team,info){const a=roster.filter(s=>s.team===team);const order=team==="red"?[...SLOT_ORDER].reverse():SLOT_ORDER;return order.map(pos=>renderPitchRow(a.filter(s=>s.pos===pos),info)).join("");}
 function renderAll(){if(!currentRoomId)return;const cap=getTotalCapacityFromInfo(currentRoomInfo);document.getElementById("greenTeamPitch").innerHTML=renderTeam("green",currentRoomInfo);document.getElementById("redTeamPitch").innerHTML=renderTeam("red",currentRoomInfo);document.getElementById("quotaBadge").textContent=`Dolu Kontenjan: ${roster.filter(isOccupied).length} / ${cap}`;updateSlotDropdown();if(isRoomAdmin)renderApplications();}
@@ -793,7 +785,7 @@ async function removeSlot(id){const s=roster.find(x=>x.id===id);if(!isRoomAdmin|
 async function resetAllPlayers(){if(!isRoomAdmin||!currentRoomId||!confirm("Tüm kadro yuvaları boşaltılsın mı?"))return;try{for(const s of roster)await db.ref(`rooms/${currentRoomId}/roster/${s.id}`).update({name:"",paid:false,status:"empty",applicationId:null});for(const [id,a] of Object.entries(applications))if(a.status==="approved")await db.ref(`rooms/${currentRoomId}/applications/${id}`).update({status:"removed",paid:false});alert("Kadro boşaltıldı.");}catch(e){alert("İşlem başarısız: "+e.message);}}
 
 async function copyIban(){const val=document.getElementById("roomIbanText").textContent;try{await navigator.clipboard.writeText(val);alert("IBAN kopyalandı.");}catch(_){alert(val);}}
-async function copyWhatsAppRoster(){if(!currentRoomId)return;const info=currentRoomInfo||{},cap=getTotalCapacityFromInfo(info),totalPrice=getPitchPriceFromInfo(info),perPerson=getPerPersonFeeFromInfo(info),link=getRoomShareUrl(currentRoomId);const lines=[`⚽ ${(info.title||"KADROKUR").toUpperCase()}`,`🏟️ ${info.homeTeamName||"Ev Sahibi"} - ${info.awayTeamName||"Deplasman"}`,`📅 ${info.pitchName||""} ${info.schedule?"| "+info.schedule:""} | ${cap} Kişi (${perPerson}₺/kişi • Saha: ${totalPrice}₺)`.trim(),""];for(const team of ["green","red"]){lines.push(team==="green"?"🟢 1. TAKIM (YEŞİL YELEK)":"🔴 2. TAKIM (KIRMIZI YELEK)");for(const s of roster.filter(x=>x.team===team))lines.push(`${SLOT_LABEL[s.pos]}: ${isOccupied(s)?s.name+(s.paid?" ✅":" ⏳"):"BOŞ ("+getSlotPriceForRoom(info,s.pos)+"₺)"}`);lines.push("");}lines.push(`🔗 Oda Linki: ${link}`);lines.push(`🏷️ Oda Kodu: ${currentRoomId}`);const text=lines.join("\n");try{await navigator.clipboard.writeText(text);alert("Kadro ve oda linki kopyalandı!");}catch(_){alert(text);}}
+async function copyWhatsAppRoster(){if(!currentRoomId)return;const info=currentRoomInfo||{},cap=getTotalCapacityFromInfo(info),totalPrice=getPitchPriceFromInfo(info),perPerson=getPerPersonFeeFromInfo(info),link=getRoomShareUrl(currentRoomId);const lines=[`⚽ ${(info.title||"KADROKUR").toUpperCase()}`,`📅 ${info.pitchName||""} ${info.schedule?"| "+info.schedule:""} | ${cap} Kişi (${perPerson}₺/kişi • Saha: ${totalPrice}₺)`.trim(),""];for(const team of ["green","red"]){lines.push(team==="green"?"🟢 1. TAKIM (YEŞİL YELEK)":"🔴 2. TAKIM (KIRMIZI YELEK)");for(const s of roster.filter(x=>x.team===team))lines.push(`${SLOT_LABEL[s.pos]}: ${isOccupied(s)?s.name+(s.paid?" ✅":" ⏳"):"BOŞ ("+getSlotPriceForRoom(info,s.pos)+"₺)"}`);lines.push("");}lines.push(`🔗 Oda Linki: ${link}`);lines.push(`🏷️ Oda Kodu: ${currentRoomId}`);const text=lines.join("\n");try{await navigator.clipboard.writeText(text);alert("Kadro ve oda linki kopyalandı!");}catch(_){alert(text);}}
 initFirebase();
 </script>
 </body></html>
