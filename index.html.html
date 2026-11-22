@@ -219,7 +219,7 @@ body{font-family:Inter,sans-serif;background:#090d16;color:#f8fafc}.pitch-bg{bac
 <section class="lg:col-span-7 flex flex-col gap-4">
 <div class="glass-card rounded-2xl p-4 sm:p-5 space-y-4">
 <div class="flex flex-wrap items-start justify-between gap-3">
-<div><h2 id="roomTitleHeading" class="text-lg sm:text-xl font-black text-white">Maç Odası</h2><p id="roomMetaText" class="text-xs text-slate-400 mt-0.5"></p></div>
+<div><h2 id="roomTitleHeading" class="text-lg sm:text-xl font-black text-white">Maç Odası</h2><p id="roomMetaText" class="text-xs text-slate-400 mt-0.5"></p><p id="roomConnectionStatus" role="status" aria-live="polite" class="text-[11px] text-emerald-300 mt-1"></p></div>
 <div class="flex flex-wrap gap-2">
 <button type="button" onclick="copyRoomLink()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs font-bold transition">🔗 Link Kopyala</button>
 <button type="button" onclick="shareCurrentRoomWhatsApp()" class="px-3 py-2 rounded-xl bg-green-600 hover:bg-green-500 text-white text-xs font-black transition">📲 WP Paylaş</button>
@@ -579,7 +579,7 @@ function populateTimeSlots(defaultSlot="20:00 - 21:00"){const sel=document.getEl
 function makeDefaultRoster(info=null){const cap=getTotalCapacityFromInfo(info);const form=TEAM_FORMATIONS[cap]||TEAM_FORMATIONS[DEFAULT_PLAYER_COUNT];const a=[];for(const team of ["green","red"]){const p=team==="green"?"g":"r";let idx=0;form.forEach(([pos,count])=>{for(let n=1;n<=count;n++){idx+=1;const id=p+idx;a.push({id,team,pos,label:SLOT_LABEL[pos],name:"",paid:false,status:"empty",applicationId:null,uid:null,email:""});}});}return a;}
 function makeDefaultRosterMap(info=null){const m={};for(const s of makeDefaultRoster(info))m[s.id]={name:"",paid:false,status:"empty",applicationId:null,uid:null,email:""};return m;}
 
-let app=null,auth=null,db=null,rooms={},currentRoomId=null,currentRoomInfo=null,roster=makeDefaultRoster(),applications={},isAdmin=false,isRoomAdmin=false,currentUser=null,movingContext=null,broadcastListener=null,initialBroadcastSeen=false,roomRosterRef=null,roomAppsRef=null,pendingPinRoomId=null,expiryTimer=null;
+let app=null,auth=null,db=null,rooms={},currentRoomId=null,currentRoomInfo=null,roster=makeDefaultRoster(),applications={},isAdmin=false,isRoomAdmin=false,currentUser=null,movingContext=null,broadcastListener=null,initialBroadcastSeen=false,roomRosterRef=null,roomInfoRef=null,roomAppsRef=null,pendingPinRoomId=null,expiryTimer=null,roomOpenRequest=0;
 let teamTactics={green:null,red:null},activeTacticTeam=null,teamTacticsRef=null,groupsRef=null,chatRef=null;
 let currentFlowTab="home",groupsData={},chatMessagesData={};
 
@@ -588,10 +588,16 @@ function extractRoomIdFromInput(rawInput){
   if(!str)return "";
   try{
     if(str.includes("room=")){
-      const qPart=str.split("room=")[1].split(/[&#?]/)[0];
-      if(qPart)return decodeURIComponent(qPart).trim().replace(/[.$#[\]]/g,"");
+      const normalized=str.startsWith("http")||str.startsWith("file:")?str:"https://example.com/?"+str.split("?").pop().replace(/^#/, "");
+      const u=new URL(normalized);
+      const qRoom=u.searchParams.get("room");
+      if(qRoom)return String(qRoom).trim().replace(/^#/, "").replace(/[.$#[\]]/g,"");
+      const hashMatch=String(u.hash||"").match(/room=([^&]+)/);
+      if(hashMatch&&hashMatch[1])return decodeURIComponent(hashMatch[1]).trim().replace(/[.$#[\]]/g,"");
     }
   }catch(_){}
+  const regexMatch=str.match(/[?&]room=([^&#]+)/i);
+  if(regexMatch&&regexMatch[1])return decodeURIComponent(regexMatch[1]).trim().replace(/[.$#[\]]/g,"");
   return str.replace(/^#/, "").replace(/\/+$/, "").split("/").pop().trim().replace(/[.$#[\]]/g,"");
 }
 
@@ -599,12 +605,10 @@ function getInitialRoomFromLocation(){
   try{
     const params=new URLSearchParams(window.location.search);
     const fromQuery=params.get("room");
-    if(fromQuery&&fromQuery.trim())return fromQuery.trim();
+    if(fromQuery)return fromQuery.trim();
     const hash=String(window.location.hash||"");
     const hm=hash.match(/room=([^&]+)/i);
     if(hm&&hm[1])return decodeURIComponent(hm[1]).trim();
-    const hrefMatch=String(window.location.href||"").match(/[?&]room=([^&#]+)/i);
-    if(hrefMatch&&hrefMatch[1])return decodeURIComponent(hrefMatch[1]).trim();
   }catch(_){}
   return "";
 }
@@ -995,12 +999,8 @@ function initFirebase(){
       if(msg)msg.textContent="Kimlik doğrulama hatası: "+err.message;
     });
 
-    const initialRoom=getInitialRoomFromLocation();
-    let roomsLoadedOnce=false;
-
     db.ref("rooms").on("value",snap=>{
       rooms=snap.val()||{};
-      roomsLoadedOnce=true;
       document.getElementById("quotaBadge").textContent=`Aktif Oda: ${Object.keys(rooms).length}`;
       renderRoomsLobby();
       renderHomePlayersShowcase();
@@ -1010,6 +1010,8 @@ function initFirebase(){
           updateRoomHeader();
           roster=mergeRoster((rooms[currentRoomId].roster)||{},currentRoomInfo);
           renderAll();
+        }else if(Object.keys(rooms).length>0){
+          goHome();
         }
       }
       sweepExpiredRooms();
@@ -1021,6 +1023,7 @@ function initFirebase(){
 
     if(!expiryTimer)expiryTimer=setInterval(sweepExpiredRooms,30000);
 
+    const initialRoom=getInitialRoomFromLocation();
     if(initialRoom){
       openRoom(initialRoom);
     }else{
@@ -1040,106 +1043,162 @@ function goHome(){
   renderRoomsLobby();
 }
 
+function withTimeout(promise,ms,label="Firebase isteği"){
+  let timer;
+  return Promise.race([
+    promise,
+    new Promise((_,reject)=>{
+      timer=setTimeout(()=>reject(new Error(`${label} zaman aşımına uğradı. İnternet bağlantısını ve Firebase Realtime Database kurallarını kontrol edin.`)),ms);
+    })
+  ]).finally(()=>clearTimeout(timer));
+}
+
 async function openRoom(roomId,bypassPin=false){
+  const requestId=++roomOpenRequest;
   const cleanId=extractRoomIdFromInput(roomId);
   const statusEl=document.getElementById("lobbyJoinStatus");
+  const setStatus=(message,isError=false)=>{
+    if(statusEl){
+      statusEl.textContent=message;
+      statusEl.className=isError?"text-xs text-red-300 px-1":"text-xs text-amber-300 px-1";
+    }
+    const roomStatus=document.getElementById("roomConnectionStatus");
+    if(roomStatus){
+      roomStatus.textContent=message;
+      roomStatus.className=isError?"text-[11px] text-red-300 mt-1":"text-[11px] text-emerald-300 mt-1";
+    }
+  };
+
   if(!cleanId){
-    if(statusEl)statusEl.textContent="Geçerli bir oda kodu veya linki girin.";
+    setStatus("Geçerli bir oda kodu veya bağlantısı girin.",true);
     return;
   }
   if(!db){
-    if(statusEl)statusEl.textContent="Veritabanı bağlantısı henüz hazır değil, lütfen bekleyin.";
+    setStatus("Veritabanı henüz hazır değil. Sayfayı yenileyip tekrar deneyin.",true);
     return;
   }
-  if(statusEl)statusEl.textContent="Odaya bağlanılıyor…";
+
+  setStatus("Oda bilgileri güvenli şekilde kontrol ediliyor…");
   restoreCreateFormToModal();
 
-  let roomObj=(rooms&&rooms[cleanId])||null;
-  let info=(roomObj&&roomObj.info)||null;
-  let initialRosterData=(roomObj&&roomObj.roster)||null;
-
   try{
-    const roomSnap=await db.ref("rooms/"+cleanId).once("value");
-    if(roomSnap.exists()){
-      const val=roomSnap.val()||{};
-      roomObj=val;
-      info=val.info||{};
-      initialRosterData=val.roster||{};
-      rooms[cleanId]=val;
-    }else{
-      roomObj=null;
+    let roomObj=(rooms&&rooms[cleanId])||null;
+    let info=roomObj&&roomObj.info;
+    let initialRosterData=roomObj&&roomObj.roster;
+
+    // Cache eksikse veya oda bulunmuyorsa Firebase'den kesin olarak oku.
+    if(!roomObj||!info||typeof info!=="object"){
+      const roomSnap=await withTimeout(
+        db.ref("rooms/"+cleanId).once("value"),
+        12000,
+        "Oda verisi okunurken bağlantı"
+      );
+      if(requestId!==roomOpenRequest)return;
+      if(!roomSnap.exists()){
+        setStatus(`"${cleanId}" kodlu oda bulunamadı. Oda kodunu veya paylaşım bağlantısını kontrol edin.`,true);
+        return;
+      }
+      roomObj=roomSnap.val()||{};
+      info=roomObj.info||{};
+      initialRosterData=roomObj.roster||{};
+      rooms[cleanId]=roomObj;
     }
-  }catch(err){
-    if(statusEl)statusEl.textContent="Odaya erişilemedi: "+err.message;
-    return;
-  }
 
-  if(!roomObj||typeof roomObj!=="object"){
-    if(statusEl)statusEl.textContent=`"${cleanId}" kodlu maç odası bulunamadı veya silinmiş.`;
-    return;
-  }
-  if(!info||typeof info!=="object"){
-    info={title:cleanId,pitchName:cleanId,schedule:""};
-  }
-
-  if(!bypassPin&&!hasRoomPinAccess(cleanId,info)){
-    if(statusEl)statusEl.textContent="";
-    openRoomPinModal(cleanId,info);
-    return;
-  }
-
-  if(statusEl)statusEl.textContent="";
-  currentRoomId=cleanId;
-  currentRoomInfo=info;
-  roster=mergeRoster(initialRosterData||{},currentRoomInfo);
-  detachRoomListeners();
-
-  try{
-    if(window.location.protocol!=="file:"){
-      const url=new URL(window.location.href);
-      url.searchParams.set("room",cleanId);
-      window.history.replaceState({},"",url.toString());
+    if(!roomObj||typeof roomObj!=="object"||!roomObj.info){
+      setStatus("Oda kaydı eksik veya bozulmuş görünüyor. Oda yöneticisinin yeniden kontrol etmesi gerekiyor.",true);
+      return;
     }
-  }catch(_){}
 
-  document.getElementById("homeView").classList.add("hidden");
-  document.getElementById("roomView").classList.remove("hidden");
-  document.getElementById("homeNavBtn").classList.remove("hidden");
-  updateRoomHeader();
-  computeRoomAdmin();
-  renderAll();
+    info=roomObj.info||{};
+    if(!bypassPin&&!hasRoomPinAccess(cleanId,info)){
+      setStatus("");
+      openRoomPinModal(cleanId,info);
+      return;
+    }
 
-  db.ref("rooms/"+cleanId+"/info").on("value",snap=>{
-    if(!snap.exists()){goHome();return;}
-    currentRoomInfo=snap.val()||{title:"Maç Odası",region:"",district:"",pitchName:"",schedule:"",iban:"TR53 0006 2000 5950 0006 6773 76",ibanOwner:"Oda Sahibi"};
+    if(requestId!==roomOpenRequest)return;
+
+    // Önce eski odaya ait tüm dinleyicileri kapat, sonra yeni odayı kur.
+    detachRoomListeners();
+    currentRoomId=cleanId;
+    currentRoomInfo=info;
+    roster=mergeRoster(initialRosterData||{},currentRoomInfo);
+    applications={};
+
+    try{
+      if(window.location.protocol!=="file:"){
+        const url=new URL(window.location.href);
+        url.searchParams.set("room",cleanId);
+        window.history.replaceState({},"",url.toString());
+      }
+    }catch(_){}
+
+    document.getElementById("homeView").classList.add("hidden");
+    document.getElementById("roomView").classList.remove("hidden");
+    document.getElementById("homeNavBtn").classList.remove("hidden");
     updateRoomHeader();
-    roster=mergeRoster(roster.reduce((m,x)=>{if(isOccupied(x))m[x.id]=x;return m;},{}),currentRoomInfo);
     computeRoomAdmin();
     renderAll();
-    sweepExpiredRooms();
-  },()=>{});
-  roomRosterRef=db.ref("rooms/"+cleanId+"/roster");
-  roomRosterRef.on("value",s=>{
-    roster=mergeRoster(s.val()||{},currentRoomInfo);
-    renderAll();
-  },e=>showMessage("Kadro okuma hatası: "+e.message,false));
-  if(currentUser){
-    teamTacticsRef=db.ref("rooms/"+cleanId+"/tactics");
-    teamTacticsRef.on("value",s=>{
-      const val=s.val()||{};
-      teamTactics={green:val.green||null,red:val.red||null};
-      if(activeTacticTeam&&teamTactics[activeTacticTeam]){
-        const cur=teamTactics[activeTacticTeam];
-        document.getElementById("teamFormationSelect").value=cur.formation||"2-3-1";
-        document.getElementById("teamPlayStyleSelect").value=cur.playStyle||"Yüksek Pres & Hızlı Pas";
-        document.getElementById("teamCaptainInput").value=cur.captain||"";
-        document.getElementById("teamTacticNoteInput").value=cur.note||"";
-        renderTeamTacticBoard();
+    setStatus("");
+
+    // Oda bilgileri dinleyicisi: artık düzgün şekilde kapatılabilir.
+    roomInfoRef=db.ref("rooms/"+cleanId+"/info");
+    roomInfoRef.on("value",snap=>{
+      if(requestId!==roomOpenRequest||currentRoomId!==cleanId)return;
+      if(!snap.exists()){
+        setStatus("Bu oda silinmiş veya artık erişilemiyor.",true);
+        goHome();
+        return;
       }
-    },()=>{});
+      currentRoomInfo=snap.val()||{};
+      updateRoomHeader();
+      computeRoomAdmin();
+      renderAll();
+      sweepExpiredRooms();
+    },err=>{
+      if(requestId===roomOpenRequest&&currentRoomId===cleanId){
+        setStatus("Oda bilgileri canlı güncellenemiyor: "+err.message,true);
+      }
+    });
+
+    roomRosterRef=db.ref("rooms/"+cleanId+"/roster");
+    roomRosterRef.on("value",snap=>{
+      if(requestId!==roomOpenRequest||currentRoomId!==cleanId)return;
+      roster=mergeRoster(snap.val()||{},currentRoomInfo);
+      renderAll();
+    },err=>{
+      if(requestId===roomOpenRequest&&currentRoomId===cleanId){
+        showMessage("Kadro okunamadı: "+err.message,false);
+      }
+    });
+
+    if(currentUser){
+      teamTacticsRef=db.ref("rooms/"+cleanId+"/tactics");
+      teamTacticsRef.on("value",snap=>{
+        if(requestId!==roomOpenRequest||currentRoomId!==cleanId)return;
+        const val=snap.val()||{};
+        teamTactics={green:val.green||null,red:val.red||null};
+        if(activeTacticTeam&&teamTactics[activeTacticTeam]){
+          const cur=teamTactics[activeTacticTeam];
+          document.getElementById("teamFormationSelect").value=cur.formation||"2-3-1";
+          document.getElementById("teamPlayStyleSelect").value=cur.playStyle||"Yüksek Pres & Hızlı Pas";
+          document.getElementById("teamCaptainInput").value=cur.captain||"";
+          document.getElementById("teamTacticNoteInput").value=cur.note||"";
+          renderTeamTacticBoard();
+        }
+      },err=>{
+        if(requestId===roomOpenRequest&&currentRoomId===cleanId){
+          console.warn("Takım taktikleri okunamadı:",err.message);
+        }
+      });
+    }
+  }catch(err){
+    if(requestId!==roomOpenRequest)return;
+    console.error("Odaya giriş hatası:",err);
+    const detail=err&&err.message?err.message:"Bilinmeyen bağlantı hatası";
+    setStatus("Odaya girilemedi: "+detail,true);
   }
 }
-
 function openRoomPinModal(roomId,info){pendingPinRoomId=roomId;document.getElementById("roomPinInput").value="";document.getElementById("roomPinError").textContent="";const title=(info&&info.title)||roomId;document.getElementById("roomPinDesc").textContent=`"${title}" odası şifre korumalıdır. Giriş şifresini yazın.`;document.getElementById("roomPinModal").classList.remove("hidden");document.getElementById("roomPinInput").focus();}
 function cancelRoomPinModal(){pendingPinRoomId=null;document.getElementById("roomPinModal").classList.add("hidden");}
 async function verifyRoomPin(e){e.preventDefault();const roomId=pendingPinRoomId;if(!roomId)return;const entered=document.getElementById("roomPinInput").value.trim(),errEl=document.getElementById("roomPinError");errEl.textContent="";
@@ -1148,7 +1207,7 @@ if(!info){try{const snap=await db.ref("rooms/"+roomId+"/info").once("value");inf
 const expected=String((info&&info.roomPin)??"").trim();
 if(!expected||entered===expected){if(expected)markRoomUnlocked(roomId,expected);const target=roomId;cancelRoomPinModal();openRoom(target,true);}else{errEl.textContent="Oda şifresi hatalı. Tekrar deneyin.";}}
 
-function detachRoomListeners(){if(roomRosterRef){roomRosterRef.off();roomRosterRef=null;}if(teamTacticsRef){teamTacticsRef.off();teamTacticsRef=null;}teamTactics={green:null,red:null};closeTeamTacticRoom();stopRoomApplicationsListener();roster=makeDefaultRoster();}
+function detachRoomListeners(){if(roomInfoRef){roomInfoRef.off();roomInfoRef=null;}if(roomRosterRef){roomRosterRef.off();roomRosterRef=null;}if(teamTacticsRef){teamTacticsRef.off();teamTacticsRef=null;}teamTactics={green:null,red:null};closeTeamTacticRoom();stopRoomApplicationsListener();roster=makeDefaultRoster();}
 function updateRoomHeader(){const info=currentRoomInfo||{};const cap=getTotalCapacityFromInfo(info);const totalPrice=getPitchPriceFromInfo(info);const perPerson=getPerPersonFeeFromInfo(info);const shareUrl=getRoomShareUrl(currentRoomId);document.getElementById("headerBadge").textContent=info.pitchName||"MAÇ ODASI";document.getElementById("headerSubtitle").textContent=[info.region,info.district,info.schedule,`${cap} Kişi • ${formatTl(perPerson)}/kişi`].filter(Boolean).join(" • ")||"Canlı kadro ve başvuru ekranı";document.getElementById("roomTitleHeading").textContent=info.title||(info.pitchName?info.pitchName+" Maçı":"Maç Odası");const loc=[info.region,info.district,info.pitchName].filter(Boolean).join(" / ");document.getElementById("roomMetaText").textContent=`${loc?loc+" • ":""}${info.schedule||"Saat belirtilmedi"} • Kod: ${currentRoomId}`;document.getElementById("roomDirectLinkText").textContent=shareUrl;document.getElementById("priceFeeSummary").textContent=`Saha Ücreti: ${formatTl(totalPrice)} • ${cap} Kişi`;document.getElementById("statPitchTotal").textContent=formatTl(totalPrice);document.getElementById("statPerPerson").textContent=formatTl(perPerson);document.getElementById("roomIbanText").textContent=info.iban||"TR53 0006 2000 5950 0006 6773 76";document.getElementById("ibanOwnerLabel").textContent="ÖDEME IBAN"+(info.ibanOwner?` (${info.ibanOwner.toUpperCase()})`:"");}
 
 function renderRoomStats(){
