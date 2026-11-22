@@ -83,6 +83,29 @@ body.room-open .home-video-backdrop{display:none}
 </div>
 </div>
 
+<!-- Sponsor reklam alanı: yalnızca yönetici tarafından onaylanan sponsorlar gösterilir. -->
+<section id="sponsorShowcase" class="hidden rounded-2xl border border-amber-400/30 bg-slate-950/75 p-4 sm:p-5 shadow-xl" aria-label="Sponsor reklamları">
+  <div class="flex items-center justify-between gap-3 mb-3"><div><p class="text-[10px] font-black tracking-[.2em] text-amber-300">KADROKUR SPONSORLARI</p><h2 class="text-lg font-black text-white">Bizi destekleyenler</h2></div><span class="text-[10px] rounded-full px-2 py-1 bg-amber-400/10 text-amber-200 border border-amber-300/20">Sponsorlu</span></div>
+  <div id="sponsorPublicList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"><p class="text-xs text-slate-400">Sponsorlar yükleniyor…</p></div>
+</section>
+
+<!-- Google AdSense alanı etkinleştirilecek: onaylı hesap ve yayıncı kodu gerektiğinde buraya eklenecek. -->
+<div id="adsenseHomeSlot" class="hidden" aria-label="Google reklam alanı"></div>
+
+<div id="sponsorAdminPanel" class="hidden glass-card rounded-2xl border border-amber-400/30 p-4 space-y-3">
+  <div><p class="text-[10px] font-black tracking-widest text-amber-300">GELİR YÖNETİMİ</p><h2 class="text-base font-black">📢 Sponsor reklam yönetimi</h2><p class="text-xs text-slate-400 mt-1">Buradan eklediğin ve aktif ettiğin sponsorlar ana sayfada herkese görünür.</p></div>
+  <form id="sponsorAdminForm" onsubmit="saveSponsorAd(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+    <input id="sponsorTitle" required maxlength="70" placeholder="İşletme / sponsor adı" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
+    <input id="sponsorImage" type="url" required placeholder="Logo veya reklam görseli URL'si (https://...)" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
+    <input id="sponsorLink" type="url" required placeholder="Tıklanınca açılacak web sitesi (https://...)" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white sm:col-span-2">
+    <input id="sponsorDescription" maxlength="140" placeholder="Kısa açıklama (isteğe bağlı)" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white sm:col-span-2">
+    <label class="flex items-center gap-2 text-xs text-slate-300"><input id="sponsorActive" type="checkbox" checked> Yayında göster</label>
+    <button id="sponsorSaveBtn" type="submit" class="px-4 py-2 rounded-lg bg-amber-400 text-slate-950 text-xs font-black">＋ Sponsoru Kaydet</button>
+  </form>
+  <p id="sponsorAdminStatus" class="text-xs text-slate-400">Sponsor eklemek için işletmenin görsel ve web sitesi bağlantısını gir.</p>
+  <div><h3 class="text-xs font-bold text-slate-200 mb-2">Kayıtlı sponsorlar</h3><div id="sponsorAdminList" class="space-y-2 text-xs text-slate-300">Yükleniyor…</div></div>
+</div>
+
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 <div class="lg:col-span-8 space-y-4">
 <div class="glass-card home-content-card rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -286,6 +309,13 @@ Kadroya başvurmak için önce <button type="button" onclick="goHome()" class="u
 <div id="movePlayerModal" class="hidden fixed inset-0 z-50 bg-black/75 p-4 flex items-center justify-center"><div class="glass-card rounded-2xl p-6 w-full max-w-md"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-black">🔄 Yer / Takım Değiştir</h2><button type="button" onclick="closeMoveModal()" class="text-xl leading-none">×</button></div><p id="movePlayerInfo" class="text-xs text-slate-300 mb-4"></p><form onsubmit="confirmMovePlayer(event)" class="space-y-4"><div><label class="block text-xs font-bold text-slate-300 mb-1" for="moveTargetSlot">Yeni Kadro / Mevki</label><select id="moveTargetSlot" required class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm"></select></div><p id="moveError" class="text-xs text-red-300"></p><div class="flex justify-end gap-2"><button type="button" onclick="closeMoveModal()" class="px-4 py-2 rounded-lg bg-slate-700 text-xs font-bold">İptal</button><button id="moveSubmitBtn" type="submit" class="px-4 py-2 rounded-lg bg-amber-500 text-slate-950 text-xs font-black">Taşımayı Onayla</button></div></form></div></div>
 
 <div id="adminLoginModal" class="hidden fixed inset-0 z-50 bg-black/75 p-4 flex items-center justify-center"><div class="glass-card rounded-2xl p-6 w-full max-w-sm"><div class="flex justify-between mb-4"><h2 class="text-lg font-black">Yönetici Girişi</h2><button type="button" onclick="closeAdminLogin()" class="text-xl">×</button></div><form onsubmit="adminLogin(event)" class="space-y-3"><input id="adminEmail" type="email" required placeholder="Yönetici e-posta" class="w-full px-3 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white"><input id="adminPassword" type="password" required placeholder="Şifre" class="w-full px-3 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white"><button id="adminLoginSubmit" type="submit" class="w-full py-2.5 rounded-lg bg-emerald-500 text-slate-950 font-bold text-sm">Giriş yap</button><p id="loginError" class="text-xs text-red-300"></p></form></div></div>
+<section id="privacyInfo" class="max-w-6xl w-full mx-auto px-4 pb-5 text-[11px] text-slate-500">
+  <details class="rounded-xl border border-slate-800 bg-slate-950/70 p-3"><summary class="cursor-pointer font-bold text-slate-300">Gizlilik ve reklam bilgilendirmesi</summary>
+    <p class="mt-2">KadroKur; üyelik ve maç odası özellikleri için Firebase hizmetlerini kullanır. Google AdSense etkinleştirildiğinde Google ve iş ortakları reklam sunumu için çerez veya benzeri teknolojiler kullanabilir. Kişiselleştirilmiş reklam tercihleri ve gerekli izinler, ilgili kullanıcıya gösterilen onay seçenekleri üzerinden yönetilmelidir.</p>
+    <p class="mt-2">Sponsorlu içerikler “Sponsorlu” olarak işaretlenir. Sponsor bağlantılarına tıklamak isteğe bağlıdır. Gizlilik talepleri ve veri soruları için site işletmecisinin iletişim bilgileri burada ayrıca yayımlanmalıdır.</p>
+    <p class="mt-2">Google'ın reklam verilerini nasıl kullandığı: <a class="text-emerald-300 underline" href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">Google partner siteleri açıklaması</a>.</p>
+  </details>
+</section>
 <footer class="text-center py-4 text-xs text-slate-500 border-t border-slate-900">KadroKur • Çoklu Maç Odası & Kadro Yönetim Platformu</footer>
 <script>
 const firebaseConfig={apiKey:"AIzaSyDI5PGiOBZWEMMz6HSU-6-AYXFCWNW7POc",authDomain:"kadrokur34-b4115.firebaseapp.com",databaseURL:"https://kadrokur34-b4115-default-rtdb.europe-west1.firebasedatabase.app",projectId:"kadrokur34-b4115",storageBucket:"kadrokur34-b4115.firebasestorage.app",messagingSenderId:"846977382574",appId:"1:846977382574:web:d4c1f5811ebfbf20ddd53f"};
@@ -424,6 +454,19 @@ function toggleCustomPitchInput(){const pitchSel=document.getElementById("newRoo
 
 function showMessage(m,ok=true){const b=document.getElementById("formMessage");b.textContent=m;b.className="mt-3 rounded-lg p-3 text-xs "+(ok?"bg-emerald-950 text-emerald-300 border border-emerald-700":"bg-red-950 text-red-300 border border-red-700");}
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function safeWebUrl(value){try{const u=new URL(String(value||"").trim());return (u.protocol==="https:"||u.protocol==="http:")?u.href:"";}catch(_){return "";}}
+let sponsorAds={},sponsorAdsRef=null;
+function renderSponsorAds(){
+  const live=Object.entries(sponsorAds||{}).filter(([,a])=>a&&a.active===true&&safeWebUrl(a.image)&&safeWebUrl(a.link));
+  const section=document.getElementById("sponsorShowcase"),publicList=document.getElementById("sponsorPublicList"),adminList=document.getElementById("sponsorAdminList");
+  if(section)section.classList.toggle("hidden",live.length===0);
+  if(publicList)publicList.innerHTML=live.length?live.map(([id,a])=>{const img=safeWebUrl(a.image),link=safeWebUrl(a.link);return `<a href="${esc(link)}" target="_blank" rel="sponsored noopener noreferrer" class="block overflow-hidden rounded-xl border border-amber-300/20 bg-slate-900/90 hover:border-amber-300/60 transition"><div class="h-28 sm:h-32 bg-slate-950 flex items-center justify-center p-3"><img src="${esc(img)}" alt="${esc(a.title||'Sponsor') }" loading="lazy" class="max-h-full max-w-full object-contain"></div><div class="p-3"><div class="flex items-center justify-between gap-2"><b class="text-sm text-white">${esc(a.title||'Sponsor')}</b><span class="text-[9px] uppercase tracking-wider text-amber-300">Sponsorlu</span></div>${a.description?`<p class="text-[11px] text-slate-400 mt-1">${esc(a.description)}</p>`:""}</div></a>`;}).join(""):"";
+  if(adminList){const all=Object.entries(sponsorAds||{});adminList.innerHTML=all.length?all.map(([id,a])=>`<div class="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-slate-950 border border-slate-800 p-2"><span>${esc(a.title||'İsimsiz sponsor')} · <b class="${a.active===true?'text-emerald-300':'text-slate-500'}">${a.active===true?'Yayında':'Pasif'}</b></span><button type="button" onclick="deleteSponsorAd('${esc(id)}')" class="rounded bg-rose-900 px-3 py-1.5 text-[11px] font-bold text-white">Sil</button></div>`).join(""):"Henüz sponsor eklenmedi.";}
+}
+function startSponsorAdsListener(){if(!db)return;if(sponsorAdsRef){sponsorAdsRef.off();}sponsorAdsRef=db.ref("sponsors");sponsorAdsRef.on("value",snap=>{sponsorAds=snap.val()||{};renderSponsorAds();},err=>{const status=document.getElementById("sponsorAdminStatus");if(status)status.textContent="Sponsor verileri okunamadı: "+err.message;});}
+async function saveSponsorAd(e){e.preventDefault();if(!isAdmin||!db){alert("Sponsor eklemek için sistem yöneticisi girişi gerekli.");return;}const title=document.getElementById("sponsorTitle").value.trim(),image=safeWebUrl(document.getElementById("sponsorImage").value),link=safeWebUrl(document.getElementById("sponsorLink").value),description=document.getElementById("sponsorDescription").value.trim(),active=document.getElementById("sponsorActive").checked,status=document.getElementById("sponsorAdminStatus"),btn=document.getElementById("sponsorSaveBtn");if(!title||!image||!link){status.textContent="Geçerli bir sponsor adı, https görsel URL'si ve web sitesi bağlantısı gir.";return;}btn.disabled=true;try{await db.ref("sponsors").push({title,image,link,description,active,createdAt:firebase.database.ServerValue.TIMESTAMP,createdBy:currentUser.uid});document.getElementById("sponsorAdminForm").reset();document.getElementById("sponsorActive").checked=true;status.textContent="Sponsor kaydedildi. Yayındaysa ana sayfada görünür.";}catch(err){status.textContent="Kaydedilemedi: "+err.message+" — Firebase sponsors kuralını eklemen gerekebilir.";}finally{btn.disabled=false;}}
+async function deleteSponsorAd(id){if(!isAdmin||!db||!id||!confirm("Bu sponsor reklamı silinsin mi?"))return;try{await db.ref("sponsors/"+id).remove();}catch(e){alert("Sponsor silinemedi: "+e.message);}}
+
 function isOccupied(s){return !!(s&&s.name&&s.status!=="empty");}
 function mergeRoster(data,info=null){const base=makeDefaultRoster(info);return base.map(d=>{const v=data&&data[d.id]&&typeof data[d.id]==="object"?data[d.id]:{};const name=typeof v.name==="string"?v.name:"";const status=name?(v.status&&v.status!=="empty"?v.status:"approved"):"empty";return {...d,...v,id:d.id,team:d.team,pos:d.pos,label:d.label,name,status,paid:name?v.paid===true:false,applicationId:name?(v.applicationId||null):null};});}
 function computeRoomAdmin(){isRoomAdmin=!!currentUser&&(ADMIN_UIDS.includes(currentUser.uid)||(!!currentRoomInfo&&currentRoomInfo.ownerUid===currentUser.uid));document.getElementById("adminBar").classList.toggle("hidden",!isRoomAdmin);const tt=document.getElementById("tournamentAdminTools");if(tt)tt.classList.toggle("hidden",!isRoomAdmin);if(!isRoomAdmin)closeMoveModal();if(isRoomAdmin&&currentRoomId)startRoomApplicationsListener();else stopRoomApplicationsListener();}
@@ -436,6 +479,7 @@ function syncAuthUiState(u){
   currentUser=u||null;
   isAdmin=!!u&&ADMIN_UIDS.includes(u.uid);
   document.getElementById("adminBtn").textContent=isAdmin?"🔓 Sistem Admini":"🔒 Yönetici Girişi";
+  const sponsorAdminPanel=document.getElementById("sponsorAdminPanel");if(sponsorAdminPanel)sponsorAdminPanel.classList.toggle("hidden",!isAdmin);
   document.getElementById("accountLoggedOut").classList.toggle("hidden",!!u);
   document.getElementById("accountLoggedIn").classList.toggle("hidden",!u);
   document.getElementById("roomLoginPrompt").classList.toggle("hidden",!!u);
@@ -469,6 +513,7 @@ function initFirebase(){
     else app=firebase.app();
     auth=firebase.auth();
     db=firebase.database();
+    startSponsorAdsListener();
     updateNotificationUi();
     syncAuthUiState(auth.currentUser||null);
     auth.onAuthStateChanged(u=>{syncAuthUiState(u||null);},err=>{document.getElementById("accountMessage").textContent=err.message;});
