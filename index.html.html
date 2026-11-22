@@ -580,6 +580,8 @@ function makeDefaultRoster(info=null){const cap=getTotalCapacityFromInfo(info);c
 function makeDefaultRosterMap(info=null){const m={};for(const s of makeDefaultRoster(info))m[s.id]={name:"",paid:false,status:"empty",applicationId:null,uid:null,email:""};return m;}
 
 let app=null,auth=null,db=null,rooms={},currentRoomId=null,currentRoomInfo=null,roster=makeDefaultRoster(),applications={},isAdmin=false,isRoomAdmin=false,currentUser=null,movingContext=null,broadcastListener=null,initialBroadcastSeen=false,roomRosterRef=null,roomInfoRef=null,roomAppsRef=null,pendingPinRoomId=null,expiryTimer=null,roomOpenRequest=0;
+let authStateReady=false,authReadyResolver=null;
+const authReadyPromise=new Promise(resolve=>{authReadyResolver=resolve;});
 let teamTactics={green:null,red:null},activeTacticTeam=null,teamTacticsRef=null,groupsRef=null,chatRef=null;
 let currentFlowTab="home",groupsData={},chatMessagesData={};
 
@@ -994,9 +996,13 @@ function initFirebase(){
 
     auth.onAuthStateChanged(u=>{
       syncAuthUiState(u||null);
+      authStateReady=true;
+      if(authReadyResolver){authReadyResolver(u||null);authReadyResolver=null;}
     },err=>{
       const msg=document.getElementById("accountMessage");
       if(msg)msg.textContent="Kimlik doğrulama hatası: "+err.message;
+      authStateReady=true;
+      if(authReadyResolver){authReadyResolver(null);authReadyResolver=null;}
     });
 
     db.ref("rooms").on("value",snap=>{
@@ -1078,31 +1084,32 @@ async function openRoom(roomId,bypassPin=false){
     return;
   }
 
-  setStatus("Oda bilgileri güvenli şekilde kontrol ediliyor…");
+  setStatus("Firebase oturumu doğrulanıyor…");
   restoreCreateFormToModal();
 
   try{
-    let roomObj=(rooms&&rooms[cleanId])||null;
-    let info=roomObj&&roomObj.info;
-    let initialRosterData=roomObj&&roomObj.roster;
-
-    // Cache eksikse veya oda bulunmuyorsa Firebase'den kesin olarak oku.
-    if(!roomObj||!info||typeof info!=="object"){
-      const roomSnap=await withTimeout(
-        db.ref("rooms/"+cleanId).once("value"),
-        12000,
-        "Oda verisi okunurken bağlantı"
-      );
-      if(requestId!==roomOpenRequest)return;
-      if(!roomSnap.exists()){
-        setStatus(`"${cleanId}" kodlu oda bulunamadı. Oda kodunu veya paylaşım bağlantısını kontrol edin.`,true);
-        return;
-      }
-      roomObj=roomSnap.val()||{};
-      info=roomObj.info||{};
-      initialRosterData=roomObj.roster||{};
-      rooms[cleanId]=roomObj;
+    // RTDB kuralları auth gerektiriyorsa, ilk okuma auth geri yüklenmeden yapılmamalı.
+    if(auth&&!authStateReady){
+      await withTimeout(authReadyPromise,10000,"Kullanıcı oturumu doğrulaması");
     }
+    if(requestId!==roomOpenRequest)return;
+
+    setStatus("Oda bilgileri sunucudan alınıyor…");
+    // Eski lobby önbelleğine güvenme; her girişte ilgili oda kaydını doğrudan doğrula.
+    const roomSnap=await withTimeout(
+      db.ref("rooms/"+cleanId).once("value"),
+      12000,
+      "Oda verisi okunurken bağlantı"
+    );
+    if(requestId!==roomOpenRequest)return;
+    if(!roomSnap.exists()){
+      setStatus(`"${cleanId}" kodlu oda bulunamadı. Oda kodunu veya paylaşım bağlantısını kontrol edin.`,true);
+      return;
+    }
+    let roomObj=roomSnap.val()||{};
+    let info=roomObj.info||{};
+    let initialRosterData=roomObj.roster||{};
+    rooms[cleanId]=roomObj;
 
     if(!roomObj||typeof roomObj!=="object"||!roomObj.info){
       setStatus("Oda kaydı eksik veya bozulmuş görünüyor. Oda yöneticisinin yeniden kontrol etmesi gerekiyor.",true);
@@ -1139,7 +1146,7 @@ async function openRoom(roomId,bypassPin=false){
     updateRoomHeader();
     computeRoomAdmin();
     renderAll();
-    setStatus("");
+    setStatus("Oda açıldı; canlı kadro bağlantısı kuruluyor…");
 
     // Oda bilgileri dinleyicisi: artık düzgün şekilde kapatılabilir.
     roomInfoRef=db.ref("rooms/"+cleanId+"/info");
@@ -1166,6 +1173,7 @@ async function openRoom(roomId,bypassPin=false){
       if(requestId!==roomOpenRequest||currentRoomId!==cleanId)return;
       roster=mergeRoster(snap.val()||{},currentRoomInfo);
       renderAll();
+      setStatus("Oda bağlantısı aktif. Kadro canlı olarak güncelleniyor.");
     },err=>{
       if(requestId===roomOpenRequest&&currentRoomId===cleanId){
         showMessage("Kadro okunamadı: "+err.message,false);
@@ -1196,7 +1204,14 @@ async function openRoom(roomId,bypassPin=false){
     if(requestId!==roomOpenRequest)return;
     console.error("Odaya giriş hatası:",err);
     const detail=err&&err.message?err.message:"Bilinmeyen bağlantı hatası";
-    setStatus("Odaya girilemedi: "+detail,true);
+    const code=String(err&&err.code||"").toLowerCase();
+    if(code.includes("permission_denied")||detail.toLowerCase().includes("permission_denied")){
+      setStatus("Firebase erişimi reddetti (PERMISSION_DENIED). Üye girişi yapın ve Realtime Database Rules içinde rooms için okuma iznini kontrol edin.",true);
+    }else if(code.includes("network")||detail.toLowerCase().includes("network")){
+      setStatus("Firebase sunucusuna ulaşılamıyor. İnternetinizi ve Realtime Database URL ayarını kontrol edin. Ayrıntı: "+detail,true);
+    }else{
+      setStatus("Odaya girilemedi: "+detail,true);
+    }
   }
 }
 function openRoomPinModal(roomId,info){pendingPinRoomId=roomId;document.getElementById("roomPinInput").value="";document.getElementById("roomPinError").textContent="";const title=(info&&info.title)||roomId;document.getElementById("roomPinDesc").textContent=`"${title}" odası şifre korumalıdır. Giriş şifresini yazın.`;document.getElementById("roomPinModal").classList.remove("hidden");document.getElementById("roomPinInput").focus();}
