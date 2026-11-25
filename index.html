@@ -285,6 +285,32 @@ body.pitch-fullscreen-active{overflow:hidden!important}
 @media(max-width:767px){.pitch-fullscreen-btn{top:7px;right:7px;padding:7px 9px;font-size:9px}.pitch-stage.is-pitch-fullscreen{padding-left:3px!important;padding-right:3px!important}.pitch-stage.is-pitch-fullscreen .fc-player-card{width:clamp(45px,13vw,70px)!important;min-height:clamp(68px,11vh,88px)!important}.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-name{font-size:7px!important}.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-top{font-size:7px!important}.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-status,.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-fee{font-size:5px!important}}
 @media(max-height:520px) and (orientation:landscape){.pitch-stage.is-pitch-fullscreen{padding-top:44px!important}.pitch-stage.is-pitch-fullscreen .pitch-surface{flex-direction:row!important;align-items:stretch!important}.pitch-stage.is-pitch-fullscreen .pitch-team-block{width:44%!important;justify-content:space-around!important}.pitch-stage.is-pitch-fullscreen .pitch-midline{width:2px!important;height:auto!important;min-height:100%!important;flex:0 0 2px!important}.pitch-stage.is-pitch-fullscreen .pitch-center-circle{left:50%;top:50%}.pitch-stage.is-pitch-fullscreen .pitch-top-goal,.pitch-stage.is-pitch-fullscreen .pitch-bottom-goal{display:none}}
 </style>
+<style id="kadrokur-mobile-fullscreen-fit">
+/* MOBILE FULLSCREEN FIX: saha ve yedekler tek ekranda */
+.pitch-stage.is-pitch-fullscreen{position:fixed!important;inset:0!important;z-index:2147483000!important;width:100vw!important;height:100vh!important;height:100dvh!important;max-width:none!important;margin:0!important;padding:calc(env(safe-area-inset-top) + 48px) 5px calc(env(safe-area-inset-bottom) + 5px)!important;box-sizing:border-box!important;background:#04110a!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:5px!important;overflow:hidden!important}
+.pitch-stage.is-pitch-fullscreen .pitch-fullscreen-btn{position:absolute!important;top:calc(env(safe-area-inset-top) + 5px)!important;right:8px!important;z-index:50!important}
+.pitch-stage.is-pitch-fullscreen .pitch-surface{flex:1 1 0!important;min-height:0!important;height:0!important;max-height:none!important;width:100%!important;max-width:none!important;margin:0!important;padding:clamp(4px,1vh,10px) 3px!important;box-sizing:border-box!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;justify-content:space-around!important;gap:1px!important;border-radius:12px!important}
+.pitch-stage.is-pitch-fullscreen .pitch-team-block{flex:1 1 0!important;min-height:0!important;justify-content:space-evenly!important;gap:1px!important;padding:1px 0!important}
+.pitch-stage.is-pitch-fullscreen .pitch-player-rows{flex:1 1 auto!important;min-height:0!important;display:flex!important;flex-direction:column!important;justify-content:space-evenly!important;gap:1px!important}
+.pitch-stage.is-pitch-fullscreen .pitch-player-row{flex:1 1 0!important;min-height:0!important;gap:clamp(2px,1vw,7px)!important;align-items:center!important}
+.pitch-stage.is-pitch-fullscreen .fc-player-card{width:clamp(43px,17vw,68px)!important;min-height:0!important;height:clamp(60px,9.5vh,82px)!important;max-height:10vh!important;padding:3px 2px!important;border-radius:8px!important}
+.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-top{font-size:clamp(6px,.9vh,8px)!important}.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-stars{font-size:6px!important;margin:0!important}
+.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-avatar{width:clamp(21px,5vh,30px)!important;height:clamp(21px,5vh,30px)!important;font-size:14px!important}
+.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-name{font-size:clamp(6px,.9vh,8px)!important;line-height:1!important}
+.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-fee,.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-status{font-size:clamp(4px,.65vh,6px)!important;line-height:1!important}
+.pitch-stage.is-pitch-fullscreen .pitch-team-heading{font-size:clamp(7px,1vh,9px)!important;padding:3px 8px!important;margin:0 auto 1px!important}
+.pitch-stage.is-pitch-fullscreen .pitch-midline{flex:0 0 2px!important;height:2px!important;margin:1px 0!important}.pitch-stage.is-pitch-fullscreen .pitch-center-circle{width:clamp(28px,5vh,42px)!important;height:clamp(28px,5vh,42px)!important}
+.pitch-stage.is-pitch-fullscreen .pitch-top-goal,.pitch-stage.is-pitch-fullscreen .pitch-bottom-goal{height:5px!important;min-width:50px!important;font-size:5px!important}
+.pitch-stage.is-pitch-fullscreen #benchSection{display:flex!important;flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;gap:5px!important;width:100%!important;min-height:0!important;margin:0!important;padding:4px 7px!important;border-radius:9px!important;background:rgba(9,24,17,.96)!important}
+.pitch-stage.is-pitch-fullscreen #benchSection>*{margin-top:0!important;margin-bottom:0!important}.pitch-stage.is-pitch-fullscreen #benchSection>div:first-child{flex:0 0 auto!important}.pitch-stage.is-pitch-fullscreen #benchSection h3{font-size:8px!important;white-space:nowrap!important}.pitch-stage.is-pitch-fullscreen #benchSection p{font-size:6px!important;line-height:1.1!important}
+.pitch-stage.is-pitch-fullscreen #benchPlayers{flex:1 1 auto!important;display:flex!important;justify-content:flex-end!important;align-items:center!important;flex-wrap:nowrap!important;gap:4px!important;min-width:0!important}
+.pitch-stage.is-pitch-fullscreen #benchPlayers .fc-player-card,.pitch-stage.is-pitch-fullscreen #benchPlayers .bench-player-card{width:clamp(42px,13vw,58px)!important;height:clamp(52px,7.5vh,64px)!important;min-height:0!important;max-height:none!important;padding:2px!important}
+.pitch-stage.is-pitch-fullscreen #benchPlayers .fc-card-avatar{width:20px!important;height:20px!important}.pitch-stage.is-pitch-fullscreen #benchPlayers .fc-card-name{font-size:6px!important}
+.pitch-stage.is-pitch-fullscreen #benchAddForm,.pitch-stage.is-pitch-fullscreen #benchAdminHint{display:none!important}
+body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;overscroll-behavior:none!important}
+@media(max-height:650px){.pitch-stage.is-pitch-fullscreen{padding-top:40px!important}.pitch-stage.is-pitch-fullscreen .fc-player-card{height:clamp(48px,8.5vh,64px)!important}.pitch-stage.is-pitch-fullscreen #benchSection{padding:2px 5px!important}}
+@media(orientation:landscape) and (max-height:520px){.pitch-stage.is-pitch-fullscreen{padding-top:38px!important;flex-direction:row!important;gap:5px!important}.pitch-stage.is-pitch-fullscreen .pitch-surface{height:100%!important;width:auto!important;flex:1 1 auto!important}.pitch-stage.is-pitch-fullscreen #benchSection{width:76px!important;flex:0 0 76px!important;flex-direction:column!important;justify-content:center!important}.pitch-stage.is-pitch-fullscreen #benchPlayers{flex-direction:column!important;justify-content:center!important}.pitch-stage.is-pitch-fullscreen #benchPlayers .fc-player-card{width:58px!important;height:70px!important}}
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 <div id="homeVideoBackdrop" class="home-video-backdrop" aria-hidden="true">
@@ -1427,29 +1453,47 @@ async function resetAllPlayers(){if(!isRoomAdmin||!currentRoomId||!confirm("Tüm
 async function copyIban(){const val=document.getElementById("roomIbanText").textContent;try{await navigator.clipboard.writeText(val);alert("IBAN kopyalandı.");}catch(_){alert(val);}}
 async function copyWhatsAppRoster(){if(!currentRoomId)return;const info=currentRoomInfo||{},cap=getTotalCapacityFromInfo(info),totalPrice=getPitchPriceFromInfo(info),perPerson=getPerPersonFeeFromInfo(info),link=getRoomShareUrl(currentRoomId);const lines=[`⚽ ${(info.title||"KADROKUR").toUpperCase()}`,`📅 ${info.pitchName||""} ${info.schedule?"| "+info.schedule:""} | ${cap} Kişi (${perPerson}₺/kişi • Saha: ${totalPrice}₺)`.trim(),""];for(const team of ["green","red"]){lines.push(team==="green"?`🏠 ${info.homeTeam||"1. Takım"}`:`✈️ ${info.awayTeam||"2. Takım"}`);for(const s of roster.filter(x=>x.team===team))lines.push(`${SLOT_LABEL[s.pos]}: ${isOccupied(s)?s.name+(s.paid?" ✅":" ⏳"):"BOŞ ("+getSlotPriceForRoom(info,s.pos)+"₺)"}`);lines.push("");}const subs=roster.filter(x=>x.team==="bench");if(subs.length){lines.push("🪑 YEDEK KULÜBESİ");subs.forEach(s=>lines.push(isOccupied(s)?s.name:"Boş yedek"));lines.push("");}lines.push(`🔗 Oda Linki: ${link}`);lines.push(`🏷️ Oda Kodu: ${currentRoomId}`);const text=lines.join("\n");try{await navigator.clipboard.writeText(text);alert("Kadro ve oda linki kopyalandı!");}catch(_){alert(text);}}
 
+let pitchFullscreenPlaceholders=null;
+function restorePitchFullscreenLayout(){
+ const stage=document.getElementById("pitchStage"),bench=document.getElementById("benchSection");
+ if(!stage||!pitchFullscreenPlaceholders)return;
+ const {stageMarker,benchMarker}=pitchFullscreenPlaceholders;
+ stage.classList.remove("is-pitch-fullscreen");
+ if(bench&&benchMarker&&benchMarker.parentNode)benchMarker.parentNode.insertBefore(bench,benchMarker);
+ if(stageMarker&&stageMarker.parentNode)stageMarker.parentNode.insertBefore(stage,stageMarker);
+ stageMarker?.remove();benchMarker?.remove();pitchFullscreenPlaceholders=null;
+ document.body.classList.remove("pitch-fullscreen-active");
+}
 function syncPitchFullscreenButton(){
  const stage=document.getElementById("pitchStage"),btn=document.getElementById("pitchFullscreenBtn"),icon=document.getElementById("pitchFullscreenIcon"),label=document.getElementById("pitchFullscreenText");
  if(!stage||!btn)return;
- const active=stage.classList.contains("is-pitch-fullscreen")||document.fullscreenElement===stage;
+ const active=stage.classList.contains("is-pitch-fullscreen");
  btn.setAttribute("aria-pressed",String(active));btn.setAttribute("aria-label",active?"Sahayı küçült":"Sahayı tam ekran yap");
  if(icon)icon.textContent=active?"⤢":"⛶";if(label)label.textContent=active?"KÜÇÜLT":"TAM EKRAN";
  document.body.classList.toggle("pitch-fullscreen-active",active);
 }
 async function togglePitchFullscreen(){
- const stage=document.getElementById("pitchStage");if(!stage)return;
- const active=stage.classList.contains("is-pitch-fullscreen")||document.fullscreenElement===stage;
- if(active){
+ const stage=document.getElementById("pitchStage"),bench=document.getElementById("benchSection");if(!stage)return;
+ if(stage.classList.contains("is-pitch-fullscreen")){
   if(document.fullscreenElement&&document.exitFullscreen){try{await document.exitFullscreen();}catch(_){}}
-  stage.classList.remove("is-pitch-fullscreen");syncPitchFullscreenButton();return;
+  restorePitchFullscreenLayout();syncPitchFullscreenButton();return;
  }
+ const stageMarker=document.createComment("KadroKur saha konumu"),benchMarker=document.createComment("KadroKur yedek konumu");
+ stage.parentNode.insertBefore(stageMarker,stage);
+ if(bench&&bench.parentNode)bench.parentNode.insertBefore(benchMarker,bench);
+ pitchFullscreenPlaceholders={stageMarker,benchMarker};
+ document.body.appendChild(stage);
+ if(bench)stage.appendChild(bench);
  stage.classList.add("is-pitch-fullscreen");syncPitchFullscreenButton();
- if(stage.requestFullscreen){try{await stage.requestFullscreen();}catch(_){/* iOS/Safari fallback: CSS full-screen mode */}}
+ if(stage.requestFullscreen){try{await stage.requestFullscreen();}catch(_){}}
  syncPitchFullscreenButton();
 }
 document.addEventListener("fullscreenchange",()=>{
- const stage=document.getElementById("pitchStage");if(stage&&!document.fullscreenElement)stage.classList.remove("is-pitch-fullscreen");syncPitchFullscreenButton();
+ const stage=document.getElementById("pitchStage");
+ if(stage&&document.fullscreenElement!==stage&&stage.classList.contains("is-pitch-fullscreen"))restorePitchFullscreenLayout();
+ syncPitchFullscreenButton();
 });
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){const stage=document.getElementById("pitchStage");if(stage)stage.classList.remove("is-pitch-fullscreen");syncPitchFullscreenButton();}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){const stage=document.getElementById("pitchStage");if(stage?.classList.contains("is-pitch-fullscreen")){if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});restorePitchFullscreenLayout();syncPitchFullscreenButton();}}});
 
 initFirebase();
 </script>
