@@ -78,6 +78,65 @@ body.room-open .home-video-backdrop{display:none}
 .fc-bench-card{width:82px;min-height:104px;padding:7px 5px}.fc-bench-card .fc-card-actions{gap:3px}.fc-bench-card .fc-card-actions button{font-size:7px;padding:3px 3px}
 .bench-player-card{width:82px;min-height:104px;padding:7px 5px;border-radius:11px;border:1px solid rgba(251,191,36,.65);background:linear-gradient(155deg,#59421a,#211b12 58%,#493416);color:#fff4cf;box-shadow:0 5px 12px rgba(0,0,0,.24);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.bench-player-card.empty{border-style:dashed;background:rgba(15,23,42,.65);color:#fcd34d}.bench-player-card .bench-name{font-size:10px;font-weight:900;overflow-wrap:anywhere;max-height:28px;overflow:hidden}.bench-player-card .bench-role{font-size:8px;color:#fcd34d;font-weight:900;margin-top:4px}.bench-player-card .bench-actions{display:flex;gap:4px;margin-top:5px}.bench-player-card button{font-size:8px;font-weight:900;border-radius:5px;padding:3px 5px;background:rgba(0,0,0,.55);color:white}@media(max-width:640px){.fc-bench-card{width:76px;min-height:98px}.bench-player-card{width:76px;min-height:98px}}
 
+
+/* FC 27 / Ultimate Team düzeni – kompakt saha ve gerçek kart oranları */
+.pitch-stage{padding:6px 2px 14px;perspective:none;max-width:100%}
+.pitch-surface{min-height:0!important;height:auto;transform:none!important;padding:12px 12px 14px!important;border-width:3px!important;border-radius:18px!important;box-shadow:0 14px 32px rgba(0,0,0,.35)!important}
+.pitch-surface:before{inset:8px}
+.pitch-surface:after{top:8px;bottom:8px}
+.pitch-team-block{padding:8px 2px!important}
+.pitch-green-block{padding-top:10px!important;padding-bottom:8px!important}
+.pitch-red-block{padding-top:8px!important;padding-bottom:10px!important}
+.pitch-team-heading{margin-bottom:7px;font-size:9px;padding:4px 10px}
+.pitch-player-rows{gap:7px}
+.pitch-player-rows>div{gap:clamp(3px,1vw,9px);min-height:0;flex-wrap:nowrap}
+.pitch-midline{margin:0 -12px;height:1px}
+.pitch-center-circle{width:54px;height:54px}
+.pitch-mid-label{font-size:7px}
+.pitch-top-goal,.pitch-bottom-goal{height:9px;min-width:70px;width:22%;font-size:6px}
+.fc-player-card{width:clamp(65px,8vw,84px);min-height:108px;padding:5px 4px 5px;border-radius:9px!important;box-shadow:0 4px 9px rgba(0,0,0,.28),inset 0 0 0 1px rgba(255,245,190,.22)}
+.fc-player-card:before{inset:3px;border-radius:6px}
+.fc-player-card .fc-card-top{font-size:8px}
+.fc-player-card .fc-card-stars{font-size:7px;letter-spacing:.5px;margin:2px 0}
+.fc-player-card .fc-card-avatar{width:42px;height:43px;border-radius:5px;font-size:21px;overflow:hidden}
+.fc-player-card .fc-card-name{font-size:9px;margin-top:3px;max-height:22px}
+.fc-player-card .fc-card-status{font-size:7px;margin-top:2px}
+.fc-player-card .fc-card-actions{gap:2px;margin-top:3px;flex-wrap:wrap;justify-content:center}
+.fc-player-card .fc-card-actions button{font-size:6px;padding:3px 3px}
+.fc-bench-card{width:78px;min-height:104px}
+@media(max-width:640px){
+ .pitch-stage{padding:3px 0 10px}
+ .pitch-surface{min-height:0!important;padding:9px 5px 10px!important;border-width:2px!important}
+ .pitch-team-block{padding:6px 0!important}
+ .pitch-green-block{padding-top:8px!important;padding-bottom:6px!important}
+ .pitch-red-block{padding-top:6px!important;padding-bottom:8px!important}
+ .pitch-player-rows{gap:6px}
+ .pitch-player-rows>div{gap:3px;flex-wrap:nowrap}
+ .fc-player-card{width:clamp(43px,11.7vw,67px);min-height:91px;padding:4px 2px}
+ .fc-player-card .fc-card-top{font-size:6px}
+ .fc-player-card .fc-card-stars{font-size:5px;letter-spacing:0;margin:2px 0}
+ .fc-player-card .fc-card-avatar{width:30px;height:32px;font-size:16px}
+ .fc-player-card .fc-card-name{font-size:7px;line-height:1.05;max-height:16px}
+ .fc-player-card .fc-card-status{font-size:5px}
+ .fc-player-card .fc-card-actions{gap:1px}
+ .fc-player-card .fc-card-actions button{font-size:5px;padding:2px 2px}
+ .pitch-center-circle{width:42px;height:42px}
+ .pitch-mid-label{font-size:6px;padding:2px 5px}
+ .pitch-team-heading{font-size:8px;padding:4px 7px;margin-bottom:5px}
+ .fc-bench-card{width:68px;min-height:94px}
+}
+.fc-player-card{background:linear-gradient(160deg,#f8e8b7 0%,#c9a15b 18%,#493b29 48%,#d7b66e 78%,#6f552c 100%)}
+.fc-player-card .fc-card-avatar img{width:100%;height:100%;object-fit:cover;border-radius:4px}
+.fc-player-card .fc-card-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px 5px;width:100%;margin-top:3px;font-size:6px;font-weight:1000;line-height:1.1}
+.fc-player-card .fc-card-stats span{white-space:nowrap}
+.fc-player-card .fc-card-position{font-size:7px;font-weight:1000;letter-spacing:.4px}
+.fc-player-card .fc-card-actions button.photo-action{background:#164e63;color:#e0f2fe}
+
+.fc-player-card.fc-card-gold{background:linear-gradient(150deg,#fff3b0,#d8ad4d 24%,#77511f 54%,#f4d889 82%,#8b6328)}
+.fc-player-card.fc-card-silver{background:linear-gradient(150deg,#fff,#b8c4cf 24%,#596575 54%,#e3e8ed 82%,#7b8794);border-color:#f1f5f9!important;color:#101827}
+.fc-player-card.fc-card-bronze{background:linear-gradient(150deg,#f5d0a4,#b87942 24%,#59351f 54%,#d99b62 82%,#704323);border-color:#f4c18e!important;color:#261407}
+.fc-player-card.fc-card-icon{background:linear-gradient(145deg,#fff2b5,#f0c45c 20%,#b65b24 46%,#ffe59a 70%,#7c351a);border:2px solid #ffe8a3!important;box-shadow:0 0 0 2px rgba(255,190,70,.25),0 8px 18px rgba(0,0,0,.4)}
+
 </style>
 <script async
 src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7620788317702116"
@@ -1009,13 +1068,46 @@ async function editFixtureDateTime(id){if(!isRoomAdmin||!currentRoomId)return;co
 async function deleteFixture(id){if(!isRoomAdmin||!confirm("Bu fikstür maçı silinsin mi?"))return;try{await tournamentRef().child(id).remove();}catch(err){alert("Silinemedi: "+err.message);}}
 
 function playerInitials(name){return String(name||"?").trim().split(/\s+/).slice(0,2).map(x=>x.charAt(0)).join("").toLocaleUpperCase("tr-TR")||"?";}
+function fcStat(value){return Math.max(1,Math.min(99,Number(value)||75));}
 function renderFcPlayerCard(s,kind="field"){
- const rating=Math.max(1,Math.min(99,Number(s.rating)||75));
- const role=kind==="bench"?"YEDEK":(s.pos||"OYUNCU");
+ const rating=fcStat(s.rating), role=kind==="bench"?"YEDEK":(s.pos||"OYUNCU");
  const paidText=s.paid?"ÖDEME TAMAM":"ÖDEME BEKLİYOR";
- return `<div class="fc-player-card ${kind==="bench"?"fc-bench-card":""}"><div class="fc-card-top"><span>${rating} GEN</span><span>${esc(role)}</span></div><div class="fc-card-stars">★ ★ ★ ★ ★</div><div class="fc-card-avatar">${esc(playerInitials(s.name))}</div><div class="fc-card-name">${esc(s.name)}</div><div class="fc-card-status">${kind==="bench"?"YEDEK KULÜBESİ":paidText}</div>${isRoomAdmin?`<div class="fc-card-actions"><button type="button" onclick="setPlayerRating('${s.id}')">REYTİNG</button><button type="button" onclick="openMoveModal('${s.id}',${s.applicationId?`'${s.applicationId}'`:"null"})">TAŞI</button><button type="button" onclick="removeSlot('${s.id}')">ÇIKAR</button></div>`:""}</div>`;
+ const photo=s.photoData?`<img src="${s.photoData}" alt="">`:esc(playerInitials(s.name));
+ const stats=[["PAC",fcStat(s.pac||rating-2)],["ŞUT",fcStat(s.sho||rating-1)],["PAS",fcStat(s.pas||rating)],["DRI",fcStat(s.dri||rating+1)],["DEF",fcStat(s.def||rating-3)],["FİZ",fcStat(s.phy||rating)]];
+ const rarity=rating>=90?"fc-card-icon":rating>=80?"fc-card-gold":rating>=70?"fc-card-silver":"fc-card-bronze";
+ return `<div class="fc-player-card ${kind==="bench"?"fc-bench-card":""} ${rarity}">
+  <div class="fc-card-top"><span>${rating} GEN</span><span class="fc-card-position">${esc(role)}</span></div>
+  <div class="fc-card-stars">★ ★ ★ ★ ★</div>
+  <div class="fc-card-avatar">${photo}</div>
+  <div class="fc-card-name">${esc(s.name)}</div>
+  <div class="fc-card-stats">${stats.map(([k,v])=>`<span>${k} <b>${v}</b></span>`).join("")}</div>
+  <div class="fc-card-status">${kind==="bench"?"YEDEK":paidText}</div>
+  ${isRoomAdmin?`<div class="fc-card-actions"><button type="button" onclick="setPlayerRating('${s.id}')">GEN</button><button type="button" class="photo-action" onclick="choosePlayerPhoto('${s.id}')">FOTO</button><button type="button" onclick="openMoveModal('${s.id}',${s.applicationId?`'${s.applicationId}'`:"null"})">TAŞI</button><button type="button" onclick="removeSlot('${s.id}')">ÇIKAR</button></div>`:""}
+ </div>`;
 }
 async function setPlayerRating(slotId){if(!isRoomAdmin||!currentRoomId)return;const player=roster.find(x=>x.id===slotId);if(!player||!isOccupied(player))return;const current=Math.max(1,Math.min(99,Number(player.rating)||75));const raw=prompt(`${player.name} için FC reytingi (1-99):`,String(current));if(raw===null)return;const rating=Number(raw);if(!Number.isInteger(rating)||rating<1||rating>99){alert("Reyting 1 ile 99 arasında tam sayı olmalı.");return;}try{await db.ref(`rooms/${currentRoomId}/roster/${slotId}/rating`).set(rating);}catch(err){alert("Reyting kaydedilemedi: "+err.message);}}
+async function choosePlayerPhoto(slotId){
+ if(!isRoomAdmin||!currentRoomId)return;
+ const slot=roster.find(x=>x.id===slotId);if(!slot||!isOccupied(slot))return;
+ let picker=document.getElementById("fcPlayerPhotoPicker");
+ if(!picker){picker=document.createElement("input");picker.type="file";picker.accept="image/*";picker.id="fcPlayerPhotoPicker";picker.hidden=true;document.body.appendChild(picker);}
+ picker.value="";
+ picker.onchange=async()=>{
+  const file=picker.files&&picker.files[0];if(!file)return;
+  if(!file.type.startsWith("image/")){alert("Lütfen resim dosyası seç.");return;}
+  if(file.size>8*1024*1024){alert("Fotoğraf en fazla 8 MB olabilir.");return;}
+  try{
+   const bitmap=await createImageBitmap(file),canvas=document.createElement("canvas");
+   const scale=Math.min(1,420/Math.max(bitmap.width,bitmap.height));
+   canvas.width=Math.round(bitmap.width*scale);canvas.height=Math.round(bitmap.height*scale);
+   canvas.getContext("2d").drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();
+   const data=canvas.toDataURL("image/jpeg",.78);
+   await db.ref(`rooms/${currentRoomId}/roster/${slotId}/photoData`).set(data);
+   alert("Oyuncu fotoğrafı karta eklendi.");
+  }catch(err){alert("Fotoğraf eklenemedi: "+err.message);}
+ };
+ picker.click();
+}
 function renderPitchRow(slots,info){return `<div class="pitch-player-row">${slots.map(s=>{const full=isOccupied(s),slotFee=getSlotPriceForRoom(info,s.pos);if(!full)return `<button type="button" onclick="selectSlotOnPitch('${s.team}','${s.id}')" class="fc-player-card empty"><div class="fc-card-top"><span>${s.pos}</span><span>${slotFee}₺</span></div><div class="fc-card-stars">✦ ✦ ✦</div><div class="fc-card-avatar">＋</div><div class="fc-card-name">BOŞ YER</div><div class="fc-card-status">KADROYA KATIL</div></button>`;return renderFcPlayerCard(s,"field");}).join("")}</div>`;}
 function renderTeam(team,info){const a=roster.filter(s=>s.team===team);const order=team==="red"?[...SLOT_ORDER].reverse():SLOT_ORDER;return order.map(pos=>renderPitchRow(a.filter(s=>s.pos===pos),info)).join("");}
 function renderBench(){const box=document.getElementById("benchPlayers");if(!box)return;const slots=roster.filter(s=>s.team==="bench");const section=document.getElementById("benchSection");if(section)section.classList.toggle("hidden",slots.length===0);const occupied=slots.filter(isOccupied).length;const count=document.getElementById("benchCount");if(count)count.textContent=`${occupied} / ${slots.length}`;box.innerHTML=slots.map(s=>isOccupied(s)?renderFcPlayerCard(s,"bench"):`<button type="button" class="bench-player-card empty" ${isRoomAdmin?`onclick="focusBenchAdd()"`:"disabled"}><span class="text-xl">＋</span><span class="bench-name">BOŞ YEDEK</span><span class="bench-role">${isRoomAdmin?"YÖNETİCİ EKLESİN":"YEDEK YERİ"}</span></button>`).join("");const form=document.getElementById("benchAddForm"),hint=document.getElementById("benchAdminHint");if(form)form.classList.toggle("hidden",!isRoomAdmin||occupied>=slots.length);if(hint)hint.classList.toggle("hidden",!isRoomAdmin||slots.length===0);}
