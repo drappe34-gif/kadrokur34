@@ -137,6 +137,58 @@ body.room-open .home-video-backdrop{display:none}
 .fc-player-card.fc-card-bronze{background:linear-gradient(150deg,#f5d0a4,#b87942 24%,#59351f 54%,#d99b62 82%,#704323);border-color:#f4c18e!important;color:#261407}
 .fc-player-card.fc-card-icon{background:linear-gradient(145deg,#fff2b5,#f0c45c 20%,#b65b24 46%,#ffe59a 70%,#7c351a);border:2px solid #ffe8a3!important;box-shadow:0 0 0 2px rgba(255,190,70,.25),0 8px 18px rgba(0,0,0,.4)}
 
+
+/* KadroKur responsive sports-platform layout refresh */
+:root{color-scheme:dark;--kk-bg:#080d16;--kk-panel:#111a28;--kk-line:rgba(148,163,184,.16);--kk-green:#39df87}
+html{scroll-behavior:smooth}body{background:radial-gradient(ellipse at 50% -18%,rgba(16,185,129,.13),transparent 42%),#080d16;overflow-x:hidden}
+.home-header>div,header>div{max-width:1600px!important}
+#homeView,#privacyInfo{max-width:1600px!important}
+#roomView{width:100%;max-width:1600px!important;grid-template-columns:minmax(0,1fr);align-items:start}
+@media(min-width:1024px){#roomView{grid-template-columns:repeat(12,minmax(0,1fr));gap:22px}}
+#roomView>section{min-width:0}
+#roomView .glass-card{border-color:var(--kk-line);background:linear-gradient(145deg,rgba(19,29,44,.96),rgba(11,18,29,.96));box-shadow:0 12px 34px rgba(0,0,0,.2)}
+#roomView>section:first-child>.glass-card:first-child{padding:20px 22px}
+.room-join-column{align-self:start}
+@media(min-width:1024px){.room-join-column{position:sticky;top:86px}}
+.room-join-column>div:first-child{padding:22px!important;border-radius:22px}
+.room-join-column h2{font-size:clamp(1.1rem,1.5vw,1.45rem);letter-spacing:-.035em}
+#joinForm{gap:17px}
+#joinForm label{display:block;margin-bottom:7px;line-height:1.35}
+#joinForm input,#joinForm select{min-height:44px;width:100%;max-width:100%;box-sizing:border-box;background:#0a1220;border-color:#29384b}
+#joinForm button[type=submit]{min-height:48px;box-shadow:0 8px 22px rgba(16,185,129,.18)}
+#joinForm .grid{gap:12px}
+#joinForm .p-4,#joinForm .p-3\.5{gap:10px}
+.pitch-stage{padding:8px 0 14px;max-width:100%;}
+.pitch-surface{min-height:0!important;height:auto;aspect-ratio:1.42/1;max-height:760px;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(12px,1.6vw,24px)!important;border-radius:22px!important;overflow:hidden}
+.pitch-surface:before{inset:10px;border-width:1.5px}
+.pitch-surface:after{top:10px;bottom:10px}
+.pitch-team-block{padding:clamp(8px,1vw,15px) 4px!important}
+.pitch-green-block{padding-top:clamp(10px,1.3vw,20px)!important;padding-bottom:clamp(10px,1.3vw,20px)!important}
+.pitch-red-block{padding-top:clamp(10px,1.3vw,20px)!important;padding-bottom:clamp(10px,1.3vw,20px)!important}
+.pitch-team-heading{margin-bottom:clamp(8px,1vw,14px);font-size:10px;padding:6px 13px;letter-spacing:.08em}
+.pitch-player-rows{gap:clamp(8px,1.3vw,17px)}
+.pitch-player-rows>div{gap:clamp(5px,.9vw,14px);min-height:0;flex-wrap:wrap;justify-content:center}
+.pitch-player-rows button,.pitch-player-rows>div>div{min-width:clamp(68px,6.1vw,94px);max-width:112px;min-height:clamp(82px,7.2vw,108px);padding:8px 6px}
+.fc-player-card{width:clamp(72px,6.3vw,96px);min-height:clamp(104px,8.5vw,128px);}
+.pitch-midline{margin:0 -12px;height:1px;flex:0 0 1px}
+.pitch-center-circle{width:clamp(48px,5vw,68px);height:clamp(48px,5vw,68px)}
+.pitch-top-goal,.pitch-bottom-goal{height:12px;min-width:100px;width:24%;font-size:7px}
+#roomTeamsDisplay{min-width:0;padding:14px!important;border-radius:18px}
+#roomTeamsDisplay img{max-width:74px;max-height:74px;object-fit:contain}
+#tournamentPanel{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:20px!important}
+#tournamentPanel>div:first-child{align-items:center}
+#tournamentSummary{gap:10px}
+#tournamentSummary>div{min-width:0;background:rgba(7,14,24,.78);border-color:var(--kk-line)}
+#tournamentFixtures>*,#tournamentStandings>*{border-radius:12px}
+#adminBar{padding:18px!important}
+#roomView input,#roomView select,#roomView textarea{max-width:100%;box-sizing:border-box}
+#roomView button{transition:transform .16s ease,filter .16s ease,box-shadow .16s ease}
+#roomView button:hover{filter:brightness(1.08)}
+#roomView button:active{transform:translateY(1px)}
+@media(max-width:1023px){#roomView{padding-top:18px;padding-bottom:28px}.room-join-column{position:static}.pitch-surface{aspect-ratio:1.22/1}.pitch-player-rows button,.pitch-player-rows>div>div{min-width:70px}}
+@media(max-width:640px){#roomView{padding-left:12px;padding-right:12px;gap:14px}.pitch-surface{aspect-ratio:auto;min-height:470px!important;padding:10px 6px!important}.pitch-player-rows{gap:7px}.pitch-player-rows>div{gap:4px;flex-wrap:wrap}.pitch-player-rows button,.pitch-player-rows>div>div{min-width:clamp(57px,17vw,76px);max-width:82px;min-height:72px;padding:5px 3px}.fc-player-card{width:clamp(58px,17vw,76px);min-height:94px;padding:5px 3px}.fc-player-card .fc-card-avatar{width:28px;height:28px;font-size:18px}.fc-player-card .fc-card-name{font-size:8px}.pitch-team-heading{font-size:8px;padding:5px 8px}.pitch-center-circle{width:42px;height:42px}.pitch-mid-label{font-size:6px;padding:2px 5px}.pitch-top-goal,.pitch-bottom-goal{min-width:68px;height:9px}.room-join-column>div:first-child{padding:16px!important}#roomView>section:first-child>.glass-card:first-child{padding:15px}.room-join-column .grid.grid-cols-2{gap:8px}}
+@media(min-width:1280px){#roomView{gap:26px}.pitch-surface{aspect-ratio:1.5/1}.pitch-player-rows button,.pitch-player-rows>div>div{min-height:104px}}
+
 </style>
 <script async
 src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7620788317702116"
@@ -149,12 +201,12 @@ crossorigin="anonymous"></script>
   </video>
   <div class="home-video-shade"></div>
 </div>
-<header class="home-header border-b border-slate-800 sticky top-0 z-30"><div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+<header class="home-header border-b border-slate-800 sticky top-0 z-30"><div class="max-w-[1600px] mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
 <div class="flex items-center gap-3"><button type="button" onclick="goHome()" class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-slate-950 text-lg">KK</button><div><div class="flex items-center gap-2"><button type="button" onclick="goHome()" class="font-black text-lg text-left">Kadro<span class="text-emerald-400">Kur</span></button><span id="headerBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300">MAÇ ODALARI</span></div><p id="headerSubtitle" class="text-xs text-slate-400 mt-1">Bölge, ilçe ve halı saha seç • Kendi maç odanı kurup paylaş</p></div></div>
 <div class="flex items-center gap-2 flex-wrap"><nav class="hidden md:flex items-center gap-1 mr-2"><button type="button" class="home-menu-link" onclick="document.getElementById('roomsList').scrollIntoView({behavior:'smooth'})">MAÇLAR</button><button type="button" class="home-menu-link" onclick="document.getElementById('accountPanel').scrollIntoView({behavior:'smooth'})">ÜYELİK</button><button type="button" class="home-menu-link" aria-label="Canlı sohbet" title="Canlı sohbet" onclick="document.getElementById('homeChatPanel').scrollIntoView({behavior:'smooth'})">💬</button></nav><button type="button" onclick="goHome()" id="homeNavBtn" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-emerald-300">🏠 Odalar</button><span id="quotaBadge" class="px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400">Aktif Oda: 0</span><button type="button" onclick="toggleAdminPanel()" id="adminBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-200">🔒 Yönetici Girişi</button></div>
 </div></header>
 
-<section id="homeView" class="max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
+<section id="homeView" class="max-w-[1600px] w-full mx-auto px-4 py-6 space-y-6">
 <div class="home-hero rounded-[2rem] p-7 sm:p-12 lg:p-16">
 <div class="max-w-2xl">
 <div class="home-hero-kicker"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> KADROKUR • SAHAYA HAZIR MISIN?</div>
@@ -192,7 +244,7 @@ crossorigin="anonymous"></script>
   <div><h3 class="text-xs font-bold text-slate-200 mb-2">Kayıtlı sponsorlar</h3><div id="sponsorAdminList" class="space-y-2 text-xs text-slate-300">Yükleniyor…</div></div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-7">
 <div class="lg:col-span-8 space-y-4">
 <div class="glass-card home-content-card rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
 <select id="filterRegion" onchange="syncFilterDistricts();renderRoomsLobby()" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
@@ -269,8 +321,8 @@ crossorigin="anonymous"></script>
 </div>
 </section>
 
-<main id="roomView" class="hidden max-w-6xl w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-<section class="lg:col-span-7 flex flex-col gap-4">
+<main id="roomView" class="hidden max-w-[1600px] w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-7">
+<section class="lg:col-span-8 min-w-0 flex flex-col gap-5">
 <div class="glass-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
 <div><h2 id="roomTitleHeading" class="text-lg font-black text-white">Maç Odası</h2><p id="roomMetaText" class="text-xs text-slate-400 mt-0.5"></p><p id="roomCountdown" class="text-xs font-black text-amber-300 mt-2"></p></div>
 <div class="flex flex-wrap gap-2">
@@ -332,7 +384,7 @@ crossorigin="anonymous"></script>
 <h3 class="text-sm font-bold mt-5 mb-2">Onaylanan oyuncular / ödeme & kadro yönetimi</h3><div id="approvedApplications" class="space-y-2 text-sm"></div></div>
 </section>
 
-<section class="lg:col-span-5 flex flex-col gap-4"><div class="glass-card rounded-2xl p-5 sm:p-6">
+<section class="lg:col-span-4 min-w-0 flex flex-col gap-4 room-join-column"><div class="glass-card rounded-2xl p-5 sm:p-6">
 <h2 class="text-xl font-black mb-1">Kadroya Katıl & Yerini Ayırt</h2><p id="joinHintText" class="text-xs text-slate-400 mb-4">Boş mevkiyi seçip başvurunu gönder. Başvuru yapmak için hesabınla giriş yap.</p>
 <div id="roomLoginPrompt" class="mb-4 rounded-xl border border-amber-500/30 bg-amber-950/30 p-3 text-xs text-amber-200 hidden">
 Kadroya başvurmak için önce <button type="button" onclick="goHome()" class="underline font-bold">Odalar / Giriş</button> ekranından hesabına giriş yapmalısın.
@@ -398,7 +450,7 @@ Kadroya başvurmak için önce <button type="button" onclick="goHome()" class="u
 <div id="movePlayerModal" class="hidden fixed inset-0 z-50 bg-black/75 p-4 flex items-center justify-center"><div class="glass-card rounded-2xl p-6 w-full max-w-md"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-black">🔄 Yer / Takım Değiştir</h2><button type="button" onclick="closeMoveModal()" class="text-xl leading-none">×</button></div><p id="movePlayerInfo" class="text-xs text-slate-300 mb-4"></p><form onsubmit="confirmMovePlayer(event)" class="space-y-4"><div><label class="block text-xs font-bold text-slate-300 mb-1" for="moveTargetSlot">Yeni Kadro / Mevki</label><select id="moveTargetSlot" required class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm"></select></div><p id="moveError" class="text-xs text-red-300"></p><div class="flex justify-end gap-2"><button type="button" onclick="closeMoveModal()" class="px-4 py-2 rounded-lg bg-slate-700 text-xs font-bold">İptal</button><button id="moveSubmitBtn" type="submit" class="px-4 py-2 rounded-lg bg-amber-500 text-slate-950 text-xs font-black">Taşımayı Onayla</button></div></form></div></div>
 
 <div id="adminLoginModal" class="hidden fixed inset-0 z-50 bg-black/75 p-4 flex items-center justify-center"><div class="glass-card rounded-2xl p-6 w-full max-w-sm"><div class="flex justify-between mb-4"><h2 class="text-lg font-black">Yönetici Girişi</h2><button type="button" onclick="closeAdminLogin()" class="text-xl">×</button></div><form onsubmit="adminLogin(event)" class="space-y-3"><input id="adminEmail" type="email" required placeholder="Yönetici e-posta" class="w-full px-3 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white"><input id="adminPassword" type="password" required placeholder="Şifre" class="w-full px-3 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white"><button id="adminLoginSubmit" type="submit" class="w-full py-2.5 rounded-lg bg-emerald-500 text-slate-950 font-bold text-sm">Giriş yap</button><p id="loginError" class="text-xs text-red-300"></p></form></div></div>
-<section id="privacyInfo" class="max-w-6xl w-full mx-auto px-4 pb-5 text-[11px] text-slate-500">
+<section id="privacyInfo" class="max-w-[1600px] w-full mx-auto px-4 pb-5 text-[11px] text-slate-500">
   <details class="rounded-xl border border-slate-800 bg-slate-950/70 p-3"><summary class="cursor-pointer font-bold text-slate-300">Gizlilik ve reklam bilgilendirmesi</summary>
     <p class="mt-2">KadroKur; üyelik ve maç odası özellikleri için Firebase hizmetlerini kullanır. Google AdSense etkinleştirildiğinde Google ve iş ortakları reklam sunumu için çerez veya benzeri teknolojiler kullanabilir. Kişiselleştirilmiş reklam tercihleri ve gerekli izinler, ilgili kullanıcıya gösterilen onay seçenekleri üzerinden yönetilmelidir.</p>
     <p class="mt-2">Sponsorlu içerikler “Sponsorlu” olarak işaretlenir. Sponsor bağlantılarına tıklamak isteğe bağlıdır. Gizlilik talepleri ve veri soruları için site işletmecisinin iletişim bilgileri burada ayrıca yayımlanmalıdır.</p>
