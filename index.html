@@ -263,7 +263,7 @@ crossorigin="anonymous"></script>
   .fc-player-card .fc-card-avatar{width:28px!important;height:28px!important;font-size:14px}
   .fc-player-card .fc-card-name{font-size:8px!important}
 }
-</style></style>
+</style>
 
 <style id="kadrokur-mobile-fullscreen">
 .pitch-stage{position:relative}
@@ -311,6 +311,395 @@ body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;ove
 @media(max-height:650px){.pitch-stage.is-pitch-fullscreen{padding-top:40px!important}.pitch-stage.is-pitch-fullscreen .fc-player-card{height:clamp(48px,8.5vh,64px)!important}.pitch-stage.is-pitch-fullscreen #benchSection{padding:2px 5px!important}}
 @media(orientation:landscape) and (max-height:520px){.pitch-stage.is-pitch-fullscreen{padding-top:38px!important;flex-direction:row!important;gap:5px!important}.pitch-stage.is-pitch-fullscreen .pitch-surface{height:100%!important;width:auto!important;flex:1 1 auto!important}.pitch-stage.is-pitch-fullscreen #benchSection{width:76px!important;flex:0 0 76px!important;flex-direction:column!important;justify-content:center!important}.pitch-stage.is-pitch-fullscreen #benchPlayers{flex-direction:column!important;justify-content:center!important}.pitch-stage.is-pitch-fullscreen #benchPlayers .fc-player-card{width:58px!important;height:70px!important}}
 </style>
+
+<style id="kadrokur-fc27-ultimate-v2">
+/* ========== FC 27 ULTIMATE TEAM PREMIUM CARDS ========== */
+@keyframes fcCardIn {
+  from { opacity: 0; transform: translateY(12px) scale(.92); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fcShine {
+  0%   { background-position: -120% 0; }
+  100% { background-position: 220% 0; }
+}
+.pitch-player-row .fc-player-card {
+  animation: fcCardIn .45s cubic-bezier(.22,1,.36,1) both;
+}
+.pitch-player-row .fc-player-card:nth-child(1){animation-delay:.02s}
+.pitch-player-row .fc-player-card:nth-child(2){animation-delay:.06s}
+.pitch-player-row .fc-player-card:nth-child(3){animation-delay:.10s}
+.pitch-player-row .fc-player-card:nth-child(4){animation-delay:.14s}
+.pitch-player-row .fc-player-card:nth-child(5){animation-delay:.18s}
+
+.fc-player-card{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  flex:0 0 auto!important;
+  width:clamp(78px,7.8vw,102px)!important;
+  min-width:72px!important;
+  max-width:108px!important;
+  min-height:128px!important;
+  height:auto!important;
+  padding:6px 5px 7px!important;
+  border-radius:14px!important;
+  text-align:center;
+  isolation:isolate;
+  overflow:hidden;
+  cursor:pointer;
+  box-shadow:
+    0 8px 0 rgba(0,0,0,.32),
+    0 14px 28px rgba(0,0,0,.38),
+    inset 0 1px 0 rgba(255,255,255,.35)!important;
+  transition: transform .22s cubic-bezier(.22,1,.36,1), filter .22s, box-shadow .22s;
+  z-index:5!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+.fc-player-card:hover{
+  transform:translateY(-6px) scale(1.055)!important;
+  filter:brightness(1.07) saturate(1.08);
+  box-shadow:
+    0 14px 0 rgba(0,0,0,.28),
+    0 22px 36px rgba(0,0,0,.42),
+    0 0 24px rgba(251,191,36,.22)!important;
+}
+.fc-player-card:active{transform:translateY(-2px) scale(1.02)!important}
+
+/* Gold base (default) */
+.fc-player-card,
+.fc-card-gold{
+  background:
+    linear-gradient(165deg,#fff8d6 0%,#f0d078 12%,#c9a03a 28%,#8b5e1a 52%,#d4b45c 78%,#a67c28 100%)!important;
+  border:1.5px solid #ffe9a8!important;
+  color:#2a1808!important;
+}
+/* Shine overlay */
+.fc-player-card:not(.empty)::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(115deg,transparent 0%,rgba(255,255,255,.0) 35%,rgba(255,255,255,.38) 48%,rgba(255,255,255,.0) 62%,transparent 100%);
+  background-size:200% 100%;
+  pointer-events:none;
+  z-index:1;
+  opacity:.55;
+  animation:fcShine 4.5s ease-in-out infinite;
+}
+.fc-player-card:before{
+  content:"";
+  position:absolute;
+  inset:3px;
+  border:1px solid rgba(255,248,210,.55);
+  border-radius:11px;
+  pointer-events:none;
+  z-index:0;
+}
+.fc-card-silver{
+  background:linear-gradient(165deg,#f8fafc 0%,#d1d9e2 18%,#8b97a8 48%,#e2e8f0 78%,#94a3b8 100%)!important;
+  border-color:#e2e8f0!important;color:#0f172a!important;
+}
+.fc-card-bronze{
+  background:linear-gradient(165deg,#fde8c8 0%,#d4a06a 18%,#8b5a2b 48%,#e8b87a 78%,#a66b3a 100%)!important;
+  border-color:#f5d0a0!important;color:#2a1508!important;
+}
+.fc-card-black{
+  background:linear-gradient(165deg,#3f3f46 0%,#18181b 40%,#a16207 78%,#09090b 100%)!important;
+  border:1.5px solid #fbbf24!important;color:#fef08a!important;
+}
+.fc-card-promo{
+  background:linear-gradient(165deg,#1e3a8a 0%,#6d28d9 40%,#db2777 85%)!important;
+  border:1.5px solid #f5d0fe!important;color:#fff!important;
+}
+.fc-card-icon{
+  background:linear-gradient(155deg,#fffbeb 0%,#fbbf24 28%,#b45309 55%,#fde68a 82%,#78350f 100%)!important;
+  border:2px solid #fde68a!important;color:#271506!important;
+  box-shadow:0 0 0 2px rgba(251,191,36,.35),0 10px 24px rgba(0,0,0,.4)!important;
+}
+
+/* Card content hierarchy – FC style */
+.fc-player-card .fc-card-top{
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  padding:0 2px;
+  position:relative;
+  z-index:2;
+  line-height:1;
+}
+.fc-player-card .fc-rating{
+  font-size:clamp(15px,1.6vw,20px)!important;
+  font-weight:1000!important;
+  letter-spacing:-.04em;
+  line-height:1;
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
+}
+.fc-player-card .fc-card-position{
+  font-size:clamp(9px,1vw,11px)!important;
+  font-weight:1000!important;
+  letter-spacing:.04em;
+  opacity:.92;
+}
+.fc-player-card .fc-card-stars{
+  font-size:7px;
+  letter-spacing:1.5px;
+  color:rgba(255,247,206,.95);
+  text-shadow:0 1px 2px rgba(60,30,5,.45);
+  margin:2px 0 3px;
+  position:relative;z-index:2;
+}
+.fc-player-card .fc-card-avatar{
+  width:clamp(40px,4.6vw,52px)!important;
+  height:clamp(40px,4.6vw,52px)!important;
+  border-radius:10px!important;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:clamp(16px,1.8vw,22px);
+  font-weight:900;
+  background:radial-gradient(circle at 32% 22%,#fff9e6,#c9a03a 70%);
+  border:1.5px solid rgba(90,54,13,.45);
+  box-shadow:0 3px 8px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.35);
+  position:relative;z-index:2;
+  margin:1px 0 2px;
+}
+.fc-player-card .fc-card-avatar img{
+  width:100%;height:100%;object-fit:cover;border-radius:8px;
+}
+.fc-player-card .fc-card-name{
+  width:100%;
+  font-size:clamp(9px,1.05vw,11px)!important;
+  font-weight:1000!important;
+  line-height:1.15;
+  margin-top:3px;
+  padding:0 2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  position:relative;z-index:2;
+  text-shadow:0 1px 0 rgba(255,255,255,.25);
+}
+.fc-card-country-row{
+  display:flex;align-items:center;justify-content:center;gap:3px;
+  margin:2px 0 1px;font-size:8px;line-height:1;position:relative;z-index:2;
+}
+.fc-mini-crest{
+  padding:1px 4px;border-radius:999px;
+  background:rgba(15,23,42,.82);color:#f8fafc;
+  font-size:6.5px;font-weight:900;letter-spacing:.02em;
+}
+.fc-role-mark{
+  padding:1px 4px;border-radius:999px;
+  background:rgba(16,185,129,.22);border:1px solid rgba(110,231,183,.4);
+  font-size:6.5px;font-weight:900;color:#a7f3d0;
+}
+.fc-player-card .fc-card-fee,
+.fc-player-card .fc-card-status{
+  font-size:clamp(6px,.75vw,8px)!important;
+  font-weight:900;line-height:1.15;
+  position:relative;z-index:2;
+  opacity:.9;
+}
+.fc-player-card .fc-card-stats{display:none!important}
+
+/* Empty slot */
+.fc-player-card.empty{
+  background:linear-gradient(160deg,#0d3d2c 0%,#062218 55%,#0a2f22 100%)!important;
+  border:1.5px dashed rgba(110,231,183,.65)!important;
+  color:#a7f3d0!important;
+  box-shadow:0 6px 16px rgba(0,0,0,.28)!important;
+}
+.fc-player-card.empty::after{display:none!important}
+.fc-player-card.empty:before{border-color:rgba(167,243,208,.25)}
+.fc-player-card.empty .fc-card-stars{color:#6ee7b7;text-shadow:none}
+.fc-player-card.empty .fc-card-avatar{
+  background:rgba(4,30,20,.7);border:1px solid rgba(167,243,208,.35);color:#a7f3d0;
+  box-shadow:none;
+}
+
+/* Admin action overlay */
+.fc-player-card .fc-card-actions{
+  display:none;
+  position:absolute;inset:0;z-index:20;
+  margin:0;padding:10px 6px;
+  align-content:center;justify-content:center;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
+  background:rgba(7,12,22,.93);
+  backdrop-filter:blur(6px);
+  border-radius:inherit;
+}
+.fc-player-card.fc-actions-open .fc-card-actions{display:grid}
+.fc-player-card .fc-card-actions button{
+  min-height:28px;padding:5px 2px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:8px;
+  background:linear-gradient(145deg,#2a3a52,#111827);
+  color:#f8fafc;font-size:8px;font-weight:900;
+  box-shadow:0 2px 6px rgba(0,0,0,.35);
+}
+.fc-player-card .fc-card-actions button:hover{filter:brightness(1.2)}
+.fc-player-card .fc-card-actions .photo-action{background:linear-gradient(145deg,#0e7490,#0c4a6e)}
+
+/* Bench cards slightly smaller */
+.fc-bench-card, #benchPlayers .fc-player-card{
+  width:clamp(70px,7vw,88px)!important;
+  min-height:112px!important;
+}
+
+/* ========== PROFESSIONAL PITCH ========== */
+.pitch-stage{
+  width:100%;min-width:0;padding:8px 0 16px;perspective:none;max-width:100%;
+}
+.pitch-surface{
+  position:relative!important;
+  width:100%!important;
+  min-height:720px!important;
+  height:auto!important;
+  aspect-ratio:auto!important;
+  max-height:none!important;
+  transform:none!important;
+  border:4px solid #9ae6b4!important;
+  border-radius:22px!important;
+  padding:18px 14px!important;
+  background:
+    /* subtle grass stripes */
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,.04) 0, rgba(255,255,255,.04) 8%,
+      transparent 8%,transparent 16%),
+    /* depth gradient */
+    linear-gradient(180deg,#1a8f45 0%,#147a3a 18%,#0f6b32 50%,#0c5c2a 82%,#0a4f24 100%)!important;
+  box-shadow:
+    0 20px 48px rgba(0,0,0,.45),
+    inset 0 0 0 2px rgba(255,255,255,.18),
+    0 0 40px rgba(16,185,129,.15)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:space-between!important;
+  gap:6px!important;
+  overflow:visible!important;
+  isolation:isolate;
+}
+/* Outer white boundary */
+.pitch-surface::before{
+  content:"";
+  position:absolute;
+  inset:11px;
+  border:2.5px solid rgba(255,255,255,.78);
+  border-radius:14px;
+  pointer-events:none;
+  z-index:0;
+  box-shadow:inset 0 0 30px rgba(0,0,0,.12);
+}
+/* Center line – hide default after, we use midline element */
+.pitch-surface::after{display:none!important}
+
+.pitch-top-goal,.pitch-bottom-goal{
+  position:relative;z-index:2;
+  margin:0 auto;width:26%;min-width:100px;height:14px;
+  border:2.5px solid rgba(255,255,255,.85);
+  background:rgba(255,255,255,.1);
+  text-align:center;font-size:7px;font-weight:900;
+  letter-spacing:.22em;color:rgba(255,255,255,.85);
+}
+.pitch-top-goal{border-top:0}
+.pitch-bottom-goal{border-bottom:0}
+
+.pitch-midline{
+  position:relative;width:100%;height:2.5px;
+  background:rgba(255,255,255,.82);
+  display:flex;justify-content:center;align-items:center;
+  margin:6px 0!important;z-index:2;
+}
+.pitch-center-circle{
+  position:absolute;
+  width:88px;height:88px;
+  border:2.5px solid rgba(255,255,255,.78);
+  border-radius:50%;
+  pointer-events:none;
+  box-shadow:0 0 0 1px rgba(0,0,0,.1);
+}
+.pitch-mid-label{
+  position:relative;z-index:3;
+  font-size:8px;letter-spacing:.18em;font-weight:900;
+  color:#ecfdf5;background:rgba(6,50,26,.9);
+  border:1px solid rgba(167,243,208,.45);
+  padding:3px 12px;border-radius:999px;
+}
+
+.pitch-team-block{
+  position:relative;z-index:3;width:100%;
+  display:flex!important;flex-direction:column!important;
+  gap:10px!important;padding:8px 2px!important;
+}
+.pitch-team-heading{
+  align-self:center;
+  display:inline-flex;align-items:center;gap:8px;
+  margin:0 auto 6px!important;
+  padding:6px 14px;border-radius:999px;
+  background:rgba(2,18,12,.85);
+  border:1px solid rgba(255,255,255,.3);
+  font-size:10px;font-weight:900;letter-spacing:.1em;color:#fff;
+  box-shadow:0 4px 12px rgba(0,0,0,.25);
+}
+.pitch-player-rows{
+  display:flex!important;flex-direction:column!important;
+  gap:12px!important;width:100%!important;
+}
+.pitch-player-row{
+  display:flex!important;flex-direction:row!important;
+  flex-wrap:wrap!important;
+  justify-content:center!important;align-items:center!important;
+  gap:clamp(8px,1.4vw,18px)!important;
+  width:100%!important;min-height:0!important;overflow:visible!important;
+}
+
+/* Red team (away) slight tint on cards already handled by class */
+
+/* Mobile refinements */
+@media(max-width:767px){
+  .pitch-surface{
+    min-height:580px!important;
+    padding:12px 6px!important;
+    border-width:3px!important;
+  }
+  .pitch-player-rows{gap:8px!important}
+  .pitch-player-row{gap:clamp(5px,2vw,10px)!important}
+  .fc-player-card{
+    width:clamp(58px,16.5vw,78px)!important;
+    min-height:104px!important;
+    padding:5px 3px!important;
+    border-radius:11px!important;
+  }
+  .fc-player-card .fc-rating{font-size:14px!important}
+  .fc-player-card .fc-card-avatar{
+    width:34px!important;height:34px!important;font-size:15px;
+  }
+  .fc-player-card .fc-card-name{font-size:8.5px!important}
+  .pitch-center-circle{width:56px;height:56px}
+  .pitch-team-heading{font-size:9px;padding:5px 10px}
+  .fc-player-card:after{animation:none;opacity:.3} /* reduce motion cost on mobile */
+}
+@media(min-width:1024px){
+  .pitch-surface{min-height:760px!important}
+  .fc-player-card{
+    width:clamp(86px,8vw,108px)!important;
+    min-height:138px!important;
+  }
+  .fc-player-card .fc-card-avatar{
+    width:50px!important;height:50px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .fc-player-card,.pitch-player-row .fc-player-card{animation:none!important}
+  .fc-player-card:not(.empty)::after{animation:none!important}
+}
+</style>
+
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 <div id="homeVideoBackdrop" class="home-video-backdrop" aria-hidden="true">
@@ -1398,7 +1787,7 @@ async function choosePlayerPhoto(slotId){
  };
  picker.click();
 }
-function renderPitchRow(slots,info){return `<div class="pitch-player-row">${slots.map(s=>{const full=isOccupied(s),slotFee=getSlotPriceForRoom(info,s.pos);if(!full)return `<button type="button" onclick="selectSlotOnPitch('${s.team}','${s.id}')" class="fc-player-card empty"><div class="fc-card-top"><span>${s.pos}</span><span>${slotFee}₺</span></div><div class="fc-card-stars">✦ ✦ ✦</div><div class="fc-card-avatar">＋</div><div class="fc-card-name">BOŞ YER</div><div class="fc-card-status">KADROYA KATIL</div></button>`;return renderFcPlayerCard(s,"field");}).join("")}</div>`;}
+function renderPitchRow(slots,info){return `<div class="pitch-player-row">${slots.map(s=>{const full=isOccupied(s),slotFee=getSlotPriceForRoom(info,s.pos);if(!full)return `<button type="button" onclick="selectSlotOnPitch('${s.team}','${s.id}')" class="fc-player-card empty"><div class="fc-card-top"><span class="fc-rating" style="font-size:11px">＋</span><span class="fc-card-position">${s.pos}</span></div><div class="fc-card-stars">✦ ✦ ✦</div><div class="fc-card-avatar">＋</div><div class="fc-card-name">BOŞ YER</div><div class="fc-card-fee">${slotFee} ₺</div><div class="fc-card-status">KADROYA KATIL</div></button>`;return renderFcPlayerCard(s,"field");}).join("")}</div>`;}
 function renderTeam(team,info){const a=roster.filter(s=>s.team===team);const order=team==="red"?[...SLOT_ORDER].reverse():SLOT_ORDER;return order.map(pos=>renderPitchRow(a.filter(s=>s.pos===pos),info)).join("");}
 function renderBench(){const box=document.getElementById("benchPlayers");if(!box)return;const slots=roster.filter(s=>s.team==="bench");const section=document.getElementById("benchSection");if(section)section.classList.toggle("hidden",slots.length===0);const occupied=slots.filter(isOccupied).length;const count=document.getElementById("benchCount");if(count)count.textContent=`${occupied} / ${slots.length}`;box.innerHTML=slots.map(s=>isOccupied(s)?renderFcPlayerCard(s,"bench"):`<button type="button" class="bench-player-card empty" ${isRoomAdmin?`onclick="focusBenchAdd()"`:"disabled"}><span class="text-xl">＋</span><span class="bench-name">BOŞ YEDEK</span><span class="bench-role">${isRoomAdmin?"YÖNETİCİ EKLESİN":"YEDEK YERİ"}</span></button>`).join("");const form=document.getElementById("benchAddForm"),hint=document.getElementById("benchAdminHint");if(form)form.classList.toggle("hidden",!isRoomAdmin||occupied>=slots.length);if(hint)hint.classList.toggle("hidden",!isRoomAdmin||slots.length===0);}
 function focusBenchAdd(){if(!isRoomAdmin)return;const input=document.getElementById("benchPlayerName");if(input)input.focus();}
