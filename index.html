@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#10b981">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KadroKur">
+<link rel="apple-touch-icon" href="./icons/icon-180.png">
 <link rel="manifest" href="./manifest.json">
 <title>KadroKur | Maç Odaları & Kadro</title>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -259,6 +264,27 @@ crossorigin="anonymous"></script>
   .fc-player-card .fc-card-name{font-size:8px!important}
 }
 </style></style>
+
+<style id="kadrokur-mobile-fullscreen">
+.pitch-stage{position:relative}
+.pitch-fullscreen-btn{position:absolute;right:10px;top:10px;z-index:30;display:inline-flex;align-items:center;gap:6px;padding:8px 11px;border:1px solid rgba(167,243,208,.55);border-radius:999px;background:rgba(3,18,12,.88);color:#d1fae5;font-size:10px;font-weight:900;letter-spacing:.04em;box-shadow:0 4px 16px rgba(0,0,0,.3);backdrop-filter:blur(8px);cursor:pointer}
+.pitch-fullscreen-btn span:first-child{font-size:17px;line-height:1}
+.pitch-stage.is-pitch-fullscreen{position:fixed!important;inset:0!important;z-index:99990!important;width:100vw!important;height:100vh!important;height:100dvh!important;max-width:none!important;margin:0!important;padding:calc(env(safe-area-inset-top) + 54px) 8px calc(env(safe-area-inset-bottom) + 8px)!important;background:#06110b!important;display:flex!important;flex-direction:column!important;justify-content:center!important;overflow:auto!important;perspective:none!important}
+.pitch-stage.is-pitch-fullscreen .pitch-fullscreen-btn{position:fixed;top:calc(env(safe-area-inset-top) + 9px);right:10px}
+.pitch-stage.is-pitch-fullscreen .pitch-surface{width:100%!important;max-width:1100px!important;min-height:0!important;height:100%!important;max-height:none!important;flex:1 1 auto!important;margin:auto!important;padding:clamp(8px,2vh,18px) 6px!important;display:flex!important;flex-direction:column!important;justify-content:space-around!important;gap:3px!important;overflow:visible!important;border-radius:14px!important}
+.pitch-stage.is-pitch-fullscreen .pitch-team-block{gap:4px!important;padding:3px 0!important}
+.pitch-stage.is-pitch-fullscreen .pitch-player-rows{gap:4px!important}
+.pitch-stage.is-pitch-fullscreen .pitch-player-row{gap:clamp(2px,1vw,10px)!important}
+.pitch-stage.is-pitch-fullscreen .fc-player-card{width:clamp(49px,12vw,86px)!important;min-height:clamp(76px,12vh,108px)!important;padding:4px 3px!important}
+.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-avatar{width:clamp(23px,5vh,34px)!important;height:clamp(23px,5vh,34px)!important}
+.pitch-stage.is-pitch-fullscreen .pitch-team-heading{font-size:clamp(8px,1.4vh,11px)!important;margin-bottom:2px!important;padding:4px 9px!important}
+.pitch-stage.is-pitch-fullscreen .pitch-midline{margin:1px 0!important}
+.pitch-stage.is-pitch-fullscreen .pitch-center-circle{width:clamp(34px,6vh,58px)!important;height:clamp(34px,6vh,58px)!important}
+.pitch-stage.is-pitch-fullscreen .pitch-top-goal,.pitch-stage.is-pitch-fullscreen .pitch-bottom-goal{height:8px;min-width:65px}
+body.pitch-fullscreen-active{overflow:hidden!important}
+@media(max-width:767px){.pitch-fullscreen-btn{top:7px;right:7px;padding:7px 9px;font-size:9px}.pitch-stage.is-pitch-fullscreen{padding-left:3px!important;padding-right:3px!important}.pitch-stage.is-pitch-fullscreen .fc-player-card{width:clamp(45px,13vw,70px)!important;min-height:clamp(68px,11vh,88px)!important}.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-name{font-size:7px!important}.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-top{font-size:7px!important}.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-status,.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-fee{font-size:5px!important}}
+@media(max-height:520px) and (orientation:landscape){.pitch-stage.is-pitch-fullscreen{padding-top:44px!important}.pitch-stage.is-pitch-fullscreen .pitch-surface{flex-direction:row!important;align-items:stretch!important}.pitch-stage.is-pitch-fullscreen .pitch-team-block{width:44%!important;justify-content:space-around!important}.pitch-stage.is-pitch-fullscreen .pitch-midline{width:2px!important;height:auto!important;min-height:100%!important;flex:0 0 2px!important}.pitch-stage.is-pitch-fullscreen .pitch-center-circle{left:50%;top:50%}.pitch-stage.is-pitch-fullscreen .pitch-top-goal,.pitch-stage.is-pitch-fullscreen .pitch-bottom-goal{display:none}}
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 <div id="homeVideoBackdrop" class="home-video-backdrop" aria-hidden="true">
@@ -398,7 +424,7 @@ crossorigin="anonymous"></script>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_180px] gap-3 items-stretch">
 <div class="min-w-0"><div class="flex flex-wrap items-center justify-between gap-2 mb-1"><h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">🏟️ Canlı Saha Dizilişi</h2><span class="flex items-center gap-2 text-[10px] tracking-widest font-black text-emerald-300"><span id="pitchFormationBadge" class="rounded-full border border-emerald-300/30 bg-emerald-950/70 px-2 py-1">DİZİLİŞ 2-3-1</span>3D TACTICAL PITCH</span></div>
-<div class="pitch-stage"><div class="pitch-bg pitch-surface rounded-2xl p-4 sm:p-7 relative">
+<div class="pitch-stage" id="pitchStage"><button type="button" id="pitchFullscreenBtn" class="pitch-fullscreen-btn" onclick="togglePitchFullscreen()" aria-label="Sahayı tam ekran yap" aria-pressed="false"><span id="pitchFullscreenIcon">⛶</span><span id="pitchFullscreenText">TAM EKRAN</span></button><div class="pitch-bg pitch-surface rounded-2xl p-4 sm:p-7 relative">
   <div class="pitch-top-goal"><span>KALE</span></div>
   <div class="pitch-team-block pitch-green-block"><div class="pitch-team-heading"><span class="pitch-team-dot green-dot"></span><span id="greenPitchTeamName">1. TAKIM</span><small>EV SAHİBİ</small></div><div id="greenTeamPitch" class="pitch-player-rows"></div></div>
   <div class="pitch-midline"><span class="pitch-center-circle"></span><span class="pitch-mid-label">ORTA SAHA</span></div>
@@ -1400,6 +1426,30 @@ async function resetAllPlayers(){if(!isRoomAdmin||!currentRoomId||!confirm("Tüm
 
 async function copyIban(){const val=document.getElementById("roomIbanText").textContent;try{await navigator.clipboard.writeText(val);alert("IBAN kopyalandı.");}catch(_){alert(val);}}
 async function copyWhatsAppRoster(){if(!currentRoomId)return;const info=currentRoomInfo||{},cap=getTotalCapacityFromInfo(info),totalPrice=getPitchPriceFromInfo(info),perPerson=getPerPersonFeeFromInfo(info),link=getRoomShareUrl(currentRoomId);const lines=[`⚽ ${(info.title||"KADROKUR").toUpperCase()}`,`📅 ${info.pitchName||""} ${info.schedule?"| "+info.schedule:""} | ${cap} Kişi (${perPerson}₺/kişi • Saha: ${totalPrice}₺)`.trim(),""];for(const team of ["green","red"]){lines.push(team==="green"?`🏠 ${info.homeTeam||"1. Takım"}`:`✈️ ${info.awayTeam||"2. Takım"}`);for(const s of roster.filter(x=>x.team===team))lines.push(`${SLOT_LABEL[s.pos]}: ${isOccupied(s)?s.name+(s.paid?" ✅":" ⏳"):"BOŞ ("+getSlotPriceForRoom(info,s.pos)+"₺)"}`);lines.push("");}const subs=roster.filter(x=>x.team==="bench");if(subs.length){lines.push("🪑 YEDEK KULÜBESİ");subs.forEach(s=>lines.push(isOccupied(s)?s.name:"Boş yedek"));lines.push("");}lines.push(`🔗 Oda Linki: ${link}`);lines.push(`🏷️ Oda Kodu: ${currentRoomId}`);const text=lines.join("\n");try{await navigator.clipboard.writeText(text);alert("Kadro ve oda linki kopyalandı!");}catch(_){alert(text);}}
+
+function syncPitchFullscreenButton(){
+ const stage=document.getElementById("pitchStage"),btn=document.getElementById("pitchFullscreenBtn"),icon=document.getElementById("pitchFullscreenIcon"),label=document.getElementById("pitchFullscreenText");
+ if(!stage||!btn)return;
+ const active=stage.classList.contains("is-pitch-fullscreen")||document.fullscreenElement===stage;
+ btn.setAttribute("aria-pressed",String(active));btn.setAttribute("aria-label",active?"Sahayı küçült":"Sahayı tam ekran yap");
+ if(icon)icon.textContent=active?"⤢":"⛶";if(label)label.textContent=active?"KÜÇÜLT":"TAM EKRAN";
+ document.body.classList.toggle("pitch-fullscreen-active",active);
+}
+async function togglePitchFullscreen(){
+ const stage=document.getElementById("pitchStage");if(!stage)return;
+ const active=stage.classList.contains("is-pitch-fullscreen")||document.fullscreenElement===stage;
+ if(active){
+  if(document.fullscreenElement&&document.exitFullscreen){try{await document.exitFullscreen();}catch(_){}}
+  stage.classList.remove("is-pitch-fullscreen");syncPitchFullscreenButton();return;
+ }
+ stage.classList.add("is-pitch-fullscreen");syncPitchFullscreenButton();
+ if(stage.requestFullscreen){try{await stage.requestFullscreen();}catch(_){/* iOS/Safari fallback: CSS full-screen mode */}}
+ syncPitchFullscreenButton();
+}
+document.addEventListener("fullscreenchange",()=>{
+ const stage=document.getElementById("pitchStage");if(stage&&!document.fullscreenElement)stage.classList.remove("is-pitch-fullscreen");syncPitchFullscreenButton();
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){const stage=document.getElementById("pitchStage");if(stage)stage.classList.remove("is-pitch-fullscreen");syncPitchFullscreenButton();}});
 
 initFirebase();
 </script>
