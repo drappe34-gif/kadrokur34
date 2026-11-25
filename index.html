@@ -220,6 +220,87 @@ crossorigin="anonymous"></script>
   #greenTeamPitch .fc-player-card,#redTeamPitch .fc-player-card{width:clamp(56px,8vw,76px);min-height:96px}
 }
 </style>
+
+<style id="kadrokur-fc27-layout-final">
+/* FC27 saha düzeni: her mevki kendi çizgisinde; kartlar satır içinde taşmaz. */
+#roomView{align-items:start}
+#roomView>section:first-child{min-width:0}
+#roomView>section:first-child>.grid{grid-template-columns:minmax(0,1fr) minmax(150px,180px);align-items:stretch}
+.pitch-stage{width:100%;min-width:0}
+.pitch-surface{
+  box-sizing:border-box;width:100%;min-height:660px!important;height:auto!important;
+  aspect-ratio:1.12/1!important;max-height:none!important;overflow:hidden!important;
+  display:flex;flex-direction:column;justify-content:space-between;gap:4px;
+  padding:16px clamp(8px,1.4vw,20px)!important;isolation:isolate;
+}
+.pitch-team-block{width:100%;min-width:0;flex:1 1 0;display:flex;flex-direction:column;justify-content:center;gap:7px;padding:5px 0!important}
+.pitch-team-heading{align-self:center;max-width:100%;margin:0 0 2px!important}
+.pitch-player-rows{width:100%;min-width:0;display:flex;flex-direction:column;justify-content:space-evenly;gap:7px!important}
+.pitch-player-row{
+  width:100%;min-width:0;min-height:clamp(92px,9vw,126px)!important;
+  display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));
+  align-items:center;justify-items:center;gap:clamp(2px,.55vw,8px)!important;
+  flex-wrap:nowrap!important;overflow:visible!important;
+}
+.pitch-player-row>.fc-player-card{
+  grid-column:auto;justify-self:center;align-self:center;
+  width:100%!important;max-width:clamp(48px,6.2vw,88px)!important;
+  min-width:0!important;min-height:clamp(82px,8.1vw,116px)!important;
+  box-sizing:border-box;padding:5px 3px!important;overflow:hidden;
+}
+.pitch-player-row>.fc-player-card .fc-card-avatar{width:clamp(25px,3vw,42px);height:clamp(25px,3vw,42px);margin:1px auto 2px}
+.pitch-player-row>.fc-player-card .fc-card-name{max-width:100%;font-size:clamp(7px,.72vw,10px);line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pitch-player-row>.fc-player-card .fc-card-stats{display:none}
+.pitch-player-row>.fc-player-card .fc-card-status{font-size:6px;line-height:1.05;margin-top:2px}
+.pitch-player-row>.fc-player-card .fc-card-fee{font-size:6px;line-height:1.05}
+.pitch-player-row>.fc-player-card .fc-card-top{width:100%;display:flex;justify-content:space-between;gap:2px;font-size:clamp(7px,.75vw,10px);line-height:1}
+.pitch-player-row>.fc-player-card .fc-card-stars{font-size:7px;line-height:1;margin:2px 0}
+.pitch-player-row>.fc-player-card .fc-card-actions{position:absolute;left:2px;right:2px;bottom:2px;display:flex;gap:1px}
+.pitch-player-row>.fc-player-card .fc-card-actions button{font-size:5px;padding:2px 1px;min-width:0}
+.fc-card-country-row{display:flex;align-items:center;justify-content:center;gap:4px;margin:2px 0;font-size:10px;line-height:1}
+.fc-mini-crest{width:12px;height:12px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#e5e7eb;color:#111827;font-size:6px;font-weight:1000}
+.fc-role-mark{font-size:9px;font-weight:1000;color:#fff}
+.fc-card-black{background:linear-gradient(145deg,#252525 0%,#090909 52%,#6b4b12 100%)!important;border:1px solid #d6ad55!important;color:#ffe9a8!important;box-shadow:inset 0 0 0 1px #8b6a2b,0 5px 14px #0008!important}
+.fc-card-promo{background:linear-gradient(145deg,#143d56 0%,#512b69 52%,#c06b3d 100%)!important;border:1px solid #f4c4ff!important;color:#fff!important;box-shadow:inset 0 0 0 1px #ffffff55,0 5px 14px #0008!important}
+.fc-card-gold{background:linear-gradient(145deg,#fff0ad 0%,#c99a3b 46%,#73501c 100%)!important;border:1px solid #ffe9a0!important;color:#211606!important;box-shadow:inset 0 0 0 1px #fff7c2,0 5px 14px #0008!important}
+.fc-card-gold .fc-card-name,.fc-card-gold .fc-card-top,.fc-card-gold .fc-card-position{color:#211606!important}
+.fc-card-black .fc-card-name,.fc-card-promo .fc-card-name{color:#fff!important}
+.fc-player-card.empty{background:linear-gradient(145deg,#082b20,#04150f)!important;border:1px dashed #86efac!important;color:#eafff1!important}
+#benchPlayers{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#benchPlayers .fc-player-card{width:min(100%,104px);min-width:0}
+#roomTeamsDisplay{min-width:0;overflow:hidden}
+.room-join-column{min-width:0}
+#tournamentPanel{min-width:0;overflow:hidden}
+#tournamentFixtures,#tournamentStandings{min-width:0;overflow-x:auto}
+@media(max-width:1023px){
+  .pitch-surface{min-height:610px!important;aspect-ratio:1/1.12!important}
+  .pitch-player-row{min-height:88px!important}
+  .pitch-player-row>.fc-player-card{max-width:clamp(45px,7.3vw,70px)!important;min-height:80px!important}
+}
+@media(max-width:767px){
+  #roomView>section:first-child>.grid{grid-template-columns:minmax(0,1fr)!important}
+  .pitch-surface{min-height:560px!important;aspect-ratio:auto!important;padding:12px 5px!important;gap:3px}
+  .pitch-team-block{gap:5px}
+  .pitch-player-rows{gap:5px!important}
+  .pitch-player-row{grid-template-columns:repeat(7,minmax(0,1fr));min-height:78px!important;gap:1px!important}
+  .pitch-player-row>.fc-player-card{max-width:clamp(39px,12vw,62px)!important;min-height:73px!important;padding:4px 2px!important}
+  .pitch-player-row>.fc-player-card .fc-card-avatar{width:25px;height:25px;font-size:15px}
+  .pitch-player-row>.fc-player-card .fc-card-top{font-size:7px}
+  .pitch-player-row>.fc-player-card .fc-card-name{font-size:7px}
+  .pitch-player-row>.fc-player-card .fc-card-fee{font-size:5px}
+  .pitch-player-row>.fc-player-card .fc-card-status{font-size:5px}
+  .pitch-midline{flex:0 0 1px;margin:0 -5px}
+  .pitch-center-circle{width:42px;height:42px}
+  #benchPlayers{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:380px){
+  .pitch-surface{min-height:530px!important}
+  .pitch-player-row>.fc-player-card{max-width:42px!important;min-height:69px!important}
+  .pitch-player-row>.fc-player-card .fc-card-avatar{width:21px;height:21px}
+  .pitch-player-row>.fc-player-card .fc-card-name{font-size:6px}
+}
+</style>
+
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 <div id="homeVideoBackdrop" class="home-video-backdrop" aria-hidden="true">
@@ -1265,12 +1346,16 @@ function renderFcPlayerCard(s,kind="field"){
  const feeText=kind==="bench"?"YEDEK":`${getSlotPriceForRoom(currentRoomInfo,s.pos)} ₺`;
  const photo=s.photoData?`<img src="${s.photoData}" alt="">`:esc(playerInitials(s.name));
  const stats=[["PAC",fcStat(s.pac||rating-2)],["ŞUT",fcStat(s.sho||rating-1)],["PAS",fcStat(s.pas||rating)],["DRI",fcStat(s.dri||rating+1)],["DEF",fcStat(s.def||rating-3)],["FİZ",fcStat(s.phy||rating)]];
- const rarity=rating>=90?"fc-card-icon":rating>=80?"fc-card-gold":rating>=70?"fc-card-silver":"fc-card-bronze";
+ const cardType=String(s.cardType||((rating>=90)?"black-gold":(rating>=80)?"promo":"gold")).toLowerCase();
+ const rarity=cardType==="black"||cardType==="black-gold"?"fc-card-black":cardType==="promo"||cardType==="special"?"fc-card-promo":"fc-card-gold";
+ const positionLabel=({GK:"KL",DEF:"DEF",MID:"OS",FWD:"FV"})[s.pos]||"OY";
+ const roleMark=s.roleMark||s.roleBadge||"＋";
  return `<div class="fc-player-card ${kind==="bench"?"fc-bench-card":""} ${rarity}">
-  <div class="fc-card-top"><span>${rating} GEN</span><span class="fc-card-position">${esc(role)}</span></div>
-  <div class="fc-card-stars">★ ★ ★ ★ ★</div>
+  <div class="fc-card-top"><span class="fc-rating">${rating}</span><span class="fc-card-position">${esc(positionLabel)}</span></div>
+  <div class="fc-card-stars">★ ★ ★</div>
   <div class="fc-card-avatar">${photo}</div>
   <div class="fc-card-name">${esc(s.name)}</div>
+  <div class="fc-card-country-row"><span title="Türkiye">🇹🇷</span><span class="fc-mini-crest">${esc(String(s.clubShort||s.club||"KK").slice(0,3).toUpperCase())}</span><span class="fc-role-mark">${esc(roleMark)}</span></div>
   <div class="fc-card-fee">${feeText}</div>
   <div class="fc-card-stats">${stats.map(([k,v])=>`<span>${k} <b>${v}</b></span>`).join("")}</div>
   <div class="fc-card-status">${kind==="bench"?"YEDEK":paidText}</div>
