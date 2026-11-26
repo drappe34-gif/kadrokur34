@@ -745,62 +745,16 @@ body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;ove
 
 
 <style id="kadrokur-home-announcement-ticker">
-.home-announcement-ticker{
-  width:100%;
-  max-width:100%;
-  min-height:42px;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  position:relative;
-  isolation:isolate;
-  background:linear-gradient(90deg,rgba(4,18,17,.98),rgba(7,38,31,.98),rgba(4,18,17,.98));
-  border-top:1px solid rgba(52,211,153,.35);
-  border-bottom:1px solid rgba(52,211,153,.35);
-  box-shadow:0 8px 24px rgba(0,0,0,.18);
-}
+.home-announcement-ticker{width:100%;max-width:100%;min-height:42px;overflow:hidden;display:flex;align-items:center;position:relative;isolation:isolate;background:linear-gradient(90deg,rgba(4,18,17,.98),rgba(7,38,31,.98),rgba(4,18,17,.98));border-top:1px solid rgba(52,211,153,.35);border-bottom:1px solid rgba(52,211,153,.35);box-shadow:0 8px 24px rgba(0,0,0,.18)}
 .home-announcement-ticker.hidden{display:none!important}
-.home-announcement-track{
-  display:flex;
-  align-items:center;
-  width:max-content;
-  min-width:max-content;
-  white-space:nowrap;
-  will-change:transform;
-}
-.home-announcement-copy{
-  display:block;
-  flex:0 0 auto;
-  padding:10px 5vw;
-  color:#d1fae5;
-  font-size:12px;
-  line-height:20px;
-  font-weight:800;
-  letter-spacing:.045em;
-}
-.home-announcement-copy:before{
-  content:"⚽";
-  color:#6ee7b7;
-  margin-right:14px;
-}
-.home-announcement-ticker.is-running .home-announcement-track{
-  animation:kadrokurAnnouncementScroll 48s linear infinite;
-}
-.home-announcement-ticker:hover .home-announcement-track{
-  animation-play-state:paused;
-}
-@keyframes kadrokurAnnouncementScroll{
-  from{transform:translateX(0)}
-  to{transform:translateX(-50%)}
-}
-@media(prefers-reduced-motion:reduce){
-  .home-announcement-ticker.is-running .home-announcement-track{animation:none;transform:none}
-  .home-announcement-copy:nth-child(2){display:none}
-}
-@media(max-width:640px){
-  .home-announcement-ticker{min-height:38px}
-  .home-announcement-copy{font-size:11px;padding:9px 28px}
-}
+.home-announcement-track{display:flex;align-items:center;width:max-content;min-width:max-content;white-space:nowrap;flex-wrap:nowrap;will-change:transform;transform:translate3d(0,0,0)}
+.home-announcement-group{display:flex;align-items:center;flex:0 0 auto;width:max-content;white-space:nowrap}
+.home-announcement-copy{display:block;flex:0 0 auto;padding:10px 24px;color:#d1fae5;font-size:12px;line-height:20px;font-weight:800;letter-spacing:.045em;white-space:nowrap}
+.home-announcement-copy:before{content:"⚽";color:#6ee7b7;margin-right:14px}
+.home-announcement-ticker.is-running .home-announcement-track{animation:kadrokurAnnouncementScroll 55s linear infinite!important;animation-play-state:running!important}
+.home-announcement-ticker:hover .home-announcement-track{animation-play-state:paused}
+@keyframes kadrokurAnnouncementScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(max-width:640px){.home-announcement-ticker{min-height:38px}.home-announcement-copy{font-size:11px;padding:9px 18px}}
 body.room-open #homeAnnouncementTicker{display:none!important}
 </style>
 
@@ -834,8 +788,12 @@ body.room-open #homeAnnouncementTicker{display:none!important}
 <!-- Ana sayfa duyuru bandı: metin sistem yöneticisi tarafından yönetilir. -->
 <div id="homeAnnouncementTicker" class="home-announcement-ticker hidden" aria-label="KadroKur duyurusu" role="status">
   <div class="home-announcement-track">
-    <span id="homeAnnouncementTextA" class="home-announcement-copy"></span>
-    <span id="homeAnnouncementTextB" class="home-announcement-copy" aria-hidden="true"></span>
+    <div class="home-announcement-group" id="homeAnnouncementGroupA">
+      <span id="homeAnnouncementTextA" class="home-announcement-copy"></span>
+    </div>
+    <div class="home-announcement-group" id="homeAnnouncementGroupB" aria-hidden="true">
+      <span id="homeAnnouncementTextB" class="home-announcement-copy"></span>
+    </div>
   </div>
 </div>
 
@@ -1360,21 +1318,45 @@ function renderHomeAnnouncement(value){
   const ticker=document.getElementById("homeAnnouncementTicker");
   const first=document.getElementById("homeAnnouncementTextA");
   const second=document.getElementById("homeAnnouncementTextB");
+  const groupA=document.getElementById("homeAnnouncementGroupA");
+  const groupB=document.getElementById("homeAnnouncementGroupB");
   const text=String(value||"").trim();
   homeAnnouncementValue=text;
-  if(!ticker||!first||!second)return;
+  if(!ticker||!first||!second||!groupA||!groupB)return;
+  const track=ticker.querySelector(".home-announcement-track");
   if(!text){
     ticker.classList.add("hidden");
+    ticker.classList.remove("is-running");
     first.textContent="";
     second.textContent="";
+    groupA.querySelectorAll(".home-announcement-copy:not(#homeAnnouncementTextA)").forEach(el=>el.remove());
+    groupB.querySelectorAll(".home-announcement-copy:not(#homeAnnouncementTextB)").forEach(el=>el.remove());
     return;
   }
-  first.textContent=text;
-  second.textContent=text;
   ticker.classList.remove("hidden");
   ticker.classList.remove("is-running");
+  if(track){track.style.animation="none";track.style.transform="translate3d(0,0,0)";}
+  first.textContent=text;
+  second.textContent=text;
+  groupA.querySelectorAll(".home-announcement-copy:not(#homeAnnouncementTextA)").forEach(el=>el.remove());
+  groupB.querySelectorAll(".home-announcement-copy:not(#homeAnnouncementTextB)").forEach(el=>el.remove());
+
+  // İki eşit şeridi ekranın en az 1,5 katı kadar doldur; kısa metinde boşluk bırakma.
+  const addCopy=group=>{
+    const item=document.createElement("span");
+    item.className="home-announcement-copy";
+    item.textContent=text;
+    group.appendChild(item);
+  };
+  const fillGroup=group=>{
+    let guard=0;
+    while(group.scrollWidth<ticker.clientWidth*1.5 && guard<60){addCopy(group);guard++;}
+  };
+  fillGroup(groupA);
+  fillGroup(groupB);
   void ticker.offsetWidth;
-  ticker.classList.add("is-running");
+  if(track)track.style.animation="";
+  requestAnimationFrame(()=>ticker.classList.add("is-running"));
 }
 
 function startHomeAnnouncementListener(){
