@@ -214,7 +214,7 @@ html{scroll-behavior:smooth}body{background:radial-gradient(ellipse at 50% -18%,
 <script async
 src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7620788317702116"
 crossorigin="anonymous"></script>
-<style id="kadrokur-fc27-clean-final"><style id="kadrokur-fc27-clean-final">
+<style id="kadrokur-fc27-clean-final">
 #roomView{align-items:start}
 #roomView>section:first-child{min-width:0}
 #roomView>section:first-child>.grid{grid-template-columns:minmax(0,1fr) 185px;align-items:stretch}
@@ -700,6 +700,25 @@ body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;ove
 }
 </style>
 
+
+<style id="kadrokur-home-top-menus">
+.home-top-actions{position:relative}
+.home-top-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 13px;border:1px solid rgba(148,163,184,.25);border-radius:12px;background:rgba(15,23,42,.78);color:#e2e8f0;font-size:11px;font-weight:850;white-space:nowrap;transition:.18s}
+.home-top-btn:hover,.home-top-btn[aria-expanded="true"]{background:rgba(16,185,129,.18);border-color:rgba(52,211,153,.55);color:#a7f3d0}
+.home-top-dropdowns{position:relative;max-width:1568px;margin:0 auto;padding:0 16px}
+.home-top-dropdown{position:absolute;z-index:80;top:8px;left:16px;width:min(620px,calc(100vw - 32px));max-height:min(72vh,680px);overflow:auto;padding:15px;border:1px solid rgba(148,163,184,.28);border-radius:18px;background:rgba(5,13,24,.97);backdrop-filter:blur(20px);box-shadow:0 24px 70px rgba(0,0,0,.55)}
+.home-top-dropdown.hidden{display:none}
+.home-dropdown-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;color:#f8fafc;font-size:13px;font-weight:900}
+#homeTopRoomsContent #roomsList{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:9px!important}
+#homeTopRoomsContent #roomsList>div{width:100%;min-width:0}
+#homeTopSearchContent>div{margin:0}
+#homeTopAccountContent #accountPanel{margin:0}
+.home-chat-icon{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(52,211,153,.35);border-radius:12px;background:rgba(16,185,129,.13);color:#6ee7b7;transition:.18s}
+.home-chat-icon:hover{background:rgba(16,185,129,.25);transform:translateY(-1px)}
+.home-chat-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:640px){.home-top-actions{width:100%;gap:6px}.home-top-btn{padding:8px 9px;font-size:9px;gap:4px}.home-top-dropdown{left:0;width:100%;padding:11px}.home-top-dropdowns{padding:0 12px}}
+</style>
+
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 <div id="homeVideoBackdrop" class="home-video-backdrop" aria-hidden="true">
@@ -710,8 +729,22 @@ body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;ove
 </div>
 <header class="home-header border-b border-slate-800 sticky top-0 z-30"><div class="max-w-[1600px] mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
 <div class="flex items-center gap-3"><button type="button" onclick="goHome()" class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-slate-950 text-lg">KK</button><div><div class="flex items-center gap-2"><button type="button" onclick="goHome()" class="font-black text-lg text-left">Kadro<span class="text-emerald-400">Kur</span></button><span id="headerBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300">MAÇ ODALARI</span></div><p id="headerSubtitle" class="text-xs text-slate-400 mt-1">Bölge, ilçe ve halı saha seç • Kendi maç odanı kurup paylaş</p></div></div>
-<div class="flex items-center gap-2 flex-wrap"><nav class="hidden md:flex items-center gap-1 mr-2"><button type="button" class="home-menu-link" onclick="document.getElementById('roomsList').scrollIntoView({behavior:'smooth'})">MAÇLAR</button><button type="button" class="home-menu-link" onclick="document.getElementById('accountPanel').scrollIntoView({behavior:'smooth'})">ÜYELİK</button><button type="button" class="home-menu-link" aria-label="Canlı sohbet" title="Canlı sohbet" onclick="document.getElementById('homeChatPanel').scrollIntoView({behavior:'smooth'})">💬</button></nav><button type="button" onclick="goHome()" id="homeNavBtn" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-emerald-300">🏠 Odalar</button><span id="quotaBadge" class="px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400">Aktif Oda: 0</span><button type="button" onclick="toggleAdminPanel()" id="adminBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-200">🔒 Yönetici Girişi</button></div>
-</div></header>
+<div class="flex items-center gap-2 flex-wrap home-top-actions">
+<button type="button" class="home-top-btn" aria-expanded="false" onclick="toggleHomeTopMenu('rooms',this)">⚽ Odalar <span>▾</span></button>
+<button type="button" class="home-top-btn" aria-expanded="false" onclick="toggleHomeTopMenu('search',this)">🔎 Halı Saha Ara / Odaya Gir <span>▾</span></button>
+<button type="button" class="home-top-btn" aria-expanded="false" onclick="toggleHomeTopMenu('account',this)">👤 Üye Girişi / Kayıt <span>▾</span></button>
+<button type="button" class="home-chat-icon" aria-label="Canlı sohbet" title="Canlı sohbet" onclick="document.getElementById('homeChatPanel').scrollIntoView({behavior:'smooth',block:'center'})"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5 8 8 0 0 1-3.5-.8L4 20l1.3-4A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8 11.5h8M8 14.5h5"/></svg></button>
+<button type="button" onclick="goHome()" id="homeNavBtn" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-emerald-300">🏠 Odalar</button>
+<span id="quotaBadge" class="px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400">Aktif Oda: 0</span>
+<button type="button" onclick="toggleAdminPanel()" id="adminBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-200">🔒 Yönetici Girişi</button>
+</div>
+</div>
+<div id="homeTopDropdowns" class="home-top-dropdowns">
+  <section id="homeTopRooms" class="home-top-dropdown hidden"><div class="home-dropdown-heading"><span>⚽ Açık Maç Odaları</span><span class="text-[10px] text-slate-400">Odalar alt alta listelenir</span></div><div id="homeTopRoomsContent"></div></section>
+  <section id="homeTopSearch" class="home-top-dropdown hidden"><div class="home-dropdown-heading">🔎 Halı Saha Ara ve Odaya Gir</div><div id="homeTopSearchContent" class="space-y-3"></div></section>
+  <section id="homeTopAccount" class="home-top-dropdown hidden"><div class="home-dropdown-heading">👤 Üye Girişi / Kayıt</div><div id="homeTopAccountContent"></div></section>
+</div>
+</header>
 
 <section id="homeView" class="max-w-[1600px] w-full mx-auto px-4 py-6 space-y-6">
 <div class="home-hero rounded-[2rem] p-7 sm:p-12 lg:p-16">
@@ -1884,6 +1917,32 @@ document.addEventListener("fullscreenchange",()=>{
 });
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){const stage=document.getElementById("pitchStage");if(stage?.classList.contains("is-pitch-fullscreen")){if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});restorePitchFullscreenLayout();syncPitchFullscreenButton();}}});
 
+
+function initHomeTopMenus(){
+ const move=(id,target)=>{const el=document.getElementById(id),host=document.getElementById(target);if(el&&host)host.appendChild(el);};
+ move("roomsList","homeTopRoomsContent");
+ const searchHost=document.getElementById("homeTopSearchContent");
+ const filter=document.getElementById("filterRegion")?.closest(".glass-card");
+ const direct=document.getElementById("directRoomCode")?.closest(".glass-card");
+ const status=document.getElementById("lobbyJoinStatus");
+ if(searchHost){if(filter)searchHost.appendChild(filter);if(direct)searchHost.appendChild(direct);if(status)searchHost.appendChild(status);}
+ move("accountPanel","homeTopAccountContent");
+}
+function toggleHomeTopMenu(name,button){
+ const ids={rooms:"homeTopRooms",search:"homeTopSearch",account:"homeTopAccount"};
+ const target=document.getElementById(ids[name]);if(!target)return;
+ const willOpen=target.classList.contains("hidden");
+ Object.values(ids).forEach(id=>document.getElementById(id)?.classList.add("hidden"));
+ document.querySelectorAll(".home-top-btn").forEach(btn=>btn.setAttribute("aria-expanded","false"));
+ if(willOpen){target.classList.remove("hidden");button?.setAttribute("aria-expanded","true");}
+}
+document.addEventListener("click",e=>{
+ if(e.target.closest(".home-top-actions")||e.target.closest(".home-top-dropdown"))return;
+ document.querySelectorAll(".home-top-dropdown").forEach(el=>el.classList.add("hidden"));
+ document.querySelectorAll(".home-top-btn").forEach(btn=>btn.setAttribute("aria-expanded","false"));
+});
+
+initHomeTopMenus();
 initFirebase();
 </script>
 </body></html>
