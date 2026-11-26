@@ -743,6 +743,67 @@ body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;ove
 }
 </style>
 
+
+<style id="kadrokur-home-announcement-ticker">
+.home-announcement-ticker{
+  width:100%;
+  max-width:100%;
+  min-height:42px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  position:relative;
+  isolation:isolate;
+  background:linear-gradient(90deg,rgba(4,18,17,.98),rgba(7,38,31,.98),rgba(4,18,17,.98));
+  border-top:1px solid rgba(52,211,153,.35);
+  border-bottom:1px solid rgba(52,211,153,.35);
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+}
+.home-announcement-ticker.hidden{display:none!important}
+.home-announcement-track{
+  display:flex;
+  align-items:center;
+  width:max-content;
+  min-width:max-content;
+  white-space:nowrap;
+  will-change:transform;
+}
+.home-announcement-copy{
+  display:block;
+  flex:0 0 auto;
+  padding:10px 5vw;
+  color:#d1fae5;
+  font-size:12px;
+  line-height:20px;
+  font-weight:800;
+  letter-spacing:.045em;
+}
+.home-announcement-copy:before{
+  content:"⚽";
+  color:#6ee7b7;
+  margin-right:14px;
+}
+.home-announcement-ticker.is-running .home-announcement-track{
+  animation:kadrokurAnnouncementScroll 48s linear infinite;
+}
+.home-announcement-ticker:hover .home-announcement-track{
+  animation-play-state:paused;
+}
+@keyframes kadrokurAnnouncementScroll{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
+@media(prefers-reduced-motion:reduce){
+  .home-announcement-ticker.is-running .home-announcement-track{animation:none;transform:none}
+  .home-announcement-copy:nth-child(2){display:none}
+}
+@media(max-width:640px){
+  .home-announcement-ticker{min-height:38px}
+  .home-announcement-copy{font-size:11px;padding:9px 28px}
+}
+body.room-open #homeAnnouncementTicker{display:none!important}
+</style>
+
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 <div id="homeVideoBackdrop" class="home-video-backdrop" aria-hidden="true">
@@ -769,6 +830,14 @@ body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;ove
   <section id="homeTopAccount" class="home-top-dropdown hidden"><div class="home-dropdown-heading">👤 Üye Girişi / Kayıt</div><div id="homeTopAccountContent"></div></section>
 </div>
 </header>
+
+<!-- Ana sayfa duyuru bandı: metin sistem yöneticisi tarafından yönetilir. -->
+<div id="homeAnnouncementTicker" class="home-announcement-ticker hidden" aria-label="KadroKur duyurusu" role="status">
+  <div class="home-announcement-track">
+    <span id="homeAnnouncementTextA" class="home-announcement-copy"></span>
+    <span id="homeAnnouncementTextB" class="home-announcement-copy" aria-hidden="true"></span>
+  </div>
+</div>
 
 <section id="homeView" class="max-w-[1600px] w-full mx-auto px-4 py-6 space-y-6">
 <div class="home-hero rounded-[2rem] p-7 sm:p-12 lg:p-16">
@@ -806,6 +875,18 @@ body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;ove
   </form>
   <p id="sponsorAdminStatus" class="text-xs text-slate-400">Sponsor eklemek için işletmenin görsel ve web sitesi bağlantısını gir.</p>
   <div><h3 class="text-xs font-bold text-slate-200 mb-2">Kayıtlı sponsorlar</h3><div id="sponsorAdminList" class="space-y-2 text-xs text-slate-300">Yükleniyor…</div></div>
+  <div class="mt-5 pt-4 border-t border-slate-700/70 space-y-2" id="announcementAdminEditor">
+    <div>
+      <p class="text-[10px] font-black tracking-widest text-emerald-300">ANA SAYFA DUYURUSU</p>
+      <h3 class="text-sm font-black text-white">📢 Kayan yazıyı düzenle</h3>
+      <p class="text-[11px] text-slate-400 mt-1">Yalnızca duyuruda görünmesini istediğin metni yazıp kaydet.</p>
+    </div>
+    <textarea id="homeAnnouncementInput" maxlength="240" rows="2" placeholder="Örn: Bu hafta sonu maç odalarını oluşturmayı unutma!" class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white resize-y"></textarea>
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <span id="homeAnnouncementStatus" class="text-[11px] text-slate-400">Duyuru metnini girip kaydedebilirsin.</span>
+      <button id="homeAnnouncementSaveBtn" type="button" onclick="saveHomeAnnouncement()" class="px-4 py-2 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs font-black">Kaydet</button>
+    </div>
+  </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-7">
@@ -1272,6 +1353,79 @@ function startSponsorAdsListener(){if(!db)return;if(sponsorAdsRef){sponsorAdsRef
 async function saveSponsorAd(e){e.preventDefault();if(!isAdmin||!db){alert("Sponsor eklemek için sistem yöneticisi girişi gerekli.");return;}const title=document.getElementById("sponsorTitle").value.trim(),image=safeWebUrl(document.getElementById("sponsorImage").value),link=safeWebUrl(document.getElementById("sponsorLink").value),description=document.getElementById("sponsorDescription").value.trim(),active=document.getElementById("sponsorActive").checked,status=document.getElementById("sponsorAdminStatus"),btn=document.getElementById("sponsorSaveBtn");if(!title||!image||!link){status.textContent="Geçerli bir sponsor adı, https görsel URL'si ve web sitesi bağlantısı gir.";return;}btn.disabled=true;try{await db.ref("sponsors").push({title,image,link,description,active,createdAt:firebase.database.ServerValue.TIMESTAMP,createdBy:currentUser.uid});document.getElementById("sponsorAdminForm").reset();document.getElementById("sponsorActive").checked=true;status.textContent="Sponsor kaydedildi. Yayındaysa ana sayfada görünür.";}catch(err){status.textContent="Kaydedilemedi: "+err.message+" — Firebase sponsors kuralını eklemen gerekebilir.";}finally{btn.disabled=false;}}
 async function deleteSponsorAd(id){if(!isAdmin||!db||!id||!confirm("Bu sponsor reklamı silinsin mi?"))return;try{await db.ref("sponsors/"+id).remove();}catch(e){alert("Sponsor silinemedi: "+e.message);}}
 
+let homeAnnouncementRef=null;
+let homeAnnouncementValue="";
+
+function renderHomeAnnouncement(value){
+  const ticker=document.getElementById("homeAnnouncementTicker");
+  const first=document.getElementById("homeAnnouncementTextA");
+  const second=document.getElementById("homeAnnouncementTextB");
+  const text=String(value||"").trim();
+  homeAnnouncementValue=text;
+  if(!ticker||!first||!second)return;
+  if(!text){
+    ticker.classList.add("hidden");
+    first.textContent="";
+    second.textContent="";
+    return;
+  }
+  first.textContent=text;
+  second.textContent=text;
+  ticker.classList.remove("hidden");
+  ticker.classList.remove("is-running");
+  void ticker.offsetWidth;
+  ticker.classList.add("is-running");
+}
+
+function startHomeAnnouncementListener(){
+  if(!db)return;
+  if(homeAnnouncementRef)homeAnnouncementRef.off();
+  homeAnnouncementRef=db.ref("siteAnnouncement");
+  homeAnnouncementRef.on("value",snap=>{
+    const data=snap.val()||{};
+    const text=typeof data==="string"?data:(data.text||"");
+    renderHomeAnnouncement(text);
+    const input=document.getElementById("homeAnnouncementInput");
+    if(input&&document.activeElement!==input)input.value=text;
+    const status=document.getElementById("homeAnnouncementStatus");
+    if(status)status.textContent=text?"Yayındaki duyuru yüklendi.":"Henüz yayında duyuru yok.";
+  },err=>{
+    const status=document.getElementById("homeAnnouncementStatus");
+    if(status)status.textContent="Duyuru okunamadı: "+err.message;
+  });
+}
+
+async function saveHomeAnnouncement(){
+  const input=document.getElementById("homeAnnouncementInput");
+  const status=document.getElementById("homeAnnouncementStatus");
+  const button=document.getElementById("homeAnnouncementSaveBtn");
+  const text=String(input?.value||"").trim();
+  if(!isAdmin||!currentUser||!db){
+    if(status)status.textContent="Bu işlem için sistem yöneticisi girişi gerekli.";
+    return;
+  }
+  if(!text){
+    if(status)status.textContent="Lütfen kayan yazıda gösterilecek metni gir.";
+    input?.focus();
+    return;
+  }
+  if(button)button.disabled=true;
+  if(status)status.textContent="Kaydediliyor…";
+  try{
+    await db.ref("siteAnnouncement").set({
+      text,
+      updatedAt:firebase.database.ServerValue.TIMESTAMP,
+      updatedBy:currentUser.uid
+    });
+    renderHomeAnnouncement(text);
+    if(status)status.textContent="Duyuru kaydedildi ve ana sayfada yayınlandı.";
+  }catch(err){
+    if(status)status.textContent="Kaydedilemedi: "+err.message+" — Firebase siteAnnouncement yazma iznini kontrol et.";
+  }finally{
+    if(button)button.disabled=false;
+  }
+}
+
 function isOccupied(s){return !!(s&&String(s.name||"").trim()&&s.status!=="empty");}
 
 /* Eski oda/kadro kayıtlarını yeni saha slotlarına güvenli biçimde eşler.
@@ -1430,6 +1584,7 @@ function initFirebase(){
     auth=firebase.auth();
     db=firebase.database();
     startSponsorAdsListener();
+    startHomeAnnouncementListener();
     updateNotificationUi();
     syncAuthUiState(auth.currentUser||null);
     auth.onAuthStateChanged(u=>{syncAuthUiState(u||null);},err=>{document.getElementById("accountMessage").textContent=err.message;});
