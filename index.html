@@ -214,7 +214,7 @@ html{scroll-behavior:smooth}body{background:radial-gradient(ellipse at 50% -18%,
 <script async
 src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7620788317702116"
 crossorigin="anonymous"></script>
-<style id="kadrokur-fc27-clean-final"><style id="kadrokur-fc27-clean-final">
+<style id="kadrokur-fc27-clean-final">
 #roomView{align-items:start}
 #roomView>section:first-child{min-width:0}
 #roomView>section:first-child>.grid{grid-template-columns:minmax(0,1fr) 185px;align-items:stretch}
@@ -697,6 +697,245 @@ body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;ove
 @media(prefers-reduced-motion:reduce){
   .fc-player-card,.pitch-player-row .fc-player-card{animation:none!important}
   .fc-player-card:not(.empty)::after{animation:none!important}
+}
+</style>
+
+
+<style id="kadrokur-fc27-premium-spacing">
+/* KadroKur FC 27 Premium Pitch & Card Polish — CSS only; existing DOM/JS preserved */
+.pitch-stage{
+  width:100%;
+  max-width:100%;
+  padding:14px 4px 20px!important;
+  perspective:1500px!important;
+  perspective-origin:50% 12%;
+}
+.pitch-surface{
+  position:relative!important;
+  isolation:isolate!important;
+  min-height:740px!important;
+  height:auto!important;
+  max-height:none!important;
+  transform:rotateX(1.8deg)!important;
+  transform-origin:50% 0!important;
+  border:3px solid rgba(190,255,205,.9)!important;
+  border-radius:22px!important;
+  overflow:hidden!important;
+  background-color:#0b5b2c!important;
+  background-image:
+    radial-gradient(ellipse at 50% 48%,rgba(75,220,125,.20),transparent 54%),
+    radial-gradient(ellipse at 8% 0%,rgba(255,255,255,.18),transparent 34%),
+    radial-gradient(ellipse at 92% 0%,rgba(255,255,255,.15),transparent 34%),
+    radial-gradient(ellipse at 50% 100%,rgba(0,0,0,.30),transparent 58%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.075) 0,rgba(255,255,255,.075) 8.33%,rgba(0,0,0,.035) 8.33%,rgba(0,0,0,.035) 16.66%),
+    linear-gradient(180deg,#167b3e 0%,#0d6933 48%,#095329 100%)!important;
+  box-shadow:
+    0 28px 65px rgba(0,0,0,.48),
+    0 0 0 1px rgba(190,255,205,.22),
+    0 0 42px rgba(16,185,129,.20),
+    inset 0 0 45px rgba(0,0,0,.18)!important;
+}
+.pitch-surface::before{
+  inset:12px!important;
+  border:2px solid rgba(245,255,248,.82)!important;
+  border-radius:13px!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10),0 0 12px rgba(255,255,255,.10);
+  z-index:1!important;
+}
+.pitch-surface::after{
+  display:block!important;
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:0!important;
+  pointer-events:none!important;
+  opacity:.8;
+  background:
+    radial-gradient(ellipse at 12% 0%,rgba(255,255,255,.16),transparent 28%),
+    radial-gradient(ellipse at 88% 0%,rgba(255,255,255,.14),transparent 28%),
+    linear-gradient(115deg,transparent 0%,rgba(255,255,255,.035) 48%,transparent 68%);
+}
+.pitch-team-block,.pitch-team-heading,.pitch-player-rows,.pitch-player-row,
+.pitch-midline,.pitch-top-goal,.pitch-bottom-goal,.pitch-corner{
+  position:relative;
+  z-index:2;
+}
+.pitch-team-block{
+  padding:clamp(12px,1.4vw,20px) 5px!important;
+  gap:12px!important;
+}
+.pitch-green-block{padding-top:clamp(14px,1.6vw,22px)!important}
+.pitch-red-block{padding-bottom:clamp(14px,1.6vw,22px)!important}
+.pitch-team-heading{
+  margin-bottom:8px!important;
+  padding:7px 15px!important;
+  border:1px solid rgba(220,255,230,.42)!important;
+  background:linear-gradient(180deg,rgba(3,31,18,.88),rgba(2,18,11,.88))!important;
+  box-shadow:0 7px 18px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.12)!important;
+}
+.pitch-player-rows{
+  gap:clamp(13px,1.5vw,21px)!important;
+}
+.pitch-player-row{
+  display:flex!important;
+  flex-direction:row!important;
+  flex-wrap:wrap!important;
+  justify-content:center!important;
+  align-items:center!important;
+  gap:clamp(10px,1.35vw,19px)!important;
+  min-height:0!important;
+  overflow:visible!important;
+  padding:2px 0!important;
+}
+.pitch-midline{
+  margin:5px 0!important;
+  height:2px!important;
+  background:rgba(245,255,248,.88)!important;
+  box-shadow:0 0 8px rgba(255,255,255,.18);
+}
+.pitch-center-circle{
+  width:clamp(58px,6vw,82px)!important;
+  height:clamp(58px,6vw,82px)!important;
+  border:2px solid rgba(245,255,248,.82)!important;
+  box-shadow:0 0 12px rgba(255,255,255,.10);
+}
+.pitch-mid-label{
+  background:rgba(3,55,27,.94)!important;
+  border:1px solid rgba(220,255,230,.42);
+}
+.pitch-top-goal,.pitch-bottom-goal{
+  border-color:rgba(245,255,248,.9)!important;
+  box-shadow:0 0 9px rgba(255,255,255,.10);
+}
+
+/* FC Ultimate Team card frame, foil and hover/focus response */
+.fc-player-card{
+  width:clamp(82px,7.6vw,104px)!important;
+  min-width:76px!important;
+  max-width:108px!important;
+  min-height:132px!important;
+  padding:7px 6px 8px!important;
+  border-radius:15px!important;
+  border-width:1.5px!important;
+  box-shadow:
+    0 8px 0 rgba(0,0,0,.28),
+    0 15px 27px rgba(0,0,0,.36),
+    inset 0 1px 0 rgba(255,255,255,.5),
+    inset 0 0 0 2px rgba(255,245,190,.16)!important;
+  transition:transform .24s cubic-bezier(.2,.8,.2,1),filter .24s,box-shadow .24s!important;
+  transform-origin:center bottom;
+}
+.fc-player-card:not(.empty)::before{
+  inset:4px!important;
+  border:1px solid rgba(255,250,224,.72)!important;
+  border-radius:11px!important;
+  box-shadow:inset 0 0 12px rgba(255,255,255,.10);
+}
+.fc-player-card:not(.empty)::after{
+  background:
+    linear-gradient(118deg,transparent 0%,rgba(255,255,255,0) 34%,rgba(255,255,255,.48) 49%,rgba(255,255,255,0) 63%,transparent 100%)!important;
+  background-size:230% 100%!important;
+  opacity:.62!important;
+  animation:fcShine 5.2s ease-in-out infinite!important;
+}
+.fc-player-card:hover,
+.fc-player-card:focus-visible{
+  transform:translateY(-7px) scale(1.055)!important;
+  filter:brightness(1.10) saturate(1.12)!important;
+  box-shadow:
+    0 13px 0 rgba(0,0,0,.22),
+    0 23px 36px rgba(0,0,0,.42),
+    0 0 26px rgba(255,211,91,.28),
+    inset 0 1px 0 rgba(255,255,255,.55)!important;
+  outline:none;
+}
+.fc-player-card:focus-visible{
+  outline:3px solid rgba(125,249,190,.95)!important;
+  outline-offset:4px!important;
+}
+.fc-card-gold,.fc-player-card.fc-card-gold{
+  border-color:#fff0b5!important;
+  box-shadow:0 0 0 1px rgba(255,220,130,.30),0 9px 20px rgba(0,0,0,.34),inset 0 0 0 2px rgba(255,255,255,.18)!important;
+}
+.fc-card-silver,.fc-player-card.fc-card-silver{border-color:#f8fbff!important}
+.fc-card-bronze,.fc-player-card.fc-card-bronze{border-color:#ffe0bd!important}
+.fc-card-black,.fc-player-card.fc-card-black{border-color:#facc15!important}
+.fc-card-promo,.fc-player-card.fc-card-promo{border-color:#f5d0fe!important}
+.fc-card-icon,.fc-player-card.fc-card-icon{border-color:#fff0a6!important}
+.fc-player-card.empty{
+  border:1.5px dashed rgba(190,255,220,.78)!important;
+  box-shadow:0 7px 18px rgba(0,0,0,.24),inset 0 0 0 1px rgba(255,255,255,.06)!important;
+}
+.fc-player-card.empty::after{display:none!important}
+
+/* Keep bench cards aligned with the upgraded pitch cards */
+#benchSection{
+  border:1px solid rgba(245,190,75,.24)!important;
+  box-shadow:0 14px 32px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.05)!important;
+}
+#benchPlayers{gap:12px!important}
+#benchPlayers .fc-player-card,#benchPlayers .bench-player-card{
+  min-height:112px!important;
+  border-radius:13px!important;
+  box-shadow:0 8px 18px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.12)!important;
+}
+
+/* Existing side panel, forms, chat and room controls keep their structure */
+#roomView>section,#roomView aside,#roomView .glass-card{min-width:0}
+#roomTeamsDisplay{align-self:stretch}
+#roomView .room-join-column{z-index:4}
+#roomView button:focus-visible,
+#roomView input:focus-visible,
+#roomView select:focus-visible,
+#roomView textarea:focus-visible{
+  outline:2px solid rgba(110,231,183,.85);
+  outline-offset:2px;
+}
+@media(max-width:1023px){
+  .pitch-stage{padding:10px 2px 16px!important;perspective:1100px!important}
+  .pitch-surface{min-height:680px!important}
+  .pitch-player-row{gap:clamp(7px,1.7vw,14px)!important}
+}
+@media(max-width:767px){
+  .pitch-stage{padding:7px 0 13px!important;perspective:900px!important}
+  .pitch-surface{
+    min-height:620px!important;
+    padding:12px 7px!important;
+    border-radius:16px!important;
+    transform:rotateX(1deg)!important;
+  }
+  .pitch-surface::before{inset:8px!important;border-width:1.5px!important}
+  .pitch-team-block{padding:9px 1px!important;gap:8px!important}
+  .pitch-player-rows{gap:11px!important}
+  .pitch-player-row{gap:clamp(5px,1.8vw,10px)!important;padding:2px 0!important}
+  .fc-player-card{
+    width:clamp(58px,16vw,74px)!important;
+    min-width:54px!important;
+    max-width:76px!important;
+    min-height:100px!important;
+    padding:5px 3px 6px!important;
+    border-radius:11px!important;
+  }
+  .fc-player-card:not(.empty)::before{inset:3px!important;border-radius:8px!important}
+  .fc-player-card .fc-rating{font-size:clamp(12px,3.2vw,16px)!important}
+  .fc-player-card .fc-card-position{font-size:7px!important}
+  .fc-player-card .fc-card-avatar{width:31px!important;height:31px!important}
+  .fc-player-card .fc-card-name{font-size:7.5px!important}
+  .pitch-team-heading{font-size:8px!important;padding:5px 9px!important}
+  .pitch-center-circle{width:46px!important;height:46px!important}
+  #benchPlayers{gap:8px!important}
+  #benchPlayers .fc-player-card,#benchPlayers .bench-player-card{
+    min-height:94px!important;
+    max-width:72px!important;
+  }
+}
+@media(max-width:380px){
+  .pitch-surface{padding-left:4px!important;padding-right:4px!important}
+  .pitch-player-row{gap:4px!important}
+  .fc-player-card{width:clamp(52px,15vw,62px)!important;min-width:49px!important;min-height:94px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .fc-player-card,.fc-player-card::after{animation:none!important;transition:none!important}
 }
 </style>
 
