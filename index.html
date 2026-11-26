@@ -719,6 +719,30 @@ body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;ove
 @media(max-width:640px){.home-top-actions{width:100%;gap:6px}.home-top-btn{padding:8px 9px;font-size:9px;gap:4px}.home-top-dropdown{left:0;width:100%;padding:11px}.home-top-dropdowns{padding:0 12px}}
 </style>
 
+
+<style id="kadrokur-room-layout-fit-v1">
+/* Oda içi düzen: saha tam genişlikte, takım logo sütunu kaldırıldı */
+#roomView{min-width:0;overflow-x:hidden}
+#roomView>section,#roomView .room-join-column{min-width:0}
+#pitchStage{width:100%;max-width:100%;min-width:0;margin:0 auto;overflow:visible}
+#pitchStage .pitch-surface{width:100%!important;max-width:100%!important;box-sizing:border-box!important;min-width:0!important}
+#tournamentPanel{width:100%;min-width:0;box-sizing:border-box;padding:16px!important;gap:12px!important}
+#tournamentPanel>div{min-width:0}
+#tournamentPanel #tournamentFixtures,
+#tournamentPanel #tournamentStandings{min-width:0;max-width:100%;overflow-x:auto}
+@media (min-width:1024px){
+  #pitchStage .pitch-surface{min-height:clamp(540px,calc(100vh - 230px),700px)!important}
+}
+@media (max-width:1023px){
+  #pitchStage .pitch-surface{min-height:clamp(500px,78vh,680px)!important}
+}
+@media (max-width:640px){
+  #roomView{padding-left:10px!important;padding-right:10px!important}
+  #pitchStage .pitch-surface{min-height:560px!important;padding:14px 7px!important;border-width:2px!important}
+  #tournamentPanel{padding:13px!important}
+}
+</style>
+
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 <div id="homeVideoBackdrop" class="home-video-backdrop" aria-hidden="true">
@@ -870,7 +894,7 @@ body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;ove
 <button type="button" onclick="copyRoomWhatsAppInvite()" class="px-3 py-2 rounded-xl bg-green-600 text-white text-xs font-bold">📲 Gruba Davet Kopyala</button>
 </div>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_180px] gap-3 items-stretch">
+<div class="w-full min-w-0">
 <div class="min-w-0"><div class="flex flex-wrap items-center justify-between gap-2 mb-1"><h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">🏟️ Canlı Saha Dizilişi</h2><span class="flex items-center gap-2 text-[10px] tracking-widest font-black text-emerald-300"><span id="pitchFormationBadge" class="rounded-full border border-emerald-300/30 bg-emerald-950/70 px-2 py-1">DİZİLİŞ 2-3-1</span>3D TACTICAL PITCH</span></div>
 <div class="pitch-stage" id="pitchStage"><button type="button" id="pitchFullscreenBtn" class="pitch-fullscreen-btn" onclick="togglePitchFullscreen()" aria-label="Sahayı tam ekran yap" aria-pressed="false"><span id="pitchFullscreenIcon">⛶</span><span id="pitchFullscreenText">TAM EKRAN</span></button><div class="pitch-bg pitch-surface rounded-2xl p-4 sm:p-7 relative">
   <div class="pitch-top-goal"><span>KALE</span></div>
@@ -881,28 +905,9 @@ body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;ove
   <div class="pitch-corner c1"></div><div class="pitch-corner c2"></div><div class="pitch-corner c3"></div><div class="pitch-corner c4"></div>
 </div></div></div>
 <section id="benchSection" class="glass-card rounded-2xl p-3 sm:p-4 space-y-3"><div class="flex items-center justify-between gap-2"><div><h3 class="text-sm font-black text-amber-300">🪑 YEDEK KULÜBESİ</h3><p class="text-[10px] text-slate-400">7 vs 7 maç kadrosu • 2 yedek oyuncu</p></div><span id="benchCount" class="text-xs font-black text-amber-200">0 / 2</span></div><div id="benchPlayers" class="flex flex-wrap gap-2"></div><form id="benchAddForm" onsubmit="addBenchPlayer(event)" class="hidden grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2"><input id="benchPlayerName" maxlength="40" placeholder="Yedek oyuncu adı" class="min-w-0 px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"><button id="benchAddBtn" type="submit" class="px-3 py-2 rounded-lg bg-amber-400 text-slate-950 text-xs font-black">＋ Yedeğe Ekle</button></form><p id="benchAdminHint" class="hidden text-[10px] text-slate-500">Yönetici, gruptaki 16 kişiyi tamamlamak için iki yedek oyuncuyu buradan ekleyebilir. Dolu oyuncuları TAŞI ile saha ve yedek arasında değiştirebilirsin.</p></section>
-<aside id="roomTeamsDisplay" class="glass-card rounded-2xl p-3 sm:p-4 flex md:flex-col items-center justify-around md:justify-center gap-3 md:gap-5">
-  <div id="roomHomeTeamDisplay" class="min-w-0 text-center"></div>
-  <div class="text-xs font-black tracking-widest text-slate-500">VS</div>
-  <div id="roomAwayTeamDisplay" class="min-w-0 text-center"></div>
-</aside></div>
+</div>
 
-<section class="glass-card rounded-2xl p-4 space-y-4" id="tournamentPanel">
-  <div class="flex flex-wrap items-center justify-between gap-2"><div><h3 class="text-base font-black text-amber-300">🏆 Turnuva Merkezi</h3><p class="text-[11px] text-slate-400">Fikstür, maç sonuçları ve otomatik puan tablosu</p></div><span class="text-[10px] font-bold rounded-full bg-amber-500/15 text-amber-300 px-2 py-1">3 / 1 / 0 PUAN</span></div>
-  <div id="tournamentAdminTools" class="hidden rounded-xl bg-slate-900/80 border border-slate-700 p-3 space-y-2">
-    <p class="text-xs font-bold text-emerald-300">Yönetici • Yeni turnuva maçı ekle</p>
-    <form id="fixtureForm" onsubmit="addTournamentFixture(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-      <input id="fixtureHome" required maxlength="35" placeholder="1. Takım adı" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
-      <input id="fixtureAway" required maxlength="35" placeholder="2. Takım adı" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
-      <input id="fixtureDate" type="date" required class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
-      <input id="fixtureTime" type="time" value="20:00" required class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
-      <button class="sm:col-span-2 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black" type="submit">＋ Fikstüre Maç Ekle</button>
-    </form>
-  </div>
-  <div id="tournamentSummary" class="grid grid-cols-2 sm:grid-cols-3 gap-2"><div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3"><div class="text-[10px] text-slate-400">Turnuva</div><div class="text-lg font-black text-amber-300">Lig Usulü</div></div><div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3"><div class="text-[10px] text-slate-400">Oynanan Maç</div><div id="tournamentPlayedCount" class="text-lg font-black text-emerald-300">0</div></div><div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3 col-span-2 sm:col-span-1"><div class="text-[10px] text-slate-400">Toplam Fikstür</div><div id="tournamentFixtureCount" class="text-lg font-black text-sky-300">0</div></div></div>
-  <div><h4 class="text-xs font-black text-slate-200 mb-2">📅 Turnuva Fikstürü ve Maç Sonuçları</h4><div id="tournamentFixtures" class="space-y-2"><p class="text-xs text-slate-500">Fikstür yükleniyor…</p></div></div>
-  <div><h4 class="text-xs font-black text-slate-200 mb-2">📊 Puan Durumu</h4><div id="tournamentStandings" class="overflow-x-auto"><p class="text-xs text-slate-500">Henüz sonuç girilmedi.</p></div></div>
-</section>
+
 
 
 
@@ -936,6 +941,22 @@ Kadroya başvurmak için önce <button type="button" onclick="goHome()" class="u
 <div class="p-4 rounded-xl bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-between"><div><span class="text-xs text-emerald-300 font-semibold block">Kişi Başı Katılım Ücreti</span><span id="priceFeeSummary" class="text-[11px] text-slate-400">Saha Ücreti: 4200 ₺ • 14 Kişi</span></div><div id="priceDisplay" class="text-2xl font-black text-emerald-400">—</div></div>
 <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-700"><div class="flex items-center justify-between mb-1"><span id="ibanOwnerLabel" class="text-[11px] font-bold text-slate-400">ÖDEME IBAN</span><button type="button" onclick="copyIban()" class="text-xs font-bold text-emerald-400">📋 IBAN Kopyala</button></div><p id="roomIbanText" class="text-xs sm:text-sm font-mono select-all">TR53 0006 2000 5950 0006 6773 76</p></div>
 <button id="joinSubmit" type="submit" class="w-full py-3.5 rounded-xl bg-emerald-500 text-slate-950 font-black text-sm">📝 Başvurumu Gönder</button><p class="text-[11px] text-slate-500">Başvuru, oda yöneticisi onayı ve ödeme onayından ayrı bir işlemdir.</p></form><div id="formMessage" class="hidden mt-3 rounded-lg p-3 text-xs"></div></div>
+<section class="glass-card rounded-2xl p-4 space-y-4" id="tournamentPanel">
+  <div class="flex flex-wrap items-center justify-between gap-2"><div><h3 class="text-base font-black text-amber-300">🏆 Turnuva Merkezi</h3><p class="text-[11px] text-slate-400">Fikstür, maç sonuçları ve otomatik puan tablosu</p></div><span class="text-[10px] font-bold rounded-full bg-amber-500/15 text-amber-300 px-2 py-1">3 / 1 / 0 PUAN</span></div>
+  <div id="tournamentAdminTools" class="hidden rounded-xl bg-slate-900/80 border border-slate-700 p-3 space-y-2">
+    <p class="text-xs font-bold text-emerald-300">Yönetici • Yeni turnuva maçı ekle</p>
+    <form id="fixtureForm" onsubmit="addTournamentFixture(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <input id="fixtureHome" required maxlength="35" placeholder="1. Takım adı" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
+      <input id="fixtureAway" required maxlength="35" placeholder="2. Takım adı" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
+      <input id="fixtureDate" type="date" required class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
+      <input id="fixtureTime" type="time" value="20:00" required class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white">
+      <button class="sm:col-span-2 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black" type="submit">＋ Fikstüre Maç Ekle</button>
+    </form>
+  </div>
+  <div id="tournamentSummary" class="grid grid-cols-2 sm:grid-cols-3 gap-2"><div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3"><div class="text-[10px] text-slate-400">Turnuva</div><div class="text-lg font-black text-amber-300">Lig Usulü</div></div><div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3"><div class="text-[10px] text-slate-400">Oynanan Maç</div><div id="tournamentPlayedCount" class="text-lg font-black text-emerald-300">0</div></div><div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3 col-span-2 sm:col-span-1"><div class="text-[10px] text-slate-400">Toplam Fikstür</div><div id="tournamentFixtureCount" class="text-lg font-black text-sky-300">0</div></div></div>
+  <div><h4 class="text-xs font-black text-slate-200 mb-2">📅 Turnuva Fikstürü ve Maç Sonuçları</h4><div id="tournamentFixtures" class="space-y-2"><p class="text-xs text-slate-500">Fikstür yükleniyor…</p></div></div>
+  <div><h4 class="text-xs font-black text-slate-200 mb-2">📊 Puan Durumu</h4><div id="tournamentStandings" class="overflow-x-auto"><p class="text-xs text-slate-500">Henüz sonuç girilmedi.</p></div></div>
+</section>
 <div class="glass-card rounded-2xl p-4 flex items-center justify-between gap-3"><div><h3 class="text-sm font-bold">WhatsApp Grubu İçin</h3><p class="text-xs text-slate-400">Güncel kadroyu kopyala.</p></div><button type="button" onclick="copyWhatsAppRoster()" class="px-4 py-2.5 rounded-xl bg-green-600 text-white text-xs font-bold">📲 Kadroyu Kopyala</button></div></section>
 </main>
 
@@ -1585,7 +1606,7 @@ function teamShortName(name){const words=String(name||"").trim().split(/\s+/).fi
 function knownTeamLogo(name){const n=String(name||"").toLocaleLowerCase("tr-TR").replace(/[ıİ]/g,"i").replace(/[ğĞ]/g,"g").replace(/[üÜ]/g,"u").replace(/[şŞ]/g,"s").replace(/[öÖ]/g,"o").replace(/[çÇ]/g,"c").replace(/[^a-z0-9]/g,"");const logos={galatasaray:"645",fenerbahce:"611",besiktas:"549",trabzonspor:"998",basaksehir:"564",istanbulbasaksehir:"564",bursaspor:"607"};return logos[n]?`https://media.api-sports.io/football/teams/${logos[n]}.png`:"";}
 function teamBadgeHtml(name,logo,color){const safeName=esc(name||"Takım"),safeColor=/^#[0-9a-f]{6}$/i.test(color||"")?color:"#475569",candidate=/^https:\/\//i.test(String(logo||""))?String(logo):knownTeamLogo(name),safeLogo=candidate?esc(candidate):"",short=esc(teamShortName(name));return `<div class="flex flex-col items-center gap-2"><div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center overflow-hidden border border-white/15 shadow-lg" style="background:${safeColor}22;border-color:${safeColor}88">${safeLogo?`<img src="${safeLogo}" alt="${safeName} arması" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-contain p-1" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.classList.remove('hidden')">`:""}<span class="${safeLogo?"hidden ":""}text-lg font-black" style="color:${safeColor}">${short}</span></div><span class="text-sm sm:text-base font-black text-white break-words">${safeName}</span></div>`;}
 function roomTeamName(team){const info=currentRoomInfo||{};return team==="green"?(info.homeTeam||"1. Takım"):(info.awayTeam||"2. Takım");}
-function renderRoomTeams(info){const wrap=document.getElementById("roomTeamsDisplay"),home=document.getElementById("roomHomeTeamDisplay"),away=document.getElementById("roomAwayTeamDisplay");if(!wrap||!home||!away)return;const h=info?.homeTeam||"1. Takım",a=info?.awayTeam||"2. Takım";home.innerHTML=teamBadgeHtml(h,info.homeTeamLogo,info.homeTeamColor);away.innerHTML=teamBadgeHtml(a,info.awayTeamLogo,info.awayTeamColor);wrap.classList.remove("hidden");const gs=document.querySelector('#teamSelect option[value="green"]'),rs=document.querySelector('#teamSelect option[value="red"]');if(gs)gs.textContent="🏠 "+h;if(rs)rs.textContent="✈️ "+a;const gh=document.getElementById("greenPitchTeamName"),rh=document.getElementById("redPitchTeamName");if(gh)gh.textContent=h.toLocaleUpperCase("tr-TR");if(rh)rh.textContent=a.toLocaleUpperCase("tr-TR");}
+function renderRoomTeams(info){const h=info?.homeTeam||"1. Takım",a=info?.awayTeam||"2. Takım";const gs=document.querySelector('#teamSelect option[value="green"]'),rs=document.querySelector('#teamSelect option[value="red"]');if(gs)gs.textContent="🏠 "+h;if(rs)rs.textContent="✈️ "+a;const gh=document.getElementById("greenPitchTeamName"),rh=document.getElementById("redPitchTeamName");if(gh)gh.textContent=h.toLocaleUpperCase("tr-TR");if(rh)rh.textContent=a.toLocaleUpperCase("tr-TR");}
 
 function openCreateRoomModal(){if(!currentUser){alert("Yeni maç odası kurmak için önce üye girişi yapın.");return;}syncCreateDistricts("Arnavutköy");populateTimeSlots("20:00 - 21:00");document.getElementById("newRoomDate").value=localDateInputValue(new Date());document.getElementById("newRoomTime").value="20:00";document.getElementById("newRoomEndTime").value="21:00";document.getElementById("newRoomHomeTeam").value="Sahabiler FK";document.getElementById("newRoomAwayTeam").value="Fenerbahçe";document.getElementById("newRoomHomeTeamCustom").value="";document.getElementById("newRoomAwayTeamCustom").value="";toggleCustomTeamInput("home");toggleCustomTeamInput("away");document.getElementById("newRoomHomeLogo").value="";document.getElementById("newRoomAwayLogo").value="";document.getElementById("newRoomHomeColor").value="#16a34a";document.getElementById("newRoomAwayColor").value="#dc2626";document.getElementById("newRoomPlayerCount").value=String(DEFAULT_PLAYER_COUNT);syncFormationOptions();document.getElementById("newRoomFormation").value=DEFAULT_FORMATION_BY_COUNT[DEFAULT_PLAYER_COUNT];document.getElementById("newRoomPitchPrice").value=String(DEFAULT_PITCH_PRICE);updateCalculatedPerPersonPreview();document.getElementById("newRoomPin").value="";document.getElementById("createRoomError").textContent="";document.getElementById("createRoomModal").classList.remove("hidden");}
 function closeCreateRoomModal(){document.getElementById("createRoomModal").classList.add("hidden");}
