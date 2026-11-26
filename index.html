@@ -743,6 +743,33 @@ body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;ove
 }
 </style>
 
+
+<style id="kadrokur-room-pitch-chrome-fit-v2">
+/* Chrome görünümünde sahanın tamamını daha rahat göstermek için ölçüler küçültüldü */
+#pitchStage{width:100%;max-width:100%;min-width:0;margin:0 auto}
+#pitchStage .pitch-surface{
+  min-height:0!important;
+  height:clamp(390px,calc(100vh - 310px),520px)!important;
+  max-height:520px!important;
+  padding:clamp(10px,1.2vw,16px)!important;
+  overflow:hidden!important;
+}
+@media (max-width:1023px){
+  #pitchStage .pitch-surface{
+    height:clamp(370px,62vh,480px)!important;
+    max-height:480px!important;
+  }
+}
+@media (max-width:640px){
+  #pitchStage .pitch-surface{
+    height:420px!important;
+    max-height:420px!important;
+    min-height:0!important;
+    padding:9px 5px!important;
+  }
+}
+</style>
+
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 <div id="homeVideoBackdrop" class="home-video-backdrop" aria-hidden="true">
