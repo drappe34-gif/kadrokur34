@@ -745,16 +745,62 @@ body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;ove
 
 
 <style id="kadrokur-home-announcement-ticker">
-.home-announcement-ticker{width:100%;max-width:100%;min-height:42px;overflow:hidden;display:flex;align-items:center;position:relative;isolation:isolate;background:linear-gradient(90deg,rgba(4,18,17,.98),rgba(7,38,31,.98),rgba(4,18,17,.98));border-top:1px solid rgba(52,211,153,.35);border-bottom:1px solid rgba(52,211,153,.35);box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.home-announcement-ticker{
+  width:100%;
+  max-width:100%;
+  min-height:42px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  position:relative;
+  isolation:isolate;
+  background:linear-gradient(90deg,rgba(4,18,17,.98),rgba(7,38,31,.98),rgba(4,18,17,.98));
+  border-top:1px solid rgba(52,211,153,.35);
+  border-bottom:1px solid rgba(52,211,153,.35);
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+}
 .home-announcement-ticker.hidden{display:none!important}
-.home-announcement-track{display:flex;align-items:center;width:max-content;min-width:max-content;white-space:nowrap;flex-wrap:nowrap;will-change:transform;transform:translate3d(0,0,0)}
-.home-announcement-group{display:flex;align-items:center;flex:0 0 auto;width:max-content;white-space:nowrap}
-.home-announcement-copy{display:block;flex:0 0 auto;padding:10px 24px;color:#d1fae5;font-size:12px;line-height:20px;font-weight:800;letter-spacing:.045em;white-space:nowrap}
-.home-announcement-copy:before{content:"⚽";color:#6ee7b7;margin-right:14px}
-.home-announcement-ticker.is-running .home-announcement-track{animation:kadrokurAnnouncementScroll 55s linear infinite!important;animation-play-state:running!important}
-.home-announcement-ticker:hover .home-announcement-track{animation-play-state:paused}
-@keyframes kadrokurAnnouncementScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@media(max-width:640px){.home-announcement-ticker{min-height:38px}.home-announcement-copy{font-size:11px;padding:9px 18px}}
+.home-announcement-track{
+  display:flex;
+  align-items:center;
+  width:max-content;
+  min-width:max-content;
+  white-space:nowrap;
+  will-change:transform;
+}
+.home-announcement-copy{
+  display:block;
+  flex:0 0 auto;
+  padding:10px 5vw;
+  color:#d1fae5;
+  font-size:12px;
+  line-height:20px;
+  font-weight:800;
+  letter-spacing:.045em;
+}
+.home-announcement-copy:before{
+  content:"⚽";
+  color:#6ee7b7;
+  margin-right:14px;
+}
+.home-announcement-ticker.is-running .home-announcement-track{
+  animation:kadrokurAnnouncementScroll 48s linear infinite;
+}
+.home-announcement-ticker:hover .home-announcement-track{
+  animation-play-state:paused;
+}
+@keyframes kadrokurAnnouncementScroll{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
+@media(prefers-reduced-motion:reduce){
+  .home-announcement-ticker.is-running .home-announcement-track{animation:none;transform:none}
+  .home-announcement-copy:nth-child(2){display:none}
+}
+@media(max-width:640px){
+  .home-announcement-ticker{min-height:38px}
+  .home-announcement-copy{font-size:11px;padding:9px 28px}
+}
 body.room-open #homeAnnouncementTicker{display:none!important}
 </style>
 
@@ -788,12 +834,8 @@ body.room-open #homeAnnouncementTicker{display:none!important}
 <!-- Ana sayfa duyuru bandı: metin sistem yöneticisi tarafından yönetilir. -->
 <div id="homeAnnouncementTicker" class="home-announcement-ticker hidden" aria-label="KadroKur duyurusu" role="status">
   <div class="home-announcement-track">
-    <div class="home-announcement-group" id="homeAnnouncementGroupA">
-      <span id="homeAnnouncementTextA" class="home-announcement-copy"></span>
-    </div>
-    <div class="home-announcement-group" id="homeAnnouncementGroupB" aria-hidden="true">
-      <span id="homeAnnouncementTextB" class="home-announcement-copy"></span>
-    </div>
+    <span id="homeAnnouncementTextA" class="home-announcement-copy"></span>
+    <span id="homeAnnouncementTextB" class="home-announcement-copy" aria-hidden="true"></span>
   </div>
 </div>
 
@@ -805,12 +847,21 @@ body.room-open #homeAnnouncementTicker{display:none!important}
 <p class="text-sm sm:text-base text-slate-100/90 leading-relaxed mt-6 max-w-xl">Yakınındaki halı saha maçlarını keşfet, kadrodaki yerini ayırt veya kendi maç odanı oluştur. Takımın burada başlıyor.</p>
 <div class="flex flex-wrap gap-3 mt-8">
 <button type="button" onclick="document.getElementById('roomsList').scrollIntoView({behavior:'smooth'})" class="px-6 py-3.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-sm font-black shadow-xl">⚽ Maçları Keşfet</button>
-<button type="button" onclick="openCreateRoomModal()" class="px-6 py-3.5 rounded-xl border border-white/35 bg-black/25 hover:bg-white/10 text-white text-sm font-extrabold">＋ Maç Odası Kur</button>
+<button type="button" onclick="openCreateRoomModal()" class="px-6 py-3.5 rounded-xl border border-emerald-300/50 bg-emerald-950/60 hover:bg-emerald-900/70 text-white text-sm font-extrabold">🌐 Online Kadro Oluştur</button>
+<button type="button" onclick="openPrivateSquadGate()" class="px-6 py-3.5 rounded-xl border border-violet-300/50 bg-violet-950/60 hover:bg-violet-900/70 text-white text-sm font-extrabold">🔐 Kendi Aranda Kadro Oluştur</button>
 </div>
 <div class="flex flex-wrap gap-5 mt-9 text-[10px] sm:text-xs font-bold tracking-wider text-white/80"><span>● CANLI MAÇ ODALARI</span><span>● ANLIK KADRO</span><span>● TOPLULUK SOHBETİ</span></div>
 </div>
 </div>
 
+<!-- Şifreli, cihaz üzerinde çalışan özel kadro hazırlama alanı -->
+<section id="privateSquadSection" class="hidden max-w-6xl mx-auto w-full rounded-3xl border border-violet-400/25 bg-slate-950/90 p-4 sm:p-6 shadow-2xl space-y-5">
+  <div class="flex flex-wrap items-center justify-between gap-3"><div><p class="text-[10px] font-black tracking-[.22em] text-violet-300">PRIVATE SQUAD • ÖZEL ALAN</p><h2 class="text-2xl sm:text-3xl font-black text-white">⚽ Kendi Aranda Kadro</h2><p class="text-xs text-slate-400 mt-1">16 kişilik listeyi gir, 7'ye 7 takımları oluştur ve iki yedeği belirle.</p></div><button type="button" onclick="closePrivateSquad()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold">← Ana sayfaya dön</button></div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+    <div class="lg:col-span-1 rounded-2xl border border-slate-700 bg-slate-900/80 p-4 space-y-3"><label for="privateSquadNames" class="text-sm font-extrabold text-white">Oyuncu listesi</label><textarea id="privateSquadNames" rows="12" maxlength="1200" placeholder="Her satıra bir oyuncu adı yaz..." class="w-full rounded-xl border border-slate-700 bg-slate-950 p-3 text-sm text-white placeholder:text-slate-500"></textarea><p id="privateSquadCount" class="text-[11px] text-slate-400">0 oyuncu • Hedef: 16 kişi</p><div class="grid grid-cols-2 gap-2"><button type="button" onclick="savePrivateSquadNames()" class="rounded-xl bg-slate-700 hover:bg-slate-600 px-3 py-3 text-xs font-black text-white">💾 Listeyi Kaydet</button><button type="button" onclick="buildPrivateSquad()" class="rounded-xl bg-violet-500 hover:bg-violet-400 px-3 py-3 text-xs font-black text-white">⚡ Takımları Kur</button></div><p class="text-[10px] leading-relaxed text-slate-500">Bu özel kadro bu tarayıcıda saklanır; online maç odalarına veya mevcut Firebase kadrolarına dokunmaz.</p></div>
+    <div class="lg:col-span-2 space-y-3"><div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><div class="rounded-2xl border border-emerald-400/30 bg-emerald-950/30 p-4"><div class="flex items-center justify-between mb-3"><h3 class="font-black text-emerald-300">🟢 1. TAKIM</h3><span class="text-[10px] text-emerald-200/70">7 OYUNCU</span></div><div id="privateTeamGreen" class="space-y-2 text-sm text-white"><p class="text-xs text-slate-500">Henüz kadro oluşturulmadı.</p></div></div><div class="rounded-2xl border border-rose-400/30 bg-rose-950/30 p-4"><div class="flex items-center justify-between mb-3"><h3 class="font-black text-rose-300">🔴 2. TAKIM</h3><span class="text-[10px] text-rose-200/70">7 OYUNCU</span></div><div id="privateTeamRed" class="space-y-2 text-sm text-white"><p class="text-xs text-slate-500">Henüz kadro oluşturulmadı.</p></div></div></div><div class="rounded-2xl border border-amber-400/25 bg-amber-950/20 p-4"><div class="flex items-center justify-between mb-2"><h3 class="font-black text-amber-300">🟡 YEDEKLER</h3><span class="text-[10px] text-amber-200/70">2 KİŞİ</span></div><div id="privateBench" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-white"><p class="text-xs text-slate-500">Yedekler burada görünecek.</p></div></div><div class="flex flex-wrap gap-2"><button type="button" onclick="copyPrivateSquad()" class="rounded-xl border border-white/15 bg-slate-800 hover:bg-slate-700 px-4 py-2.5 text-xs font-bold text-white">📋 Kadroyu Kopyala</button><button type="button" onclick="clearPrivateSquad()" class="rounded-xl border border-rose-400/20 bg-rose-950/30 hover:bg-rose-900/40 px-4 py-2.5 text-xs font-bold text-rose-200">Temizle</button></div></div>
+  </div>
+</section>
 
 <!-- Sponsor reklam alanı: yalnızca yönetici tarafından onaylanan sponsorlar gösterilir. -->
 <section id="sponsorShowcase" class="hidden rounded-2xl border border-amber-400/30 bg-slate-950/75 p-4 sm:p-5 shadow-xl" aria-label="Sponsor reklamları">
@@ -999,6 +1050,7 @@ Kadroya başvurmak için önce <button type="button" onclick="goHome()" class="u
 <div class="glass-card rounded-2xl p-4 flex items-center justify-between gap-3"><div><h3 class="text-sm font-bold">WhatsApp Grubu İçin</h3><p class="text-xs text-slate-400">Güncel kadroyu kopyala.</p></div><button type="button" onclick="copyWhatsAppRoster()" class="px-4 py-2.5 rounded-xl bg-green-600 text-white text-xs font-bold">📲 Kadroyu Kopyala</button></div></section>
 </main>
 
+<div id="privateSquadGate" class="hidden fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center"><div class="w-full max-w-md rounded-3xl border border-violet-300/25 bg-slate-950 p-6 shadow-2xl"><div class="text-center"><div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-500/15 text-3xl">🔐</div><p class="text-[10px] font-black tracking-[.22em] text-violet-300">KADROKUR PRIVATE ACCESS</p><h2 class="mt-2 text-2xl font-black text-white">Özel Alan Girişi</h2><p class="mt-2 text-xs text-slate-400">Devam etmek için arkadaşlarınla paylaşılan ortak şifreyi gir.</p></div><div class="mt-5 relative"><input id="privateSquadPassword" type="password" autocomplete="off" placeholder="Ortak giriş şifresi" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 pr-14 text-white outline-none focus:border-violet-400" onkeydown="if(event.key==='Enter')checkPrivateSquadPassword()"><button type="button" onclick="togglePrivatePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-violet-300">Göster</button></div><p id="privateSquadGateError" class="mt-2 min-h-5 text-xs text-rose-300"></p><div class="mt-3 grid grid-cols-2 gap-2"><button type="button" onclick="closePrivateSquadGate()" class="rounded-xl bg-slate-800 px-4 py-3 text-xs font-bold text-white">Vazgeç</button><button type="button" onclick="checkPrivateSquadPassword()" class="rounded-xl bg-violet-500 hover:bg-violet-400 px-4 py-3 text-xs font-black text-white">Giriş Yap</button></div></div></div>
 <div id="createRoomModal" class="hidden fixed inset-0 z-50 bg-black/75 p-4 flex items-center justify-center overflow-y-auto"><div class="glass-card rounded-2xl p-6 w-full max-w-lg my-auto"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-black">➕ Yeni Maç Odası Kur</h2><button type="button" onclick="closeCreateRoomModal()" class="text-xl leading-none">×</button></div><p class="text-xs text-slate-400 mb-4">Bölge/yaka, ilçe, halı saha, gün, saat, kişi sayısı ve toplam saha ücretini belirle. Kişi başı ücret otomatik hesaplanır.</p><form onsubmit="createRoom(event)" class="space-y-3">
 <div><label class="block text-xs font-bold text-slate-300 mb-1" for="newRoomTitle">Oda / Maç Başlığı</label><input id="newRoomTitle" required maxlength="60" placeholder="Örn: Cuma Akşamı Halı Saha" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white"></div>
 <div class="rounded-xl border border-slate-700 bg-slate-900/70 p-3 space-y-3">
@@ -1318,45 +1370,21 @@ function renderHomeAnnouncement(value){
   const ticker=document.getElementById("homeAnnouncementTicker");
   const first=document.getElementById("homeAnnouncementTextA");
   const second=document.getElementById("homeAnnouncementTextB");
-  const groupA=document.getElementById("homeAnnouncementGroupA");
-  const groupB=document.getElementById("homeAnnouncementGroupB");
   const text=String(value||"").trim();
   homeAnnouncementValue=text;
-  if(!ticker||!first||!second||!groupA||!groupB)return;
-  const track=ticker.querySelector(".home-announcement-track");
+  if(!ticker||!first||!second)return;
   if(!text){
     ticker.classList.add("hidden");
-    ticker.classList.remove("is-running");
     first.textContent="";
     second.textContent="";
-    groupA.querySelectorAll(".home-announcement-copy:not(#homeAnnouncementTextA)").forEach(el=>el.remove());
-    groupB.querySelectorAll(".home-announcement-copy:not(#homeAnnouncementTextB)").forEach(el=>el.remove());
     return;
   }
-  ticker.classList.remove("hidden");
-  ticker.classList.remove("is-running");
-  if(track){track.style.animation="none";track.style.transform="translate3d(0,0,0)";}
   first.textContent=text;
   second.textContent=text;
-  groupA.querySelectorAll(".home-announcement-copy:not(#homeAnnouncementTextA)").forEach(el=>el.remove());
-  groupB.querySelectorAll(".home-announcement-copy:not(#homeAnnouncementTextB)").forEach(el=>el.remove());
-
-  // İki eşit şeridi ekranın en az 1,5 katı kadar doldur; kısa metinde boşluk bırakma.
-  const addCopy=group=>{
-    const item=document.createElement("span");
-    item.className="home-announcement-copy";
-    item.textContent=text;
-    group.appendChild(item);
-  };
-  const fillGroup=group=>{
-    let guard=0;
-    while(group.scrollWidth<ticker.clientWidth*1.5 && guard<60){addCopy(group);guard++;}
-  };
-  fillGroup(groupA);
-  fillGroup(groupB);
+  ticker.classList.remove("hidden");
+  ticker.classList.remove("is-running");
   void ticker.offsetWidth;
-  if(track)track.style.animation="";
-  requestAnimationFrame(()=>ticker.classList.add("is-running"));
+  ticker.classList.add("is-running");
 }
 
 function startHomeAnnouncementListener(){
@@ -2108,7 +2136,26 @@ document.addEventListener("click",e=>{
  document.querySelectorAll(".home-top-btn").forEach(btn=>btn.setAttribute("aria-expanded","false"));
 });
 
-initHomeTopMenus();
-initFirebase();
+// Özel kadro alanı: ortak şifre bu sabitte tutulur. Dağıtımdan önce istenen şifreyle değiştirilebilir.
+const PRIVATE_SQUAD_SHARED_PASSWORD = "KadroKur2026!";
+let privateSquadUnlocked = false;
+function openPrivateSquadGate(){const gate=document.getElementById("privateSquadGate");if(!gate)return;document.getElementById("privateSquadPassword").value="";document.getElementById("privateSquadGateError").textContent="";gate.classList.remove("hidden");setTimeout(()=>document.getElementById("privateSquadPassword").focus(),80);}
+function closePrivateSquadGate(){document.getElementById("privateSquadGate")?.classList.add("hidden");}
+function togglePrivatePasswordVisibility(){const input=document.getElementById("privateSquadPassword"),btn=input?.parentElement?.querySelector("button");if(!input)return;input.type=input.type==="password"?"text":"password";if(btn)btn.textContent=input.type==="password"?"Göster":"Gizle";}
+function checkPrivateSquadPassword(){const input=document.getElementById("privateSquadPassword");const err=document.getElementById("privateSquadGateError");if(!input)return;if(input.value===PRIVATE_SQUAD_SHARED_PASSWORD){privateSquadUnlocked=true;closePrivateSquadGate();document.getElementById("homeView").classList.add("hidden");document.getElementById("privateSquadSection").classList.remove("hidden");loadPrivateSquad();}else{err.textContent="Şifre hatalı. Lütfen tekrar deneyin.";input.select();}}
+function closePrivateSquad(){document.getElementById("privateSquadSection")?.classList.add("hidden");document.getElementById("homeView")?.classList.remove("hidden");}
+function privateNames(){return (document.getElementById("privateSquadNames")?.value||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,40);}
+function updatePrivateSquadCount(){const n=privateNames().length;const el=document.getElementById("privateSquadCount");if(el)el.textContent=`${n} oyuncu • ${n<16?`${16-n} kişi daha ekleyebilirsin`:(n>16?`${n-16} kişi yedek havuzunda`:`7'ye 7 + 2 yedek hazır`)}`;}
+function savePrivateSquadNames(){if(!privateSquadUnlocked)return;try{localStorage.setItem("kadrokur_private_names_v1",JSON.stringify(privateNames()));updatePrivateSquadCount();alert("Oyuncu listesi bu cihazda kaydedildi.");}catch(e){alert("Liste kaydedilemedi: "+e.message);}}
+function loadPrivateSquad(){try{const saved=JSON.parse(localStorage.getItem("kadrokur_private_names_v1")||"[]");if(saved.length)document.getElementById("privateSquadNames").value=saved.join("\n");const teams=JSON.parse(localStorage.getItem("kadrokur_private_teams_v1")||"null");if(teams)renderPrivateTeams(teams);}catch(_){}updatePrivateSquadCount();}
+function renderPrivateTeams(data){const render=(arr)=>arr.map((name,i)=>`<div class="flex items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-3 py-2"><span class="text-[10px] text-slate-500">${String(i+1).padStart(2,"0")}</span><span class="font-semibold">${escapePrivateHtml(name)}</span></div>`).join("")||'<p class="text-xs text-slate-500">Oyuncu yok.</p>';document.getElementById("privateTeamGreen").innerHTML=render(data.green||[]);document.getElementById("privateTeamRed").innerHTML=render(data.red||[]);document.getElementById("privateBench").innerHTML=render(data.bench||[]);}
+function escapePrivateHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function buildPrivateSquad(){if(!privateSquadUnlocked)return;const names=privateNames();if(names.length<14){alert("Takım kurmak için en az 14 oyuncu girmelisin.");return;}const shuffled=[...names].sort(()=>Math.random()-.5);const data={green:shuffled.slice(0,7),red:shuffled.slice(7,14),bench:shuffled.slice(14)};renderPrivateTeams(data);try{localStorage.setItem("kadrokur_private_names_v1",JSON.stringify(names));localStorage.setItem("kadrokur_private_teams_v1",JSON.stringify(data));}catch(e){alert("Kadro oluşturuldu ancak kaydedilemedi: "+e.message);}updatePrivateSquadCount();}
+function copyPrivateSquad(){const data=JSON.parse(localStorage.getItem("kadrokur_private_teams_v1")||"null");if(!data){alert("Önce takımları oluşturmalısın.");return;}const msg=`⚽ KADROKUR | ÖZEL KADRO\n\n🟢 1. TAKIM\n${(data.green||[]).map((x,i)=>`${i+1}. ${x}`).join("\n")}\n\n🔴 2. TAKIM\n${(data.red||[]).map((x,i)=>`${i+1}. ${x}`).join("\n")}\n\n🟡 YEDEKLER\n${(data.bench||[]).map((x,i)=>`${i+1}. ${x}`).join("\n")}`;if(navigator.clipboard?.writeText)navigator.clipboard.writeText(msg).then(()=>alert("Kadro kopyalandı.")).catch(()=>prompt("Kadro metni:",msg));else prompt("Kadro metni:",msg);}
+function clearPrivateSquad(){if(!confirm("Özel kadro listesini ve takımları temizlemek istiyor musun?"))return;document.getElementById("privateSquadNames").value="";["kadrokur_private_names_v1","kadrokur_private_teams_v1"].forEach(k=>localStorage.removeItem(k));renderPrivateTeams({green:[],red:[],bench:[]});updatePrivateSquadCount();}
+document.addEventListener("input",e=>{if(e.target?.id==="privateSquadNames")updatePrivateSquadCount();});
+
+  initHomeTopMenus();
+  initFirebase();
 </script>
 </body></html>
