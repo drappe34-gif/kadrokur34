@@ -1,948 +1,170 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#10b981">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="KadroKur">
-<link rel="apple-touch-icon" href="./icons/icon-180.png">
-<link rel="manifest" href="./manifest.json">
-<title>KadroKur | Maç Odaları & Kadro</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KadroKur • 9:16 Video Bölümü</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
-body{font-family:Inter,sans-serif;background:#090d16;color:#f8fafc}.pitch-bg{background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0,rgba(255,255,255,.03) 40px,transparent 40px,transparent 80px),linear-gradient(180deg,#0b2415,#10351f 50%,#0b2415);border:2px solid rgba(74,222,128,.35);box-shadow:0 0 40px rgba(16,185,129,.12)}.glass-card{background:rgba(15,23,42,.84);backdrop-filter:blur(12px);border:1px solid rgba(148,163,184,.18)}button:disabled{opacity:.45;cursor:not-allowed}
-.home-video-backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse at center,#173d2a 0%,#090d16 78%)}
-.home-video-backdrop video{width:100%;height:100%;object-fit:cover;opacity:.88;filter:saturate(1.22) contrast(1.12)}
-.home-video-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,8,16,.40),rgba(3,8,16,.12) 50%,rgba(3,8,16,.40)),linear-gradient(0deg,rgba(3,8,16,.72),rgba(3,8,16,.08) 48%,rgba(3,8,16,.30))}
-header,#homeView,#roomView,footer{position:relative;z-index:1}
-.home-header{background:rgba(3,10,18,.48)!important;backdrop-filter:blur(14px);border-color:rgba(255,255,255,.14)!important}
-.home-menu-link{padding:.6rem .9rem;border-radius:999px;color:#e2e8f0;font-size:11px;font-weight:800;letter-spacing:.04em;transition:.2s}
-.home-menu-link:hover{background:rgba(16,185,129,.22);color:#6ee7b7}
-.home-hero{min-height:clamp(390px,58vh,620px);display:flex;align-items:center;background:linear-gradient(90deg,rgba(2,8,15,.58),rgba(2,8,15,.08));border:1px solid rgba(255,255,255,.16);box-shadow:0 24px 80px rgba(0,0,0,.24)}
-.home-hero-kicker{display:inline-flex;align-items:center;gap:.5rem;padding:.45rem .8rem;border:1px solid rgba(110,231,183,.38);border-radius:999px;background:rgba(2,44,34,.48);color:#a7f3d0;font-size:10px;font-weight:900;letter-spacing:.16em}
-.home-hero-title{text-shadow:0 4px 30px rgba(0,0,0,.65);letter-spacing:-.055em}
-.home-content-card{background:rgba(5,13,22,.78)!important;backdrop-filter:blur(16px);border-color:rgba(255,255,255,.16)!important}
-@media(max-width:640px){.home-menu-link{padding:.5rem .65rem;font-size:10px}.home-hero{min-height:430px}}
-body.room-open .home-video-backdrop{display:none}
-#homeChatMessages{scrollbar-width:thin;scrollbar-color:#475569 transparent}
-@media(prefers-reduced-motion:reduce){.home-video-backdrop video{display:none}}
-
-/* KadroKur 3D halı saha görünümü */
-.pitch-stage{padding:10px 5px 22px;perspective:1300px;}
-.pitch-surface{isolation:isolate;overflow:hidden;min-height:560px;position:relative;border:5px solid #a8f0b2!important;box-shadow:0 24px 55px rgba(0,0,0,.48),inset 0 0 0 2px rgba(255,255,255,.22),0 0 35px rgba(16,185,129,.18)!important;background:repeating-linear-gradient(90deg,rgba(255,255,255,.055) 0,rgba(255,255,255,.055) 9%,transparent 9%,transparent 18%),linear-gradient(180deg,#167a3c 0%,#0f6932 50%,#0b572b 100%)!important;transform:rotateX(7deg);transform-origin:center top;}
-.pitch-surface:before{content:"";position:absolute;inset:12px;border:2px solid rgba(236,253,245,.78);border-radius:3px;pointer-events:none;z-index:0;}
-.pitch-surface:after{content:"";position:absolute;left:50%;top:12px;bottom:12px;border-left:2px solid rgba(236,253,245,.72);pointer-events:none;z-index:0;}
-.pitch-team-block{position:relative;z-index:2;padding:12px 4px;}
-.pitch-green-block{padding-top:24px;padding-bottom:22px;}
-.pitch-red-block{padding-top:22px;padding-bottom:24px;}
-.pitch-team-heading{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 12px;width:max-content;max-width:100%;padding:6px 13px;border-radius:999px;background:rgba(2,20,12,.72);border:1px solid rgba(255,255,255,.3);box-shadow:0 5px 12px rgba(0,0,0,.22);font-size:11px;font-weight:900;letter-spacing:.1em;color:#fff;}
-.pitch-team-heading small{font-size:8px;letter-spacing:.08em;color:#d1fae5;}
-.pitch-team-dot{width:9px;height:9px;border-radius:50%;box-shadow:0 0 10px currentColor}.green-dot{background:#4ade80;color:#4ade80}.red-dot{background:#fb7185;color:#fb7185}
-.pitch-player-rows{display:flex;flex-direction:column;gap:12px;position:relative;z-index:2;}
-.pitch-player-rows>div{display:flex;justify-content:center;align-items:center;gap:clamp(5px,2vw,18px);flex-wrap:wrap;min-height:58px;}
-.pitch-midline{height:2px;background:rgba(236,253,245,.76);position:relative;z-index:1;margin:2px -28px;display:flex;justify-content:center;align-items:center;}
-.pitch-center-circle{position:absolute;width:92px;height:92px;border:2px solid rgba(236,253,245,.68);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
-.pitch-mid-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:8px;letter-spacing:.2em;font-weight:900;color:rgba(255,255,255,.5);background:rgba(8,65,33,.72);padding:3px 8px;border-radius:20px;white-space:nowrap;}
-.pitch-top-goal,.pitch-bottom-goal{position:relative;z-index:2;margin:0 auto;width:25%;min-width:90px;height:13px;border:2px solid rgba(255,255,255,.72);border-top:0;background:rgba(255,255,255,.08);text-align:center;font-size:7px;font-weight:900;letter-spacing:.25em;color:rgba(255,255,255,.72);}
-.pitch-bottom-goal{border:2px solid rgba(255,255,255,.72);border-bottom:0;}
-.pitch-corner{position:absolute;width:14px;height:14px;border:1px solid rgba(255,255,255,.65);border-radius:50%;z-index:1}.pitch-corner.c1{top:12px;left:12px}.pitch-corner.c2{top:12px;right:12px}.pitch-corner.c3{bottom:12px;left:12px}.pitch-corner.c4{bottom:12px;right:12px}
-.pitch-player-rows button,.pitch-player-rows>div>div{min-width:76px;max-width:112px;min-height:68px;padding:8px 7px;border-radius:12px!important;box-shadow:0 7px 0 rgba(0,0,0,.22),0 10px 18px rgba(0,0,0,.22);backdrop-filter:blur(5px);transition:transform .18s,box-shadow .18s;}
-.pitch-player-rows button:hover{transform:translateY(-4px) scale(1.035);box-shadow:0 10px 0 rgba(0,0,0,.18),0 16px 22px rgba(0,0,0,.25);}
-.pitch-player-rows button{background:linear-gradient(145deg,rgba(9,48,28,.96),rgba(4,25,16,.94));border:1px dashed rgba(187,247,208,.72)!important;color:#ecfdf5;}
-.pitch-player-rows>div>div{background:linear-gradient(145deg,rgba(5,75,42,.97),rgba(3,38,25,.97));border:1px solid rgba(134,239,172,.75)!important;color:white;}
-.pitch-red-block .pitch-player-rows>div>div{background:linear-gradient(145deg,rgba(127,29,29,.97),rgba(69,10,10,.97));border-color:rgba(252,165,165,.8)!important;}
-.pitch-red-block .pitch-player-rows button{background:linear-gradient(145deg,rgba(127,29,29,.92),rgba(69,10,10,.95));border-color:rgba(252,165,165,.72)!important;}
-@media(max-width:640px){.pitch-stage{padding:4px 0 14px;perspective:900px}.pitch-surface{min-height:580px;padding:12px 8px!important;transform:rotateX(5deg)}.pitch-player-rows>div{gap:5px}.pitch-player-rows button,.pitch-player-rows>div>div{min-width:65px;max-width:85px;min-height:62px;padding:6px 4px}.pitch-center-circle{width:72px;height:72px}.pitch-team-heading{font-size:9px;padding:5px 9px}}
-
-
-/* FC tarzı yıldız oyuncu kartları */
-.fc-player-card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;width:92px;min-height:116px;padding:7px 5px 6px;border-radius:12px!important;overflow:hidden;background:linear-gradient(155deg,#fff2b5 0%,#d6a844 20%,#78501c 48%,#f2d47c 76%,#8a5b20 100%);border:1px solid #ffe7a0!important;box-shadow:0 7px 0 rgba(0,0,0,.28),0 12px 22px rgba(0,0,0,.3),inset 0 0 0 2px rgba(255,245,190,.28);color:#251708;isolation:isolate;transition:transform .18s,filter .18s;}
-.fc-player-card:before{content:"";position:absolute;inset:4px;border:1px solid rgba(255,248,210,.72);border-radius:8px;pointer-events:none;z-index:-1}
-.fc-player-card:after{content:"";position:absolute;inset:0;background:linear-gradient(130deg,rgba(255,255,255,.35),transparent 28%,transparent 70%,rgba(255,255,255,.16));pointer-events:none;z-index:-1}
-.fc-player-card:hover{transform:translateY(-4px) scale(1.04);filter:brightness(1.08)}
-.fc-player-card .fc-card-top{width:100%;display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:1000;line-height:1}
-.fc-player-card .fc-card-stars{font-size:8px;letter-spacing:1px;color:#fff7ce;text-shadow:0 1px 2px #5b3510;margin:4px 0 3px}
-.fc-player-card .fc-card-avatar{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;font-size:22px;background:radial-gradient(circle at 35% 25%,#fff9d9,#b98537 70%);border:1px solid rgba(90,54,13,.5);box-shadow:0 2px 5px rgba(0,0,0,.25)}
-.fc-player-card .fc-card-name{width:100%;font-size:10px;line-height:1.15;font-weight:1000;text-align:center;margin-top:4px;overflow-wrap:anywhere;max-height:24px;overflow:hidden}
-.fc-player-card .fc-card-status{font-size:8px;font-weight:900;margin-top:3px;white-space:nowrap}
-.fc-player-card .fc-card-actions{display:flex;gap:6px;margin-top:4px;position:relative;z-index:2}
-.fc-player-card .fc-card-actions button{font-size:8px;line-height:1;padding:3px 4px;border-radius:5px;background:rgba(30,20,8,.78);color:#fff4cf}
-.fc-player-card.empty{background:linear-gradient(155deg,#243b35,#10251f 55%,#1b4535);border:1px dashed rgba(167,243,208,.75)!important;color:#d1fae5;cursor:pointer}
-.fc-player-card.empty:before{border-color:rgba(167,243,208,.35)}
-.fc-player-card.empty .fc-card-stars{color:#6ee7b7;text-shadow:none}
-.fc-player-card.empty .fc-card-avatar{background:rgba(4,25,18,.6);border:1px solid rgba(167,243,208,.35);color:#a7f3d0}
-.pitch-red-block .fc-player-card:not(.empty){background:linear-gradient(155deg,#ffe1d9 0%,#d98b79 20%,#702c2b 48%,#f1b5a5 76%,#7b3431 100%);border-color:#ffd0c2!important;color:#2b0c0b}
-.pitch-red-block .fc-player-card .fc-card-avatar{background:radial-gradient(circle at 35% 25%,#fff0e9,#b65b4e 70%)}
-@media(max-width:640px){.pitch-player-rows>div{gap:5px}.fc-player-card{width:76px;min-height:105px;padding:6px 4px}.fc-player-card .fc-card-avatar{width:29px;height:29px;font-size:19px}.fc-player-card .fc-card-name{font-size:9px}}
-.fc-bench-card{width:82px;min-height:104px;padding:7px 5px}.fc-bench-card .fc-card-actions{gap:3px}.fc-bench-card .fc-card-actions button{font-size:7px;padding:3px 3px}
-.bench-player-card{width:82px;min-height:104px;padding:7px 5px;border-radius:11px;border:1px solid rgba(251,191,36,.65);background:linear-gradient(155deg,#59421a,#211b12 58%,#493416);color:#fff4cf;box-shadow:0 5px 12px rgba(0,0,0,.24);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.bench-player-card.empty{border-style:dashed;background:rgba(15,23,42,.65);color:#fcd34d}.bench-player-card .bench-name{font-size:10px;font-weight:900;overflow-wrap:anywhere;max-height:28px;overflow:hidden}.bench-player-card .bench-role{font-size:8px;color:#fcd34d;font-weight:900;margin-top:4px}.bench-player-card .bench-actions{display:flex;gap:4px;margin-top:5px}.bench-player-card button{font-size:8px;font-weight:900;border-radius:5px;padding:3px 5px;background:rgba(0,0,0,.55);color:white}@media(max-width:640px){.fc-bench-card{width:76px;min-height:98px}.bench-player-card{width:76px;min-height:98px}}
-
-
-/* FC 27 / Ultimate Team düzeni – kompakt saha ve gerçek kart oranları */
-.pitch-stage{padding:6px 2px 14px;perspective:none;max-width:100%}
-.pitch-surface{min-height:0!important;height:auto;transform:none!important;padding:12px 12px 14px!important;border-width:3px!important;border-radius:18px!important;box-shadow:0 14px 32px rgba(0,0,0,.35)!important}
-.pitch-surface:before{inset:8px}
-.pitch-surface:after{top:8px;bottom:8px}
-.pitch-team-block{padding:8px 2px!important}
-.pitch-green-block{padding-top:10px!important;padding-bottom:8px!important}
-.pitch-red-block{padding-top:8px!important;padding-bottom:10px!important}
-.pitch-team-heading{margin-bottom:7px;font-size:9px;padding:4px 10px}
-.pitch-player-rows{gap:7px}
-.pitch-player-rows>div{gap:clamp(3px,1vw,9px);min-height:0;flex-wrap:nowrap}
-.pitch-midline{margin:0 -12px;height:1px}
-.pitch-center-circle{width:54px;height:54px}
-.pitch-mid-label{font-size:7px}
-.pitch-top-goal,.pitch-bottom-goal{height:9px;min-width:70px;width:22%;font-size:6px}
-.fc-player-card{width:clamp(65px,8vw,84px);min-height:108px;padding:5px 4px 5px;border-radius:9px!important;box-shadow:0 4px 9px rgba(0,0,0,.28),inset 0 0 0 1px rgba(255,245,190,.22)}
-.fc-player-card:before{inset:3px;border-radius:6px}
-.fc-player-card .fc-card-top{font-size:8px}
-.fc-player-card .fc-card-stars{font-size:7px;letter-spacing:.5px;margin:2px 0}
-.fc-player-card .fc-card-avatar{width:42px;height:43px;border-radius:5px;font-size:21px;overflow:hidden}
-.fc-player-card .fc-card-name{font-size:9px;margin-top:3px;max-height:22px}
-.fc-player-card .fc-card-status{font-size:7px;margin-top:2px}
-.fc-player-card .fc-card-actions{gap:2px;margin-top:3px;flex-wrap:wrap;justify-content:center}
-.fc-player-card .fc-card-actions button{font-size:6px;padding:3px 3px}
-.fc-bench-card{width:78px;min-height:104px}
-@media(max-width:640px){
- .pitch-stage{padding:3px 0 10px}
- .pitch-surface{min-height:0!important;padding:9px 5px 10px!important;border-width:2px!important}
- .pitch-team-block{padding:6px 0!important}
- .pitch-green-block{padding-top:8px!important;padding-bottom:6px!important}
- .pitch-red-block{padding-top:6px!important;padding-bottom:8px!important}
- .pitch-player-rows{gap:6px}
- .pitch-player-rows>div{gap:3px;flex-wrap:nowrap}
- .fc-player-card{width:clamp(43px,11.7vw,67px);min-height:91px;padding:4px 2px}
- .fc-player-card .fc-card-top{font-size:6px}
- .fc-player-card .fc-card-stars{font-size:5px;letter-spacing:0;margin:2px 0}
- .fc-player-card .fc-card-avatar{width:30px;height:32px;font-size:16px}
- .fc-player-card .fc-card-name{font-size:7px;line-height:1.05;max-height:16px}
- .fc-player-card .fc-card-status{font-size:5px}
- .fc-player-card .fc-card-actions{gap:1px}
- .fc-player-card .fc-card-actions button{font-size:5px;padding:2px 2px}
- .pitch-center-circle{width:42px;height:42px}
- .pitch-mid-label{font-size:6px;padding:2px 5px}
- .pitch-team-heading{font-size:8px;padding:4px 7px;margin-bottom:5px}
- .fc-bench-card{width:68px;min-height:94px}
+/* === 9:16 DIKEY VIDEO BOLUMU === */
+.reels-section {
+  max-width: 1280px;
+  margin: 28px auto 12px;
+  padding: 0 16px;
 }
-.fc-player-card{background:linear-gradient(160deg,#f8e8b7 0%,#c9a15b 18%,#493b29 48%,#d7b66e 78%,#6f552c 100%)}
-.fc-player-card .fc-card-avatar img{width:100%;height:100%;object-fit:cover;border-radius:4px}
-.fc-player-card .fc-card-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px 5px;width:100%;margin-top:3px;font-size:6px;font-weight:1000;line-height:1.1}
-.fc-player-card .fc-card-stats span{white-space:nowrap}
-.fc-player-card .fc-card-position{font-size:7px;font-weight:1000;letter-spacing:.4px}
-.fc-player-card .fc-card-actions button.photo-action{background:#164e63;color:#e0f2fe}
-
-.fc-player-card.fc-card-gold{background:linear-gradient(150deg,#fff3b0,#d8ad4d 24%,#77511f 54%,#f4d889 82%,#8b6328)}
-.fc-player-card.fc-card-silver{background:linear-gradient(150deg,#fff,#b8c4cf 24%,#596575 54%,#e3e8ed 82%,#7b8794);border-color:#f1f5f9!important;color:#101827}
-.fc-player-card.fc-card-bronze{background:linear-gradient(150deg,#f5d0a4,#b87942 24%,#59351f 54%,#d99b62 82%,#704323);border-color:#f4c18e!important;color:#261407}
-.fc-player-card.fc-card-icon{background:linear-gradient(145deg,#fff2b5,#f0c45c 20%,#b65b24 46%,#ffe59a 70%,#7c351a);border:2px solid #ffe8a3!important;box-shadow:0 0 0 2px rgba(255,190,70,.25),0 8px 18px rgba(0,0,0,.4)}
-
-
-/* KadroKur responsive sports-platform layout refresh */
-:root{color-scheme:dark;--kk-bg:#080d16;--kk-panel:#111a28;--kk-line:rgba(148,163,184,.16);--kk-green:#39df87}
-html{scroll-behavior:smooth}body{background:radial-gradient(ellipse at 50% -18%,rgba(16,185,129,.13),transparent 42%),#080d16;overflow-x:hidden}
-.home-header>div,header>div{max-width:1600px!important}
-#homeView,#privacyInfo{max-width:1600px!important}
-#roomView{width:100%;max-width:1600px!important;grid-template-columns:minmax(0,1fr);align-items:start}
-@media(min-width:1024px){#roomView{grid-template-columns:repeat(12,minmax(0,1fr));gap:22px}}
-#roomView>section{min-width:0}
-#roomView .glass-card{border-color:var(--kk-line);background:linear-gradient(145deg,rgba(19,29,44,.96),rgba(11,18,29,.96));box-shadow:0 12px 34px rgba(0,0,0,.2)}
-#roomView>section:first-child>.glass-card:first-child{padding:20px 22px}
-.room-join-column{align-self:start}
-@media(min-width:1024px){.room-join-column{position:sticky;top:86px}}
-.room-join-column>div:first-child{padding:22px!important;border-radius:22px}
-.room-join-column h2{font-size:clamp(1.1rem,1.5vw,1.45rem);letter-spacing:-.035em}
-#joinForm{gap:17px}
-#joinForm label{display:block;margin-bottom:7px;line-height:1.35}
-#joinForm input,#joinForm select{min-height:44px;width:100%;max-width:100%;box-sizing:border-box;background:#0a1220;border-color:#29384b}
-#joinForm button[type=submit]{min-height:48px;box-shadow:0 8px 22px rgba(16,185,129,.18)}
-#joinForm .grid{gap:12px}
-#joinForm .p-4,#joinForm .p-3\.5{gap:10px}
-.pitch-stage{padding:8px 0 14px;max-width:100%;}
-.pitch-surface{min-height:0!important;height:auto;aspect-ratio:1.42/1;max-height:760px;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(12px,1.6vw,24px)!important;border-radius:22px!important;overflow:visible}
-.pitch-surface:before,.pitch-surface:after{z-index:0}
-.pitch-team-block,.pitch-player-rows,.pitch-player-row{position:relative;z-index:3;min-width:0;overflow:visible}
-.pitch-player-row{display:flex;justify-content:center;align-items:center;gap:clamp(5px,.8vw,12px);flex-wrap:wrap}
-.pitch-player-rows{width:100%;overflow:visible}
-.fc-player-card{flex:0 0 auto;position:relative;z-index:4}
-.pitch-team-heading{position:relative;z-index:4}
-.pitch-surface:before{inset:10px;border-width:1.5px}
-.pitch-surface:after{top:10px;bottom:10px}
-.pitch-team-block{padding:clamp(8px,1vw,15px) 4px!important}
-.pitch-green-block{padding-top:clamp(10px,1.3vw,20px)!important;padding-bottom:clamp(10px,1.3vw,20px)!important}
-.pitch-red-block{padding-top:clamp(10px,1.3vw,20px)!important;padding-bottom:clamp(10px,1.3vw,20px)!important}
-.pitch-team-heading{margin-bottom:clamp(8px,1vw,14px);font-size:10px;padding:6px 13px;letter-spacing:.08em}
-.pitch-player-rows{gap:clamp(8px,1.3vw,17px)}
-.pitch-player-rows>div{gap:clamp(5px,.9vw,14px);min-height:0;flex-wrap:wrap;justify-content:center}
-.pitch-player-rows button,.pitch-player-rows>div>div{min-width:clamp(68px,6.1vw,94px);max-width:112px;min-height:clamp(82px,7.2vw,108px);padding:8px 6px}
-.fc-player-card{width:clamp(72px,6.3vw,96px);min-height:clamp(104px,8.5vw,128px);}
-.pitch-midline{margin:0 -12px;height:1px;flex:0 0 1px}
-.pitch-center-circle{width:clamp(48px,5vw,68px);height:clamp(48px,5vw,68px)}
-.pitch-top-goal,.pitch-bottom-goal{height:12px;min-width:100px;width:24%;font-size:7px}
-#roomTeamsDisplay{min-width:0;padding:14px!important;border-radius:18px}
-#roomTeamsDisplay img{max-width:74px;max-height:74px;object-fit:contain}
-#tournamentPanel{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:20px!important}
-#tournamentPanel>div:first-child{align-items:center}
-#tournamentSummary{gap:10px}
-#tournamentSummary>div{min-width:0;background:rgba(7,14,24,.78);border-color:var(--kk-line)}
-#tournamentFixtures>*,#tournamentStandings>*{border-radius:12px}
-#adminBar{padding:18px!important}
-#roomView input,#roomView select,#roomView textarea{max-width:100%;box-sizing:border-box}
-#roomView button{transition:transform .16s ease,filter .16s ease,box-shadow .16s ease}
-#roomView button:hover{filter:brightness(1.08)}
-#roomView button:active{transform:translateY(1px)}
-@media(max-width:1023px){#roomView{padding-top:18px;padding-bottom:28px}.room-join-column{position:static}.pitch-surface{aspect-ratio:1.22/1}.pitch-player-rows button,.pitch-player-rows>div>div{min-width:70px}}
-@media(max-width:640px){#roomView{padding-left:12px;padding-right:12px;gap:14px}.pitch-surface{aspect-ratio:auto;min-height:470px!important;padding:10px 6px!important}.pitch-player-rows{gap:7px}.pitch-player-rows>div{gap:4px;flex-wrap:wrap}.pitch-player-rows button,.pitch-player-rows>div>div{min-width:clamp(57px,17vw,76px);max-width:82px;min-height:72px;padding:5px 3px}.fc-player-card{width:clamp(58px,17vw,76px);min-height:94px;padding:5px 3px}.fc-player-card .fc-card-avatar{width:28px;height:28px;font-size:18px}.fc-player-card .fc-card-name{font-size:8px}.pitch-team-heading{font-size:8px;padding:5px 8px}.pitch-center-circle{width:42px;height:42px}.pitch-mid-label{font-size:6px;padding:2px 5px}.pitch-top-goal,.pitch-bottom-goal{min-width:68px;height:9px}.room-join-column>div:first-child{padding:16px!important}#roomView>section:first-child>.glass-card:first-child{padding:15px}.room-join-column .grid.grid-cols-2{gap:8px}}
-@media(min-width:1280px){#roomView{gap:26px}.pitch-surface{aspect-ratio:1.5/1}.pitch-player-rows button,.pitch-player-rows>div>div{min-height:104px}}
-
-
-/* Oyuncu kartina tiklayinca acilan yonetici islem menusu */
-.fc-player-card{cursor:pointer;}
-.fc-player-card .fc-card-actions{display:none;position:absolute;inset:0;z-index:10;margin:0;padding:12px 7px;align-content:center;justify-content:center;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;background:rgba(7,12,22,.91);backdrop-filter:blur(5px);border-radius:inherit;}
-.fc-player-card.fc-actions-open .fc-card-actions{display:grid;}
-.fc-player-card .fc-card-actions button{min-height:27px;padding:6px 3px;border:1px solid rgba(255,255,255,.2);border-radius:7px;background:linear-gradient(145deg,#263449,#111827);color:#f8fafc;font-size:9px;font-weight:900;letter-spacing:.03em;box-shadow:0 2px 6px rgba(0,0,0,.35);}
-.fc-player-card .fc-card-actions button:hover{filter:brightness(1.25);transform:translateY(-1px);}
-.fc-player-card .fc-card-actions .photo-action{background:linear-gradient(145deg,#075985,#0c4a6e);}
-.fc-player-card.fc-actions-open{z-index:20;}
-.fc-player-card[role="button"]:focus-visible{outline:2px solid #67e8f9;outline-offset:3px;}
-</style>
-<script async
-src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7620788317702116"
-crossorigin="anonymous"></script>
-<style id="kadrokur-fc27-clean-final">
-#roomView{align-items:start}
-#roomView>section:first-child{min-width:0}
-#roomView>section:first-child>.grid{grid-template-columns:minmax(0,1fr) 185px;align-items:stretch}
-.pitch-stage{width:100%;min-width:0;padding:6px 0 14px;perspective:none}
-.pitch-surface{position:relative;width:100%;min-height:700px!important;height:auto!important;aspect-ratio:auto!important;max-height:none!important;transform:none!important;border:3px solid #a8f0b2!important;border-radius:20px!important;padding:16px 14px!important;background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0,rgba(255,255,255,.05) 9%,transparent 9%,transparent 18%),linear-gradient(180deg,#167a3c 0%,#0f6932 50%,#0b572b 100%)!important;box-shadow:0 18px 40px rgba(0,0,0,.42)!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important;gap:8px!important;overflow:visible!important;isolation:isolate}
-.pitch-surface::before{content:"";position:absolute;inset:10px;border:2px solid rgba(236,253,245,.68);border-radius:12px;pointer-events:none;z-index:0}
-.pitch-surface::after{display:none!important}
-.pitch-top-goal,.pitch-bottom-goal{position:relative;z-index:2;margin:0 auto;width:24%;min-width:90px;height:12px;border:2px solid rgba(255,255,255,.72);background:rgba(255,255,255,.08);text-align:center;font-size:7px;font-weight:900;letter-spacing:.22em;color:rgba(255,255,255,.8)}
-.pitch-top-goal{border-top:0}.pitch-bottom-goal{border-bottom:0}
-.pitch-midline{position:relative;width:100%;height:2px;background:rgba(236,253,245,.72);display:flex;justify-content:center;align-items:center;margin:4px 0!important;z-index:2}
-.pitch-center-circle{position:absolute;width:78px;height:78px;border:2px solid rgba(236,253,245,.62);border-radius:50%;pointer-events:none}
-.pitch-mid-label{position:relative;z-index:3;font-size:8px;letter-spacing:.16em;font-weight:900;color:#ecfdf5;background:rgba(6,56,28,.92);border:1px solid rgba(167,243,208,.4);padding:3px 10px;border-radius:999px}
-.pitch-team-block{position:relative;z-index:3;width:100%;display:flex!important;flex-direction:column!important;gap:8px!important;padding:6px 0!important}
-.pitch-team-heading{align-self:center;display:inline-flex;align-items:center;gap:8px;margin:0 auto 4px!important;padding:5px 12px;border-radius:999px;background:rgba(2,20,12,.82);border:1px solid rgba(255,255,255,.28);font-size:10px;font-weight:900;letter-spacing:.08em;color:#fff}
-#greenTeamPitch.pitch-player-rows,#redTeamPitch.pitch-player-rows{display:flex!important;flex-direction:column!important;gap:10px!important;width:100%!important}
-#greenTeamPitch .pitch-player-row,#redTeamPitch .pitch-player-row{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;justify-content:center!important;align-items:center!important;gap:clamp(6px,1.1vw,14px)!important;width:100%!important;min-height:0!important;overflow:visible!important}
-.fc-player-card{position:relative!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;flex:0 0 auto!important;width:clamp(74px,7.6vw,94px)!important;min-width:0!important;max-width:94px!important;min-height:118px!important;padding:6px 5px 5px!important;border-radius:11px!important;text-align:center;box-shadow:0 6px 16px rgba(0,0,0,.36)!important;transition:transform .16s ease,filter .16s ease;z-index:5!important;visibility:visible!important;opacity:1!important}
-.fc-player-card:hover{transform:translateY(-3px) scale(1.04)!important;filter:brightness(1.07)}
-.fc-player-card .fc-card-top{width:100%;display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:900;line-height:1}
-.fc-player-card .fc-card-stars{font-size:7px;letter-spacing:.5px;line-height:1;margin:2px 0}
-.fc-player-card .fc-card-avatar{width:38px!important;height:38px!important;border-radius:999px!important;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;background:rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.35)}
-.fc-player-card .fc-card-avatar img{width:100%;height:100%;object-fit:cover}
-.fc-player-card .fc-card-name{width:100%;font-size:9.5px!important;font-weight:900;line-height:1.1;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fc-card-country-row{display:flex;align-items:center;justify-content:center;gap:4px;margin:2px 0;font-size:9px;line-height:1}
-.fc-mini-crest{padding:1px 4px;border-radius:999px;background:rgba(15,23,42,.85);color:#f8fafc;font-size:6.5px;font-weight:900}
-.fc-role-mark{padding:1px 4px;border-radius:999px;background:rgba(16,185,129,.22);border:1px solid rgba(110,231,183,.45);font-size:7px;font-weight:900;color:#a7f3d0}
-.fc-player-card .fc-card-fee,.fc-player-card .fc-card-status{font-size:6.5px!important;font-weight:900;line-height:1.1}
-.fc-player-card .fc-card-stats{display:none!important}
-.fc-player-card .fc-card-actions{display:flex;gap:2px;margin-top:3px;flex-wrap:wrap;justify-content:center}
-.fc-player-card .fc-card-actions button{font-size:5.5px!important;font-weight:900;padding:2px 3px!important;border-radius:4px;background:rgba(9,13,22,.85);color:#f8fafc}
-.fc-card-gold{background:linear-gradient(155deg,#fff3b0 0%,#d6a844 35%,#78501c 80%,#f2d47c 100%)!important;border:1px solid #ffe7a0!important;color:#251708!important}
-.fc-card-silver{background:linear-gradient(155deg,#ffffff 0%,#b8c4cf 40%,#596575 85%,#e3e8ed 100%)!important;border:1px solid #f1f5f9!important;color:#101827!important}
-.fc-card-bronze{background:linear-gradient(155deg,#f5d0a4 0%,#b87942 40%,#59351f 85%,#d99b62 100%)!important;border:1px solid #f4c18e!important;color:#261407!important}
-.fc-card-black{background:linear-gradient(155deg,#27272a 0%,#09090b 55%,#78501c 100%)!important;border:1px solid #eab308!important;color:#fef08a!important}
-.fc-card-promo{background:linear-gradient(155deg,#1e3a8a 0%,#7e22ce 55%,#db2777 100%)!important;border:1px solid #f5d0fe!important;color:#ffffff!important}
-.fc-card-icon{background:linear-gradient(155deg,#fffbeb 0%,#f59e0b 45%,#92400e 100%)!important;border:2px solid #fde68a!important;color:#271506!important}
-.fc-player-card.empty{background:linear-gradient(155deg,#0b3325,#051c14)!important;border:1px dashed rgba(167,243,208,.75)!important;color:#d1fae5!important;cursor:pointer}
-#benchSection{min-width:0}
-#benchPlayers{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;justify-items:center}
-#benchPlayers .fc-player-card,#benchPlayers .bench-player-card{width:100%!important;max-width:84px!important;min-height:104px!important}
-@media(max-width:767px){
-  #roomView>section:first-child>.grid{grid-template-columns:minmax(0,1fr)!important}
-  .pitch-surface{min-height:600px!important;padding:12px 6px!important}
-  #greenTeamPitch .pitch-player-row,#redTeamPitch .pitch-player-row{gap:4px!important}
-  .fc-player-card{width:clamp(56px,17vw,76px)!important;min-height:98px!important;padding:4px 3px!important}
-  .fc-player-card .fc-card-avatar{width:28px!important;height:28px!important;font-size:14px}
-  .fc-player-card .fc-card-name{font-size:8px!important}
+.reels-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
 }
-</style>
-
-<style id="kadrokur-mobile-fullscreen">
-.pitch-stage{position:relative}
-.pitch-fullscreen-btn{position:absolute;right:10px;top:10px;z-index:30;display:inline-flex;align-items:center;gap:6px;padding:8px 11px;border:1px solid rgba(167,243,208,.55);border-radius:999px;background:rgba(3,18,12,.88);color:#d1fae5;font-size:10px;font-weight:900;letter-spacing:.04em;box-shadow:0 4px 16px rgba(0,0,0,.3);backdrop-filter:blur(8px);cursor:pointer}
-.pitch-fullscreen-btn span:first-child{font-size:17px;line-height:1}
-.pitch-stage.is-pitch-fullscreen{position:fixed!important;inset:0!important;z-index:99990!important;width:100vw!important;height:100vh!important;height:100dvh!important;max-width:none!important;margin:0!important;padding:calc(env(safe-area-inset-top) + 54px) 8px calc(env(safe-area-inset-bottom) + 8px)!important;background:#06110b!important;display:flex!important;flex-direction:column!important;justify-content:center!important;overflow:auto!important;perspective:none!important}
-.pitch-stage.is-pitch-fullscreen .pitch-fullscreen-btn{position:fixed;top:calc(env(safe-area-inset-top) + 9px);right:10px}
-.pitch-stage.is-pitch-fullscreen .pitch-surface{width:100%!important;max-width:1100px!important;min-height:0!important;height:100%!important;max-height:none!important;flex:1 1 auto!important;margin:auto!important;padding:clamp(8px,2vh,18px) 6px!important;display:flex!important;flex-direction:column!important;justify-content:space-around!important;gap:3px!important;overflow:visible!important;border-radius:14px!important}
-.pitch-stage.is-pitch-fullscreen .pitch-team-block{gap:4px!important;padding:3px 0!important}
-.pitch-stage.is-pitch-fullscreen .pitch-player-rows{gap:4px!important}
-.pitch-stage.is-pitch-fullscreen .pitch-player-row{gap:clamp(2px,1vw,10px)!important}
-.pitch-stage.is-pitch-fullscreen .fc-player-card{width:clamp(49px,12vw,86px)!important;min-height:clamp(76px,12vh,108px)!important;padding:4px 3px!important}
-.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-avatar{width:clamp(23px,5vh,34px)!important;height:clamp(23px,5vh,34px)!important}
-.pitch-stage.is-pitch-fullscreen .pitch-team-heading{font-size:clamp(8px,1.4vh,11px)!important;margin-bottom:2px!important;padding:4px 9px!important}
-.pitch-stage.is-pitch-fullscreen .pitch-midline{margin:1px 0!important}
-.pitch-stage.is-pitch-fullscreen .pitch-center-circle{width:clamp(34px,6vh,58px)!important;height:clamp(34px,6vh,58px)!important}
-.pitch-stage.is-pitch-fullscreen .pitch-top-goal,.pitch-stage.is-pitch-fullscreen .pitch-bottom-goal{height:8px;min-width:65px}
-body.pitch-fullscreen-active{overflow:hidden!important}
-@media(max-width:767px){.pitch-fullscreen-btn{top:7px;right:7px;padding:7px 9px;font-size:9px}.pitch-stage.is-pitch-fullscreen{padding-left:3px!important;padding-right:3px!important}.pitch-stage.is-pitch-fullscreen .fc-player-card{width:clamp(45px,13vw,70px)!important;min-height:clamp(68px,11vh,88px)!important}.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-name{font-size:7px!important}.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-top{font-size:7px!important}.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-status,.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-fee{font-size:5px!important}}
-@media(max-height:520px) and (orientation:landscape){.pitch-stage.is-pitch-fullscreen{padding-top:44px!important}.pitch-stage.is-pitch-fullscreen .pitch-surface{flex-direction:row!important;align-items:stretch!important}.pitch-stage.is-pitch-fullscreen .pitch-team-block{width:44%!important;justify-content:space-around!important}.pitch-stage.is-pitch-fullscreen .pitch-midline{width:2px!important;height:auto!important;min-height:100%!important;flex:0 0 2px!important}.pitch-stage.is-pitch-fullscreen .pitch-center-circle{left:50%;top:50%}.pitch-stage.is-pitch-fullscreen .pitch-top-goal,.pitch-stage.is-pitch-fullscreen .pitch-bottom-goal{display:none}}
-</style>
-<style id="kadrokur-mobile-fullscreen-fit">
-/* MOBILE FULLSCREEN FIX: saha ve yedekler tek ekranda */
-.pitch-stage.is-pitch-fullscreen{position:fixed!important;inset:0!important;z-index:2147483000!important;width:100vw!important;height:100vh!important;height:100dvh!important;max-width:none!important;margin:0!important;padding:calc(env(safe-area-inset-top) + 48px) 5px calc(env(safe-area-inset-bottom) + 5px)!important;box-sizing:border-box!important;background:#04110a!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:5px!important;overflow:hidden!important}
-.pitch-stage.is-pitch-fullscreen .pitch-fullscreen-btn{position:absolute!important;top:calc(env(safe-area-inset-top) + 5px)!important;right:8px!important;z-index:50!important}
-.pitch-stage.is-pitch-fullscreen .pitch-surface{flex:1 1 0!important;min-height:0!important;height:0!important;max-height:none!important;width:100%!important;max-width:none!important;margin:0!important;padding:clamp(4px,1vh,10px) 3px!important;box-sizing:border-box!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;justify-content:space-around!important;gap:1px!important;border-radius:12px!important}
-.pitch-stage.is-pitch-fullscreen .pitch-team-block{flex:1 1 0!important;min-height:0!important;justify-content:space-evenly!important;gap:1px!important;padding:1px 0!important}
-.pitch-stage.is-pitch-fullscreen .pitch-player-rows{flex:1 1 auto!important;min-height:0!important;display:flex!important;flex-direction:column!important;justify-content:space-evenly!important;gap:1px!important}
-.pitch-stage.is-pitch-fullscreen .pitch-player-row{flex:1 1 0!important;min-height:0!important;gap:clamp(2px,1vw,7px)!important;align-items:center!important}
-.pitch-stage.is-pitch-fullscreen .fc-player-card{width:clamp(43px,17vw,68px)!important;min-height:0!important;height:clamp(60px,9.5vh,82px)!important;max-height:10vh!important;padding:3px 2px!important;border-radius:8px!important}
-.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-top{font-size:clamp(6px,.9vh,8px)!important}.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-stars{font-size:6px!important;margin:0!important}
-.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-avatar{width:clamp(21px,5vh,30px)!important;height:clamp(21px,5vh,30px)!important;font-size:14px!important}
-.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-name{font-size:clamp(6px,.9vh,8px)!important;line-height:1!important}
-.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-fee,.pitch-stage.is-pitch-fullscreen .fc-player-card .fc-card-status{font-size:clamp(4px,.65vh,6px)!important;line-height:1!important}
-.pitch-stage.is-pitch-fullscreen .pitch-team-heading{font-size:clamp(7px,1vh,9px)!important;padding:3px 8px!important;margin:0 auto 1px!important}
-.pitch-stage.is-pitch-fullscreen .pitch-midline{flex:0 0 2px!important;height:2px!important;margin:1px 0!important}.pitch-stage.is-pitch-fullscreen .pitch-center-circle{width:clamp(28px,5vh,42px)!important;height:clamp(28px,5vh,42px)!important}
-.pitch-stage.is-pitch-fullscreen .pitch-top-goal,.pitch-stage.is-pitch-fullscreen .pitch-bottom-goal{height:5px!important;min-width:50px!important;font-size:5px!important}
-.pitch-stage.is-pitch-fullscreen #benchSection{display:flex!important;flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;gap:5px!important;width:100%!important;min-height:0!important;margin:0!important;padding:4px 7px!important;border-radius:9px!important;background:rgba(9,24,17,.96)!important}
-.pitch-stage.is-pitch-fullscreen #benchSection>*{margin-top:0!important;margin-bottom:0!important}.pitch-stage.is-pitch-fullscreen #benchSection>div:first-child{flex:0 0 auto!important}.pitch-stage.is-pitch-fullscreen #benchSection h3{font-size:8px!important;white-space:nowrap!important}.pitch-stage.is-pitch-fullscreen #benchSection p{font-size:6px!important;line-height:1.1!important}
-.pitch-stage.is-pitch-fullscreen #benchPlayers{flex:1 1 auto!important;display:flex!important;justify-content:flex-end!important;align-items:center!important;flex-wrap:nowrap!important;gap:4px!important;min-width:0!important}
-.pitch-stage.is-pitch-fullscreen #benchPlayers .fc-player-card,.pitch-stage.is-pitch-fullscreen #benchPlayers .bench-player-card{width:clamp(42px,13vw,58px)!important;height:clamp(52px,7.5vh,64px)!important;min-height:0!important;max-height:none!important;padding:2px!important}
-.pitch-stage.is-pitch-fullscreen #benchPlayers .fc-card-avatar{width:20px!important;height:20px!important}.pitch-stage.is-pitch-fullscreen #benchPlayers .fc-card-name{font-size:6px!important}
-.pitch-stage.is-pitch-fullscreen #benchAddForm,.pitch-stage.is-pitch-fullscreen #benchAdminHint{display:none!important}
-body.pitch-fullscreen-active{overflow:hidden!important;height:100%!important;overscroll-behavior:none!important}
-@media(max-height:650px){.pitch-stage.is-pitch-fullscreen{padding-top:40px!important}.pitch-stage.is-pitch-fullscreen .fc-player-card{height:clamp(48px,8.5vh,64px)!important}.pitch-stage.is-pitch-fullscreen #benchSection{padding:2px 5px!important}}
-@media(orientation:landscape) and (max-height:520px){.pitch-stage.is-pitch-fullscreen{padding-top:38px!important;flex-direction:row!important;gap:5px!important}.pitch-stage.is-pitch-fullscreen .pitch-surface{height:100%!important;width:auto!important;flex:1 1 auto!important}.pitch-stage.is-pitch-fullscreen #benchSection{width:76px!important;flex:0 0 76px!important;flex-direction:column!important;justify-content:center!important}.pitch-stage.is-pitch-fullscreen #benchPlayers{flex-direction:column!important;justify-content:center!important}.pitch-stage.is-pitch-fullscreen #benchPlayers .fc-player-card{width:58px!important;height:70px!important}}
-</style>
-
-<style id="kadrokur-fc27-ultimate-v2">
-/* ========== FC 27 ULTIMATE TEAM PREMIUM CARDS ========== */
-@keyframes fcCardIn {
-  from { opacity: 0; transform: translateY(12px) scale(.92); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+.reels-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
 }
-@keyframes fcShine {
-  0%   { background-position: -120% 0; }
-  100% { background-position: 220% 0; }
+.reels-subtitle {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  opacity: 0.75;
+  color: #cbd5e1;
 }
-.pitch-player-row .fc-player-card {
-  animation: fcCardIn .45s cubic-bezier(.22,1,.36,1) both;
+.reels-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
 }
-.pitch-player-row .fc-player-card:nth-child(1){animation-delay:.02s}
-.pitch-player-row .fc-player-card:nth-child(2){animation-delay:.06s}
-.pitch-player-row .fc-player-card:nth-child(3){animation-delay:.10s}
-.pitch-player-row .fc-player-card:nth-child(4){animation-delay:.14s}
-.pitch-player-row .fc-player-card:nth-child(5){animation-delay:.18s}
-
-.fc-player-card{
-  position:relative!important;
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:center!important;
-  justify-content:flex-start!important;
-  flex:0 0 auto!important;
-  width:clamp(78px,7.8vw,102px)!important;
-  min-width:72px!important;
-  max-width:108px!important;
-  min-height:128px!important;
-  height:auto!important;
-  padding:6px 5px 7px!important;
-  border-radius:14px!important;
-  text-align:center;
-  isolation:isolate;
-  overflow:hidden;
-  cursor:pointer;
-  box-shadow:
-    0 8px 0 rgba(0,0,0,.32),
-    0 14px 28px rgba(0,0,0,.38),
-    inset 0 1px 0 rgba(255,255,255,.35)!important;
-  transition: transform .22s cubic-bezier(.22,1,.36,1), filter .22s, box-shadow .22s;
-  z-index:5!important;
-  visibility:visible!important;
-  opacity:1!important;
+.reel-card {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #111318;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.fc-player-card:hover{
-  transform:translateY(-6px) scale(1.055)!important;
-  filter:brightness(1.07) saturate(1.08);
-  box-shadow:
-    0 14px 0 rgba(0,0,0,.28),
-    0 22px 36px rgba(0,0,0,.42),
-    0 0 24px rgba(251,191,36,.22)!important;
+.reel-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
 }
-.fc-player-card:active{transform:translateY(-2px) scale(1.02)!important}
-
-/* Gold base (default) */
-.fc-player-card,
-.fc-card-gold{
-  background:
-    linear-gradient(165deg,#fff8d6 0%,#f0d078 12%,#c9a03a 28%,#8b5e1a 52%,#d4b45c 78%,#a67c28 100%)!important;
-  border:1.5px solid #ffe9a8!important;
-  color:#2a1808!important;
+.reel-card video,
+.reel-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
-/* Shine overlay */
-.fc-player-card:not(.empty)::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(115deg,transparent 0%,rgba(255,255,255,.0) 35%,rgba(255,255,255,.38) 48%,rgba(255,255,255,.0) 62%,transparent 100%);
-  background-size:200% 100%;
-  pointer-events:none;
-  z-index:1;
-  opacity:.55;
-  animation:fcShine 4.5s ease-in-out infinite;
+.reel-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  backdrop-filter: blur(4px);
 }
-.fc-player-card:before{
-  content:"";
-  position:absolute;
-  inset:3px;
-  border:1px solid rgba(255,248,210,.55);
-  border-radius:11px;
-  pointer-events:none;
-  z-index:0;
+.reel-play-btn {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 1.1rem;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  pointer-events: none;
 }
-.fc-card-silver{
-  background:linear-gradient(165deg,#f8fafc 0%,#d1d9e2 18%,#8b97a8 48%,#e2e8f0 78%,#94a3b8 100%)!important;
-  border-color:#e2e8f0!important;color:#0f172a!important;
+.reel-overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 28px 12px 12px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  color: #fff;
 }
-.fc-card-bronze{
-  background:linear-gradient(165deg,#fde8c8 0%,#d4a06a 18%,#8b5a2b 48%,#e8b87a 78%,#a66b3a 100%)!important;
-  border-color:#f5d0a0!important;color:#2a1508!important;
+.reel-caption {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-.fc-card-black{
-  background:linear-gradient(165deg,#3f3f46 0%,#18181b 40%,#a16207 78%,#09090b 100%)!important;
-  border:1.5px solid #fbbf24!important;color:#fef08a!important;
+.reel-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(6px);
 }
-.fc-card-promo{
-  background:linear-gradient(165deg,#1e3a8a 0%,#6d28d9 40%,#db2777 85%)!important;
-  border:1.5px solid #f5d0fe!important;color:#fff!important;
+.reel-modal.is-open {
+  display: flex;
 }
-.fc-card-icon{
-  background:linear-gradient(155deg,#fffbeb 0%,#fbbf24 28%,#b45309 55%,#fde68a 82%,#78350f 100%)!important;
-  border:2px solid #fde68a!important;color:#271506!important;
-  box-shadow:0 0 0 2px rgba(251,191,36,.35),0 10px 24px rgba(0,0,0,.4)!important;
+.reel-modal-box {
+  position: relative;
+  width: min(420px, 94vw);
+  aspect-ratio: 9 / 16;
+  max-height: 88vh;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
 }
-
-/* Card content hierarchy – FC style */
-.fc-player-card .fc-card-top{
-  width:100%;
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  padding:0 2px;
-  position:relative;
-  z-index:2;
-  line-height:1;
+.reel-modal-box video,
+.reel-modal-box iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
 }
-.fc-player-card .fc-rating{
-  font-size:clamp(15px,1.6vw,20px)!important;
-  font-weight:1000!important;
-  letter-spacing:-.04em;
-  line-height:1;
-  text-shadow:0 1px 0 rgba(255,255,255,.35);
+.reel-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
 }
-.fc-player-card .fc-card-position{
-  font-size:clamp(9px,1vw,11px)!important;
-  font-weight:1000!important;
-  letter-spacing:.04em;
-  opacity:.92;
-}
-.fc-player-card .fc-card-stars{
-  font-size:7px;
-  letter-spacing:1.5px;
-  color:rgba(255,247,206,.95);
-  text-shadow:0 1px 2px rgba(60,30,5,.45);
-  margin:2px 0 3px;
-  position:relative;z-index:2;
-}
-.fc-player-card .fc-card-avatar{
-  width:clamp(40px,4.6vw,52px)!important;
-  height:clamp(40px,4.6vw,52px)!important;
-  border-radius:10px!important;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:clamp(16px,1.8vw,22px);
-  font-weight:900;
-  background:radial-gradient(circle at 32% 22%,#fff9e6,#c9a03a 70%);
-  border:1.5px solid rgba(90,54,13,.45);
-  box-shadow:0 3px 8px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.35);
-  position:relative;z-index:2;
-  margin:1px 0 2px;
-}
-.fc-player-card .fc-card-avatar img{
-  width:100%;height:100%;object-fit:cover;border-radius:8px;
-}
-.fc-player-card .fc-card-name{
-  width:100%;
-  font-size:clamp(9px,1.05vw,11px)!important;
-  font-weight:1000!important;
-  line-height:1.15;
-  margin-top:3px;
-  padding:0 2px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  position:relative;z-index:2;
-  text-shadow:0 1px 0 rgba(255,255,255,.25);
-}
-.fc-card-country-row{
-  display:flex;align-items:center;justify-content:center;gap:3px;
-  margin:2px 0 1px;font-size:8px;line-height:1;position:relative;z-index:2;
-}
-.fc-mini-crest{
-  padding:1px 4px;border-radius:999px;
-  background:rgba(15,23,42,.82);color:#f8fafc;
-  font-size:6.5px;font-weight:900;letter-spacing:.02em;
-}
-.fc-role-mark{
-  padding:1px 4px;border-radius:999px;
-  background:rgba(16,185,129,.22);border:1px solid rgba(110,231,183,.4);
-  font-size:6.5px;font-weight:900;color:#a7f3d0;
-}
-.fc-player-card .fc-card-fee,
-.fc-player-card .fc-card-status{
-  font-size:clamp(6px,.75vw,8px)!important;
-  font-weight:900;line-height:1.15;
-  position:relative;z-index:2;
-  opacity:.9;
-}
-.fc-player-card .fc-card-stats{display:none!important}
-
-/* Empty slot */
-.fc-player-card.empty{
-  background:linear-gradient(160deg,#0d3d2c 0%,#062218 55%,#0a2f22 100%)!important;
-  border:1.5px dashed rgba(110,231,183,.65)!important;
-  color:#a7f3d0!important;
-  box-shadow:0 6px 16px rgba(0,0,0,.28)!important;
-}
-.fc-player-card.empty::after{display:none!important}
-.fc-player-card.empty:before{border-color:rgba(167,243,208,.25)}
-.fc-player-card.empty .fc-card-stars{color:#6ee7b7;text-shadow:none}
-.fc-player-card.empty .fc-card-avatar{
-  background:rgba(4,30,20,.7);border:1px solid rgba(167,243,208,.35);color:#a7f3d0;
-  box-shadow:none;
-}
-
-/* Admin action overlay */
-.fc-player-card .fc-card-actions{
-  display:none;
-  position:absolute;inset:0;z-index:20;
-  margin:0;padding:10px 6px;
-  align-content:center;justify-content:center;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:6px;
-  background:rgba(7,12,22,.93);
-  backdrop-filter:blur(6px);
-  border-radius:inherit;
-}
-.fc-player-card.fc-actions-open .fc-card-actions{display:grid}
-.fc-player-card .fc-card-actions button{
-  min-height:28px;padding:5px 2px;
-  border:1px solid rgba(255,255,255,.22);
-  border-radius:8px;
-  background:linear-gradient(145deg,#2a3a52,#111827);
-  color:#f8fafc;font-size:8px;font-weight:900;
-  box-shadow:0 2px 6px rgba(0,0,0,.35);
-}
-.fc-player-card .fc-card-actions button:hover{filter:brightness(1.2)}
-.fc-player-card .fc-card-actions .photo-action{background:linear-gradient(145deg,#0e7490,#0c4a6e)}
-
-/* Bench cards slightly smaller */
-.fc-bench-card, #benchPlayers .fc-player-card{
-  width:clamp(70px,7vw,88px)!important;
-  min-height:112px!important;
-}
-
-/* ========== PROFESSIONAL PITCH ========== */
-.pitch-stage{
-  width:100%;min-width:0;padding:8px 0 16px;perspective:none;max-width:100%;
-}
-.pitch-surface{
-  position:relative!important;
-  width:100%!important;
-  min-height:720px!important;
-  height:auto!important;
-  aspect-ratio:auto!important;
-  max-height:none!important;
-  transform:none!important;
-  border:4px solid #9ae6b4!important;
-  border-radius:22px!important;
-  padding:18px 14px!important;
-  background:
-    /* subtle grass stripes */
-    repeating-linear-gradient(90deg,
-      rgba(255,255,255,.04) 0, rgba(255,255,255,.04) 8%,
-      transparent 8%,transparent 16%),
-    /* depth gradient */
-    linear-gradient(180deg,#1a8f45 0%,#147a3a 18%,#0f6b32 50%,#0c5c2a 82%,#0a4f24 100%)!important;
-  box-shadow:
-    0 20px 48px rgba(0,0,0,.45),
-    inset 0 0 0 2px rgba(255,255,255,.18),
-    0 0 40px rgba(16,185,129,.15)!important;
-  display:flex!important;
-  flex-direction:column!important;
-  justify-content:space-between!important;
-  gap:6px!important;
-  overflow:visible!important;
-  isolation:isolate;
-}
-/* Outer white boundary */
-.pitch-surface::before{
-  content:"";
-  position:absolute;
-  inset:11px;
-  border:2.5px solid rgba(255,255,255,.78);
-  border-radius:14px;
-  pointer-events:none;
-  z-index:0;
-  box-shadow:inset 0 0 30px rgba(0,0,0,.12);
-}
-/* Center line – hide default after, we use midline element */
-.pitch-surface::after{display:none!important}
-
-.pitch-top-goal,.pitch-bottom-goal{
-  position:relative;z-index:2;
-  margin:0 auto;width:26%;min-width:100px;height:14px;
-  border:2.5px solid rgba(255,255,255,.85);
-  background:rgba(255,255,255,.1);
-  text-align:center;font-size:7px;font-weight:900;
-  letter-spacing:.22em;color:rgba(255,255,255,.85);
-}
-.pitch-top-goal{border-top:0}
-.pitch-bottom-goal{border-bottom:0}
-
-.pitch-midline{
-  position:relative;width:100%;height:2.5px;
-  background:rgba(255,255,255,.82);
-  display:flex;justify-content:center;align-items:center;
-  margin:6px 0!important;z-index:2;
-}
-.pitch-center-circle{
-  position:absolute;
-  width:88px;height:88px;
-  border:2.5px solid rgba(255,255,255,.78);
-  border-radius:50%;
-  pointer-events:none;
-  box-shadow:0 0 0 1px rgba(0,0,0,.1);
-}
-.pitch-mid-label{
-  position:relative;z-index:3;
-  font-size:8px;letter-spacing:.18em;font-weight:900;
-  color:#ecfdf5;background:rgba(6,50,26,.9);
-  border:1px solid rgba(167,243,208,.45);
-  padding:3px 12px;border-radius:999px;
-}
-
-.pitch-team-block{
-  position:relative;z-index:3;width:100%;
-  display:flex!important;flex-direction:column!important;
-  gap:10px!important;padding:8px 2px!important;
-}
-.pitch-team-heading{
-  align-self:center;
-  display:inline-flex;align-items:center;gap:8px;
-  margin:0 auto 6px!important;
-  padding:6px 14px;border-radius:999px;
-  background:rgba(2,18,12,.85);
-  border:1px solid rgba(255,255,255,.3);
-  font-size:10px;font-weight:900;letter-spacing:.1em;color:#fff;
-  box-shadow:0 4px 12px rgba(0,0,0,.25);
-}
-.pitch-player-rows{
-  display:flex!important;flex-direction:column!important;
-  gap:12px!important;width:100%!important;
-}
-.pitch-player-row{
-  display:flex!important;flex-direction:row!important;
-  flex-wrap:wrap!important;
-  justify-content:center!important;align-items:center!important;
-  gap:clamp(8px,1.4vw,18px)!important;
-  width:100%!important;min-height:0!important;overflow:visible!important;
-}
-
-/* Red team (away) slight tint on cards already handled by class */
-
-/* Mobile refinements */
-@media(max-width:767px){
-  .pitch-surface{
-    min-height:580px!important;
-    padding:12px 6px!important;
-    border-width:3px!important;
+@media (max-width: 768px) {
+  .reels-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
   }
-  .pitch-player-rows{gap:8px!important}
-  .pitch-player-row{gap:clamp(5px,2vw,10px)!important}
-  .fc-player-card{
-    width:clamp(58px,16.5vw,78px)!important;
-    min-height:104px!important;
-    padding:5px 3px!important;
-    border-radius:11px!important;
-  }
-  .fc-player-card .fc-rating{font-size:14px!important}
-  .fc-player-card .fc-card-avatar{
-    width:34px!important;height:34px!important;font-size:15px;
-  }
-  .fc-player-card .fc-card-name{font-size:8.5px!important}
-  .pitch-center-circle{width:56px;height:56px}
-  .pitch-team-heading{font-size:9px;padding:5px 10px}
-  .fc-player-card:after{animation:none;opacity:.3} /* reduce motion cost on mobile */
-}
-@media(min-width:1024px){
-  .pitch-surface{min-height:760px!important}
-  .fc-player-card{
-    width:clamp(86px,8vw,108px)!important;
-    min-height:138px!important;
-  }
-  .fc-player-card .fc-card-avatar{
-    width:50px!important;height:50px!important;
+  .reel-card {
+    flex: 0 0 62%;
+    scroll-snap-align: start;
   }
 }
-@media(prefers-reduced-motion:reduce){
-  .fc-player-card,.pitch-player-row .fc-player-card{animation:none!important}
-  .fc-player-card:not(.empty)::after{animation:none!important}
-}
 </style>
-
-
-<style id="kadrokur-home-top-menus">
-.home-top-actions{position:relative}
-.home-top-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 13px;border:1px solid rgba(148,163,184,.25);border-radius:12px;background:rgba(15,23,42,.78);color:#e2e8f0;font-size:11px;font-weight:850;white-space:nowrap;transition:.18s}
-.home-top-btn:hover,.home-top-btn[aria-expanded="true"]{background:rgba(16,185,129,.18);border-color:rgba(52,211,153,.55);color:#a7f3d0}
-.home-top-dropdowns{position:relative;max-width:1568px;margin:0 auto;padding:0 16px}
-.home-top-dropdown{position:absolute;z-index:80;top:8px;left:16px;width:min(620px,calc(100vw - 32px));max-height:min(72vh,680px);overflow:auto;padding:15px;border:1px solid rgba(148,163,184,.28);border-radius:18px;background:rgba(5,13,24,.97);backdrop-filter:blur(20px);box-shadow:0 24px 70px rgba(0,0,0,.55)}
-.home-top-dropdown.hidden{display:none}
-.home-dropdown-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;color:#f8fafc;font-size:13px;font-weight:900}
-#homeTopRoomsContent #roomsList{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:9px!important}
-#homeTopRoomsContent #roomsList>div{width:100%;min-width:0}
-#homeTopSearchContent>div{margin:0}
-#homeTopAccountContent #accountPanel{margin:0}
-.home-chat-icon{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(52,211,153,.35);border-radius:12px;background:rgba(16,185,129,.13);color:#6ee7b7;transition:.18s}
-.home-chat-icon:hover{background:rgba(16,185,129,.25);transform:translateY(-1px)}
-.home-chat-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-@media(max-width:640px){.home-top-actions{width:100%;gap:6px}.home-top-btn{padding:8px 9px;font-size:9px;gap:4px}.home-top-dropdown{left:0;width:100%;padding:11px}.home-top-dropdowns{padding:0 12px}}
-</style>
-
-
-<style id="kadrokur-room-layout-fit-v1">
-/* Oda içi düzen: saha tam genişlikte, takım logo sütunu kaldırıldı */
-#roomView{min-width:0;overflow-x:hidden}
-#roomView>section,#roomView .room-join-column{min-width:0}
-#pitchStage{width:100%;max-width:100%;min-width:0;margin:0 auto;overflow:visible}
-#pitchStage .pitch-surface{width:100%!important;max-width:100%!important;box-sizing:border-box!important;min-width:0!important}
-#tournamentPanel{width:100%;min-width:0;box-sizing:border-box;padding:16px!important;gap:12px!important}
-#tournamentPanel>div{min-width:0}
-#tournamentPanel #tournamentFixtures,
-#tournamentPanel #tournamentStandings{min-width:0;max-width:100%;overflow-x:auto}
-@media (min-width:1024px){
-  #pitchStage .pitch-surface{min-height:clamp(540px,calc(100vh - 230px),700px)!important}
-}
-@media (max-width:1023px){
-  #pitchStage .pitch-surface{min-height:clamp(500px,78vh,680px)!important}
-}
-@media (max-width:640px){
-  #roomView{padding-left:10px!important;padding-right:10px!important}
-  #pitchStage .pitch-surface{min-height:560px!important;padding:14px 7px!important;border-width:2px!important}
-  #tournamentPanel{padding:13px!important}
-}
-</style>
-
-
-<style id="kadrokur-home-announcement-ticker">
-.home-announcement-ticker{
-  width:100%;
-  max-width:100%;
-  min-height:42px;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  position:relative;
-  isolation:isolate;
-  background:linear-gradient(90deg,rgba(4,18,17,.98),rgba(7,38,31,.98),rgba(4,18,17,.98));
-  border-top:1px solid rgba(52,211,153,.35);
-  border-bottom:1px solid rgba(52,211,153,.35);
-  box-shadow:0 8px 24px rgba(0,0,0,.18);
-}
-.home-announcement-ticker.hidden{display:none!important}
-.home-announcement-track{
-  display:flex;
-  align-items:center;
-  width:max-content;
-  min-width:max-content;
-  white-space:nowrap;
-  will-change:transform;
-}
-.home-announcement-copy{
-  display:block;
-  flex:0 0 auto;
-  padding:10px 5vw;
-  color:#d1fae5;
-  font-size:12px;
-  line-height:20px;
-  font-weight:800;
-  letter-spacing:.045em;
-}
-.home-announcement-copy:before{
-  content:"⚽";
-  color:#6ee7b7;
-  margin-right:14px;
-}
-.home-announcement-ticker.is-running .home-announcement-track{
-  animation:kadrokurAnnouncementScroll 48s linear infinite;
-}
-.home-announcement-ticker:hover .home-announcement-track{
-  animation-play-state:paused;
-}
-@keyframes kadrokurAnnouncementScroll{
-  from{transform:translateX(0)}
-  to{transform:translateX(-50%)}
-}
-@media(prefers-reduced-motion:reduce){
-  .home-announcement-ticker.is-running .home-announcement-track{animation:none;transform:none}
-  .home-announcement-copy:nth-child(2){display:none}
-}
-@media(max-width:640px){
-  .home-announcement-ticker{min-height:38px}
-  .home-announcement-copy{font-size:11px;padding:9px 28px}
-}
-body.room-open #homeAnnouncementTicker{display:none!important}
-</style>
-
 </head>
-<body class="min-h-screen flex flex-col justify-between">
-<div id="homeVideoBackdrop" class="home-video-backdrop" aria-hidden="true">
-  <video autoplay muted loop playsinline preload="metadata" poster="">
-    <source src="https://res.cloudinary.com/p5kt4ew2/video/upload/hali-saha-4k.mp4" type="video/mp4">
-  </video>
-  <div class="home-video-shade"></div>
-</div>
-<header class="home-header border-b border-slate-800 sticky top-0 z-30"><div class="max-w-[1600px] mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-<div class="flex items-center gap-3"><button type="button" onclick="goHome()" class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-slate-950 text-lg">KK</button><div><div class="flex items-center gap-2"><button type="button" onclick="goHome()" class="font-black text-lg text-left">Kadro<span class="text-emerald-400">Kur</span></button><span id="headerBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300">MAÇ ODALARI</span></div><p id="headerSubtitle" class="text-xs text-slate-400 mt-1">Bölge, ilçe ve halı saha seç • Kendi maç odanı kurup paylaş</p></div></div>
-<div class="flex items-center gap-2 flex-wrap home-top-actions">
-<button type="button" class="home-top-btn" aria-expanded="false" onclick="toggleHomeTopMenu('rooms',this)">⚽ Odalar <span>▾</span></button>
-<button type="button" class="home-top-btn" aria-expanded="false" onclick="toggleHomeTopMenu('search',this)">🔎 Halı Saha Ara / Odaya Gir <span>▾</span></button>
-<button type="button" class="home-top-btn" aria-expanded="false" onclick="toggleHomeTopMenu('account',this)">👤 Üye Girişi / Kayıt <span>▾</span></button>
-<button type="button" class="home-chat-icon" aria-label="Canlı sohbet" title="Canlı sohbet" onclick="toggleHomeChat(this)" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5 8 8 0 0 1-3.5-.8L4 20l1.3-4A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8 11.5h8M8 14.5h5"/></svg></button>
-<button type="button" onclick="goHome()" id="homeNavBtn" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-emerald-300">🏠 Odalar</button>
-<span id="quotaBadge" class="px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400">Aktif Oda: 0</span>
-<button type="button" onclick="toggleAdminPanel()" id="adminBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-200">🔒 Yönetici Girişi</button>
-</div>
-</div>
-<div id="homeTopDropdowns" class="home-top-dropdowns">
-  <section id="homeTopRooms" class="home-top-dropdown hidden"><div class="home-dropdown-heading"><span>⚽ Açık Maç Odaları</span><span class="text-[10px] text-slate-400">Odalar alt alta listelenir</span></div><div id="homeTopRoomsContent"></div></section>
-  <section id="homeTopSearch" class="home-top-dropdown hidden"><div class="home-dropdown-heading">🔎 Halı Saha Ara ve Odaya Gir</div><div id="homeTopSearchContent" class="space-y-3"></div></section>
-  <section id="homeTopAccount" class="home-top-dropdown hidden"><div class="home-dropdown-heading">👤 Üye Girişi / Kayıt</div><div id="homeTopAccountContent"></div></section>
-</div>
-</header>
-
-<!-- Ana sayfa duyuru bandı: metin sistem yöneticisi tarafından yönetilir. -->
-<div id="homeAnnouncementTicker" class="home-announcement-ticker hidden" aria-label="KadroKur duyurusu" role="status">
-  <div class="home-announcement-track">
-    <span id="homeAnnouncementTextA" class="home-announcement-copy"></span>
-    <span id="homeAnnouncementTextB" class="home-announcement-copy" aria-hidden="true"></span>
-  </div>
-</div>
-
-<section id="homeView" class="max-w-[1600px] w-full mx-auto px-4 py-6 space-y-6">
-<div class="home-hero rounded-[2rem] p-7 sm:p-12 lg:p-16">
-<div class="max-w-2xl">
-<div class="home-hero-kicker"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> KADROKUR • SAHAYA HAZIR MISIN?</div>
-<h1 class="home-hero-title text-5xl sm:text-6xl lg:text-7xl font-black leading-[.98] mt-6">Takımını kur.<br><span class="text-emerald-300">Maçını yap.</span></h1>
-<p class="text-sm sm:text-base text-slate-100/90 leading-relaxed mt-6 max-w-xl">Yakınındaki halı saha maçlarını keşfet, kadrodaki yerini ayırt veya kendi maç odanı oluştur. Takımın burada başlıyor.</p>
-<div class="flex flex-wrap gap-3 mt-8">
-<button type="button" onclick="openMatchHistory()" class="px-6 py-3.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-sm font-black shadow-xl">⚽ Maçları Keşfet</button>
-<button type="button" onclick="openCreateRoomModal()" class="px-6 py-3.5 rounded-xl border border-emerald-300/50 bg-emerald-950/60 hover:bg-emerald-900/70 text-white text-sm font-extrabold">🌐 Online Kadro Oluştur</button>
-<button type="button" onclick="openPrivateSquadGate()" class="px-6 py-3.5 rounded-xl border border-violet-300/50 bg-violet-950/60 hover:bg-violet-900/70 text-white text-sm font-extrabold">🔐 Kendi Aranda Kadro Oluştur</button>
-</div>
-<div class="flex flex-wrap gap-5 mt-9 text-[10px] sm:text-xs font-bold tracking-wider text-white/80"><span>● CANLI MAÇ ODALARI</span><span>● ANLIK KADRO</span><span>● TOPLULUK SOHBETİ</span></div>
-</div>
-</div>
-
-<!-- Şifreli, cihaz üzerinde çalışan özel kadro hazırlama alanı -->
-<section id="privateSquadSection" class="hidden max-w-6xl mx-auto w-full rounded-3xl border border-violet-400/25 bg-slate-950/90 p-4 sm:p-6 shadow-2xl space-y-5">
-  <div class="flex flex-wrap items-center justify-between gap-3"><div><p class="text-[10px] font-black tracking-[.22em] text-violet-300">PRIVATE SQUAD • ÖZEL ALAN</p><h2 class="text-2xl sm:text-3xl font-black text-white">⚽ Kendi Aranda Kadro</h2><p class="text-xs text-slate-400 mt-1">16 kişilik listeyi gir, 7'ye 7 takımları oluştur ve iki yedeği belirle.</p></div><button type="button" onclick="closePrivateSquad()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold">← Ana sayfaya dön</button></div>
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
-    <div class="lg:col-span-1 rounded-2xl border border-slate-700 bg-slate-900/80 p-4 space-y-3"><label for="privateSquadNames" class="text-sm font-extrabold text-white">Oyuncu listesi</label><textarea id="privateSquadNames" rows="12" maxlength="1200" placeholder="Her satıra bir oyuncu adı yaz..." class="w-full rounded-xl border border-slate-700 bg-slate-950 p-3 text-sm text-white placeholder:text-slate-500"></textarea><p id="privateSquadCount" class="text-[11px] text-slate-400">0 oyuncu • Hedef: 16 kişi</p><div class="grid grid-cols-2 gap-2"><button type="button" onclick="savePrivateSquadNames()" class="rounded-xl bg-slate-700 hover:bg-slate-600 px-3 py-3 text-xs font-black text-white">💾 Listeyi Kaydet</button><button type="button" onclick="buildPrivateSquad()" class="rounded-xl bg-violet-500 hover:bg-violet-400 px-3 py-3 text-xs font-black text-white">⚡ Takımları Kur</button></div><p class="text-[10px] leading-relaxed text-slate-500">Bu özel kadro bu tarayıcıda saklanır; online maç odalarına veya mevcut Firebase kadrolarına dokunmaz.</p></div>
-    <div class="lg:col-span-2 space-y-3"><div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><div class="rounded-2xl border border-emerald-400/30 bg-emerald-950/30 p-4"><div class="flex items-center justify-between mb-3"><h3 class="font-black text-emerald-300">🟢 1. TAKIM</h3><span class="text-[10px] text-emerald-200/70">7 OYUNCU</span></div><div id="privateTeamGreen" class="space-y-2 text-sm text-white"><p class="text-xs text-slate-500">Henüz kadro oluşturulmadı.</p></div></div><div class="rounded-2xl border border-rose-400/30 bg-rose-950/30 p-4"><div class="flex items-center justify-between mb-3"><h3 class="font-black text-rose-300">🔴 2. TAKIM</h3><span class="text-[10px] text-rose-200/70">7 OYUNCU</span></div><div id="privateTeamRed" class="space-y-2 text-sm text-white"><p class="text-xs text-slate-500">Henüz kadro oluşturulmadı.</p></div></div></div><div class="rounded-2xl border border-amber-400/25 bg-amber-950/20 p-4"><div class="flex items-center justify-between mb-2"><h3 class="font-black text-amber-300">🟡 YEDEKLER</h3><span class="text-[10px] text-amber-200/70">2 KİŞİ</span></div><div id="privateBench" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-white"><p class="text-xs text-slate-500">Yedekler burada görünecek.</p></div></div><div class="flex flex-wrap gap-2"><button type="button" onclick="copyPrivateSquad()" class="rounded-xl border border-white/15 bg-slate-800 hover:bg-slate-700 px-4 py-2.5 text-xs font-bold text-white">📋 Kadroyu Kopyala</button><button type="button" onclick="clearPrivateSquad()" class="rounded-xl border border-rose-400/20 bg-rose-950/30 hover:bg-rose-900/40 px-4 py-2.5 text-xs font-bold text-rose-200">Temizle</button></div></div>
-  </div>
-</section>
-
-<!-- Sponsor reklam alanı: yalnızca yönetici tarafından onaylanan sponsorlar gösterilir. -->
-<section id="sponsorShowcase" class="hidden rounded-2xl border border-amber-400/30 bg-slate-950/75 p-4 sm:p-5 shadow-xl" aria-label="Sponsor reklamları">
-  <div class="flex items-center justify-between gap-3 mb-3"><div><p class="text-[10px] font-black tracking-[.2em] text-amber-300">KADROKUR SPONSORLARI</p><h2 class="text-lg font-black text-white">Bizi destekleyenler</h2></div><span class="text-[10px] rounded-full px-2 py-1 bg-amber-400/10 text-amber-200 border border-amber-300/20">Sponsorlu</span></div>
-  <div id="sponsorPublicList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"><p class="text-xs text-slate-400">Sponsorlar yükleniyor…</p></div>
-</section>
-
-<!-- Google AdSense alanı etkinleştirilecek: onaylı hesap ve yayıncı kodu gerektiğinde buraya eklenecek. -->
-<div id="adsenseHomeSlot" class="hidden" aria-label="Google reklam alanı"></div>
-
-<div id="sponsorAdminPanel" class="hidden glass-card rounded-2xl border border-amber-400/30 p-4 space-y-3">
-  <div><p class="text-[10px] font-black tracking-widest text-amber-300">GELİR YÖNETİMİ</p><h2 class="text-base font-black">📢 Sponsor reklam yönetimi</h2><p class="text-xs text-slate-400 mt-1">Buradan eklediğin ve aktif ettiğin sponsorlar ana sayfada herkese görünür.</p></div>
-  <form id="sponsorAdminForm" onsubmit="saveSponsorAd(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-    <input id="sponsorTitle" required maxlength="70" placeholder="İşletme / sponsor adı" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
-    <input id="sponsorImage" type="url" required placeholder="Logo veya reklam görseli URL'si (https://...)" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
-    <input id="sponsorLink" type="url" required placeholder="Tıklanınca açılacak web sitesi (https://...)" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white sm:col-span-2">
-    <input id="sponsorDescription" maxlength="140" placeholder="Kısa açıklama (isteğe bağlı)" class="px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white sm:col-span-2">
-    <label class="flex items-center gap-2 text-xs text-slate-300"><input id="sponsorActive" type="checkbox" checked> Yayında göster</label>
-    <button id="sponsorSaveBtn" type="submit" class="px-4 py-2 rounded-lg bg-amber-400 text-slate-950 text-xs font-black">＋ Sponsoru Kaydet</button>
-  </form>
-  <p id="sponsorAdminStatus" class="text-xs text-slate-400">Sponsor eklemek için işletmenin görsel ve web sitesi bağlantısını gir.</p>
-  <div><h3 class="text-xs font-bold text-slate-200 mb-2">Kayıtlı sponsorlar</h3><div id="sponsorAdminList" class="space-y-2 text-xs text-slate-300">Yükleniyor…</div></div>
-  <div class="mt-5 pt-4 border-t border-slate-700/70 space-y-2" id="announcementAdminEditor">
-    <div>
-      <p class="text-[10px] font-black tracking-widest text-emerald-300">ANA SAYFA DUYURUSU</p>
-      <h3 class="text-sm font-black text-white">📢 Kayan yazıyı düzenle</h3>
-      <p class="text-[11px] text-slate-400 mt-1">Yalnızca duyuruda görünmesini istediğin metni yazıp kaydet.</p>
-    </div>
-    <textarea id="homeAnnouncementInput" maxlength="240" rows="2" placeholder="Örn: Bu hafta sonu maç odalarını oluşturmayı unutma!" class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white resize-y"></textarea>
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <span id="homeAnnouncementStatus" class="text-[11px] text-slate-400">Duyuru metnini girip kaydedebilirsin.</span>
-      <button id="homeAnnouncementSaveBtn" type="button" onclick="saveHomeAnnouncement()" class="px-4 py-2 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs font-black">Kaydet</button>
-    </div>
-  </div>
-</div>
-
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-7">
-<div class="lg:col-span-8 space-y-4">
-<div class="glass-card home-content-card rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-<select id="filterRegion" onchange="syncFilterDistricts();renderRoomsLobby()" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
-<option value="">Tüm Yakalar (Avrupa / Anadolu)</option>
-<option value="İstanbul - Avrupa Yakası">İstanbul - Avrupa Yakası</option>
-<option value="İstanbul - Anadolu Yakası">İstanbul - Anadolu Yakası</option>
-</select>
-<select id="filterDistrict" onchange="renderRoomsLobby()" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
-<option value="">Tüm İlçeler</option>
-</select>
-<input id="filterPitch" oninput="renderRoomsLobby()" placeholder="Halı saha adı ara..." class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
-</div>
-
-<div class="glass-card home-content-card rounded-2xl p-4 flex flex-col sm:flex-row gap-2">
-<input id="directRoomCode" placeholder="Oda kodu veya linki yapıştır (Örn: bolluca-hali-saha)" class="flex-1 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
-<button type="button" onclick="joinByRoomCode()" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold">Odaya Gir</button>
-</div>
-<p id="lobbyJoinStatus" class="text-xs text-amber-300 px-1"></p>
-
-<div id="roomsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"><p class="text-xs text-slate-400">Odalar yükleniyor…</p></div>
-<section id="matchHistorySection" class="mt-6 rounded-2xl border border-sky-400/20 bg-slate-950/70 p-4 sm:p-5 space-y-3">
-  <div class="flex flex-wrap items-center justify-between gap-2"><div><p class="text-[10px] font-black tracking-[.2em] text-sky-300">KADROKUR ARŞİV</p><h2 class="text-lg font-black text-white">🏁 Geçmiş Maçlar</h2><p class="text-xs text-slate-400">Tamamlanan maçlara dokunarak skoru ve maç kadrolarını görüntüle.</p></div><span id="matchHistoryCount" class="rounded-full bg-sky-500/10 border border-sky-400/20 px-3 py-1 text-[10px] font-bold text-sky-200">0 MAÇ</span></div>
-  <div id="matchHistoryList" class="grid grid-cols-1 md:grid-cols-2 gap-3"><p class="text-xs text-slate-500">Geçmiş maçlar yükleniyor…</p></div>
-</section>
-</div>
-
-<div class="lg:col-span-4 space-y-4">
-<div id="accountPanel" class="rounded-2xl border border-slate-700 glass-card home-content-card p-4 sm:p-5">
-<div id="accountLoggedOut">
-<p class="text-sm font-bold text-white mb-1">Üye Girişi / Kayıt</p>
-<p class="text-xs text-slate-400 mb-3">Maç odası kurmak ve kadrodan yer seçmek için hesabınla giriş yap.</p>
-<label class="block text-xs text-slate-300 mb-1" for="accountName">Adın / Lakabın</label>
-<input id="accountName" maxlength="40" placeholder="Örn: Cüneyt (yalnızca yeni kayıt için)" class="w-full mb-2 px-3 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
-<label class="block text-xs text-slate-300 mb-1" for="accountEmail">E-posta</label>
-<input id="accountEmail" type="email" autocomplete="email" placeholder="ornek@mail.com" class="w-full mb-2 px-3 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
-<label class="block text-xs text-slate-300 mb-1" for="accountPassword">Şifre (en az 6 karakter)</label>
-<input id="accountPassword" type="password" minlength="6" autocomplete="current-password" placeholder="Şifren" class="w-full mb-3 px-3 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white">
-<div class="flex flex-wrap gap-2"><button type="button" onclick="registerPlayer()" id="registerBtn" class="px-4 py-2.5 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black">Üye ol</button><button type="button" onclick="loginPlayer()" id="memberLoginBtn" class="px-4 py-2.5 rounded-lg bg-slate-700 text-white text-xs font-bold">Giriş yap</button></div>
-<p id="accountMessage" class="text-xs mt-3 text-amber-300"></p>
-</div>
-<div id="accountLoggedIn" class="hidden space-y-3">
-<div class="flex flex-wrap items-center justify-between gap-2">
-<div><p class="text-xs text-emerald-300 font-bold">Hesabınla giriş yaptın</p><p id="accountIdentity" class="text-sm font-bold text-white"></p></div>
-<button type="button" onclick="logoutPlayer()" class="px-3 py-2 rounded-lg bg-slate-700 text-white text-xs font-bold">Çıkış</button>
+<body class="bg-slate-950 text-white">
+<section id="homeView">
 </div>
 <div class="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
 <div><p class="text-xs font-bold text-slate-200">Maç Saati Bildirimleri</p><p id="notifStatusText" class="text-[11px] text-slate-400">İzin durumu kontrol ediliyor…</p></div>
@@ -977,7 +199,26 @@ body.room-open #homeAnnouncementTicker{display:none!important}
 </div>
 </div>
 </div>
+
+<!-- === 9:16 DIKEY VIDEO BOLUMU === -->
+<section class="reels-section" id="reelsSection" aria-label="9:16 Dikey Videolar">
+  <div class="reels-header">
+    <div>
+      <h2 class="reels-title">Kısa Videolar (9:16)</h2>
+      <p class="reels-subtitle">Öne çıkan anlar, maç özetleri ve duyurular • Kartlara tıklayarak büyük oynatıcıda aç</p>
+    </div>
+  </div>
+  <div class="reels-grid" id="reelsGrid"></div>
 </section>
+</section>
+
+<!-- Buyuk Video Oynatici Modal -->
+<div class="reel-modal" id="reelModal" role="dialog" aria-modal="true" aria-label="Video Oynatıcı">
+  <div class="reel-modal-box" id="reelModalBox">
+    <button type="button" class="reel-modal-close" id="reelModalClose" aria-label="Kapat">✕</button>
+    <div id="reelModalMedia" style="width:100%;height:100%;"></div>
+  </div>
+</div>
 
 <main id="roomView" class="hidden max-w-[1600px] w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-7">
 <section class="lg:col-span-8 min-w-0 flex flex-col gap-5">
@@ -1000,10 +241,6 @@ body.room-open #homeAnnouncementTicker{display:none!important}
 </div></div></div>
 <section id="benchSection" class="glass-card rounded-2xl p-3 sm:p-4 space-y-3"><div class="flex items-center justify-between gap-2"><div><h3 class="text-sm font-black text-amber-300">🪑 YEDEK KULÜBESİ</h3><p class="text-[10px] text-slate-400">7 vs 7 maç kadrosu • 2 yedek oyuncu</p></div><span id="benchCount" class="text-xs font-black text-amber-200">0 / 2</span></div><div id="benchPlayers" class="flex flex-wrap gap-2"></div><form id="benchAddForm" onsubmit="addBenchPlayer(event)" class="hidden grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2"><input id="benchPlayerName" maxlength="40" placeholder="Yedek oyuncu adı" class="min-w-0 px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"><button id="benchAddBtn" type="submit" class="px-3 py-2 rounded-lg bg-amber-400 text-slate-950 text-xs font-black">＋ Yedeğe Ekle</button></form><p id="benchAdminHint" class="hidden text-[10px] text-slate-500">Yönetici, gruptaki 16 kişiyi tamamlamak için iki yedek oyuncuyu buradan ekleyebilir. Dolu oyuncuları TAŞI ile saha ve yedek arasında değiştirebilirsin.</p></section>
 </div>
-
-
-
-
 
 <div id="adminBar" class="hidden glass-card rounded-xl p-4"><div class="flex flex-wrap justify-between gap-3 mb-3"><b class="text-xs text-amber-300">🛠️ Oda Yönetici Paneli</b><button type="button" onclick="adminLogout()" class="px-3 py-1.5 rounded bg-slate-700 text-xs">Çıkış yap</button></div>
 <div class="mt-3 rounded-xl bg-slate-900/90 border border-emerald-500/30 p-3"><p class="text-xs font-bold text-emerald-300 mb-2">⚽ Maç Dizilişini Değiştir</p><div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2"><select id="roomFormationSelect" class="min-w-0 px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white"></select><button type="button" id="saveRoomFormationBtn" onclick="changeRoomFormation()" class="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black">Dizilişi Kaydet</button></div><p class="text-[10px] text-slate-400 mt-2">Değişiklik tüm oda katılımcılarına anında yansır. Oyuncu ve ödeme bilgileri korunur.</p><p id="roomFormationStatus" class="text-[10px] text-slate-400 mt-1"></p></div>
@@ -1120,7 +357,6 @@ const firebaseConfig={apiKey:"AIzaSyDI5PGiOBZWEMMz6HSU-6-AYXFCWNW7POc",authDomai
 const ADMIN_UIDS=["Q83RJGZIUdOh2uDhF1HfdJFt3sQ2","5WlVfp3r3pfSnfFMR9GZKCzxeih1"];
 const DEFAULT_PITCH_PRICE=4200, DEFAULT_PLAYER_COUNT=14;
 const SLOT_ORDER=["GK","DEF","MID","FWD"], SLOT_LABEL={GK:"Kaleci",DEF:"Defans",MID:"Orta Saha",FWD:"Forvet"};
-// Diziliş isimleri kaleci hariç DEFANS-ORTA SAHA-FORVET sayısını gösterir.
 const FORMATIONS_BY_COUNT={
   10:[
     {id:"2-1-1",name:"2-1-1 • Dengeli",slots:[["GK",1],["DEF",2],["MID",1],["FWD",1]]},
@@ -1314,7 +550,7 @@ function computeExpireAtMs(matchDay,timeSlot){
 }
 
 function populateTimeSlots(defaultSlot="20:00 - 21:00"){const sel=document.getElementById("newRoomTimeSlot");if(!sel)return;const pad=n=>String(n).padStart(2,"0");const slots=[];for(let mins=0;mins<24*60;mins+=30){const sH=Math.floor(mins/60),sM=mins%60;const eMins=mins+60,eH=Math.floor(eMins/60)%24,eM=eMins%60;slots.push(`${pad(sH)}:${pad(sM)} - ${pad(eH)}:${pad(eM)}`);}sel.innerHTML=slots.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join("");if(slots.includes(defaultSlot))sel.value=defaultSlot;}
-function makeDefaultRoster(info=null){const cap=getTotalCapacityFromInfo(info);const selected=getFormationDefinition(cap,info&&info.formation);const form=selected.slots;const a=[];for(const team of ["green","red"]){const p=team==="green"?"g":"r";let idx=0;form.forEach(([pos,count])=>{for(let n=1;n<=count;n++){idx+=1;const id=p+idx;a.push({id,team,pos,label:SLOT_LABEL[pos],name:"",paid:false,status:"empty",applicationId:null});}});}/* 7v7 odalarında 14 saha oyuncusuna ek olarak iki kalıcı yedek yeri */if(cap===14){for(let n=1;n<=2;n++)a.push({id:"sub"+n,team:"bench",pos:"SUB",label:"Yedek",name:"",paid:false,status:"empty",applicationId:null});}return a;}
+function makeDefaultRoster(info=null){const cap=getTotalCapacityFromInfo(info);const selected=getFormationDefinition(cap,info&&info.formation);const form=selected.slots;const a=[];for(const team of ["green","red"]){const p=team==="green"?"g":"r";let idx=0;form.forEach(([pos,count])=>{for(let n=1;n<=count;n++){idx+=1;const id=p+idx;a.push({id,team,pos,label:SLOT_LABEL[pos],name:"",paid:false,status:"empty",applicationId:null});}});}if(cap===14){for(let n=1;n<=2;n++)a.push({id:"sub"+n,team:"bench",pos:"SUB",label:"Yedek",name:"",paid:false,status:"empty",applicationId:null});}return a;}
 function makeDefaultRosterMap(info=null){const m={};for(const s of makeDefaultRoster(info))m[s.id]={name:"",paid:false,status:"empty",applicationId:null};return m;}
 
 let app,auth,db,rooms={},archivedMatchHistory={},currentRoomId=null,currentRoomInfo=null,roster=makeDefaultRoster(),applications={},isAdmin=false,isRoomAdmin=false,currentUser=null,movingContext=null,broadcastListener=null,initialBroadcastSeen=false,roomRosterRef=null,roomAppsRef=null,pendingPinRoomId=null,expiryTimer=null,generalChatRef=null;
@@ -1443,8 +679,6 @@ async function saveHomeAnnouncement(){
 
 function isOccupied(s){return !!(s&&String(s.name||"").trim()&&s.status!=="empty");}
 
-/* Eski oda/kadro kayıtlarını yeni saha slotlarına güvenli biçimde eşler.
-   Veritabanına yazmaz; yalnızca ekranda kullanılacak normalize edilmiş görünümü üretir. */
 function mergeRoster(data,info=null){
   const base=makeDefaultRoster(info);
   const byId=new Map(base.map(slot=>[String(slot.id),slot]));
@@ -1472,7 +706,7 @@ function mergeRoster(data,info=null){
       GK:"GK",GOALKEEPER:"GK",KEEPER:"GK",KALECI:"GK","KALECİ":"GK",
       DEF:"DEF",DEFENCE:"DEF",DEFENSE:"DEF",DEFENDER:"DEF",DEFANS:"DEF",
       MID:"MID",MIDFIELD:"MID",MIDFIELDER:"MID",ORTASAHA:"MID","ORTA SAHA":"MID",
-      FWD:"FWD",FW:"FWD",FORWARD:"FWD",STRIKER:"FWD",FORVET:"FWD","FORVET":"FWD",
+      FWD:"FWD",FW:"FWD",FORWARD:"FWD",STRIKER:"FWD",FORVET:"FWD",
       SUB:"SUB",BENCH:"SUB",YEDEK:"SUB"
     };
     return aliases[raw]||"";
@@ -1513,7 +747,6 @@ function mergeRoster(data,info=null){
     return {key,id,team,pos,name,raw:v,index};
   }).filter(x=>x.name);
 
-  // İlk tercih: mevcut slot ID'siyle birebir eşleşme.
   for(const rec of prepared){
     const slot=byId.get(rec.id)||byId.get(rec.key);
     if(!slot||used.has(slot.id))continue;
@@ -1524,7 +757,6 @@ function mergeRoster(data,info=null){
     rec.assigned=true;
   }
 
-  // İkinci tercih: eski kayıtlardaki team + position bilgisiyle eşleştir.
   for(const rec of prepared){
     if(rec.assigned)continue;
     let candidates=base.filter(slot=>!used.has(slot.id)&&rec.team&&slot.team===rec.team);
@@ -1540,7 +772,6 @@ function mergeRoster(data,info=null){
     rec.assigned=true;
   }
 
-  // Son çare: eski dizilerde takım/mevki alanı yoksa oyuncuları sırayla boş saha slotlarına koy.
   for(const rec of prepared){
     if(rec.assigned)continue;
     const slot=base.find(x=>!used.has(x.id)&&x.team!=="bench")||base.find(x=>!used.has(x.id));
@@ -1941,274 +1172,400 @@ async function sendGeneralChatMessage(e){
 function openMatchHistory(){const section=document.getElementById("matchHistorySection");if(section){section.scrollIntoView({behavior:"smooth",block:"start"});renderMatchHistory();}}
 function collectMatchHistory(){const all=[];for(const [roomId,room] of Object.entries(rooms||{})){const info=room?.info||{},matches=room?.tournament?.matches||{};for(const [matchId,m] of Object.entries(matches)){if(m?.status!=="played")continue;all.push({roomId,matchId,...m,roomTitle:info.title||info.pitchName||"Maç Odası",pitchName:info.pitchName||"",region:info.region||"",district:info.district||"",_source:"room",_fallbackRoster:room.roster||{}});}}for(const [roomId,matches] of Object.entries(archivedMatchHistory||{})){for(const [matchId,m] of Object.entries(matches||{})){if(m?.status!=="played")continue;if(all.some(x=>x.roomId===roomId&&x.matchId===matchId))continue;all.push({roomId,matchId,...m,_source:"archive"});}}return all.sort((a,b)=>(Number(b.playedAt)||new Date(b.dateTime||0).getTime()||0)-(Number(a.playedAt)||new Date(a.dateTime||0).getTime()||0));}
 function renderMatchHistory(){const box=document.getElementById("matchHistoryList");if(!box)return;const items=collectMatchHistory(),count=document.getElementById("matchHistoryCount");if(count)count.textContent=`${items.length} MAÇ`;const c=document.getElementById("matchHistoryCount");if(c)c.textContent=`${items.length} MAÇ`;if(!items.length){box.innerHTML='<div class="col-span-full rounded-xl border border-slate-800 bg-slate-900/50 p-5 text-center"><p class="text-sm font-bold text-slate-300">Henüz tamamlanmış maç bulunmuyor.</p><p class="mt-1 text-xs text-slate-500">Maç odası yöneticisi maç sonucunu kaydettiğinde burada listelenecek.</p></div>';return;}box.innerHTML=items.map(m=>{const date=m.dateTime?formatMatchDateTime(m.dateTime):"Tarih belirtilmedi",home=esc(m.home||"Takım 1"),away=esc(m.away||"Takım 2"),hs=Number(m.homeScore)||0,as=Number(m.awayScore)||0;return `<button type="button" onclick="openMatchHistoryDetail('${encodeURIComponent(m.roomId)}','${encodeURIComponent(m.matchId)}')" class="text-left rounded-xl border border-slate-700 bg-slate-900/80 hover:border-sky-400/50 hover:bg-slate-900 p-4 transition"><div class="flex items-center justify-between gap-2"><span class="text-[10px] text-slate-400">📅 ${esc(date)}</span><span class="rounded-full bg-emerald-500/10 px-2 py-1 text-[9px] font-black text-emerald-300">TAMAMLANDI</span></div><p class="mt-2 text-[10px] text-sky-300">${esc(m.roomTitle||"Maç Odası")} ${m.pitchName?"• "+esc(m.pitchName):""}</p><div class="mt-2 grid grid-cols-[1fr_auto_1fr] items-center gap-2"><b class="text-xs text-white">${home}</b><strong class="text-xl font-black tabular-nums text-emerald-300">${hs} - ${as}</strong><b class="text-xs text-white text-right">${away}</b></div><p class="mt-2 text-[10px] text-slate-500">Detayları ve maç kadrosunu görmek için dokun</p></button>`;}).join("");}
-function openMatchHistoryDetail(encodedRoomId,encodedMatchId){const roomId=decodeURIComponent(encodedRoomId),matchId=decodeURIComponent(encodedMatchId);let room=rooms?.[roomId],m=room?.tournament?.matches?.[matchId],info=room?.info||{};if(!m){m=archivedMatchHistory?.[roomId]?.[matchId];info={title:m?.roomTitle,pitchName:m?.pitchName,region:m?.region,district:m?.district};}if(!m)return;const title=document.getElementById("matchHistoryDetailTitle"),meta=document.getElementById("matchHistoryDetailMeta"),score=document.getElementById("matchHistoryDetailScore"),squads=document.getElementById("matchHistoryDetailSquads");title.textContent=`${m.home||"Takım 1"} - ${m.away||"Takım 2"}`;meta.textContent=[info.title||m.roomTitle,info.pitchName||m.pitchName,info.region,info.district,m.dateTime?formatMatchDateTime(m.dateTime):""].filter(Boolean).join(" • ");const hs=Number(m.homeScore)||0,as=Number(m.awayScore)||0;score.innerHTML=`<div class="rounded-2xl border border-emerald-400/25 bg-emerald-950/30 p-5 text-center"><p class="text-[10px] font-black tracking-[.2em] text-emerald-300">MAÇ SONUCU</p><div class="mt-2 grid grid-cols-[1fr_auto_1fr] items-center gap-3"><b class="text-sm text-white">${escapePrivateHtml(m.home||"Takım 1")}</b><strong class="text-4xl font-black text-emerald-300 tabular-nums">${hs} : ${as}</strong><b class="text-sm text-white">${escapePrivateHtml(m.away||"Takım 2")}</b></div><p class="mt-2 text-xs ${hs===as?"text-amber-300":"text-slate-300"}">${hs===as?"Berabere":"Maç tamamlandı"}</p></div>`;let snap=m.rosterSnapshot;if(!snap&&room){const r=mergeRoster(room.roster||{},info);snap={home:r.filter(x=>x.team==="green"&&isOccupied(x)).map(x=>({name:x.name,pos:x.pos,rating:x.rating||null})),away:r.filter(x=>x.team==="red"&&isOccupied(x)).map(x=>({name:x.name,pos:x.pos,rating:x.rating||null}))};}const renderList=(arr)=>Array.isArray(arr)&&arr.length?arr.map((p,i)=>`<div class="flex items-center justify-between gap-2 rounded-lg border border-white/10 bg-black/20 px-3 py-2"><span class="text-xs text-white">${i+1}. ${escapePrivateHtml(typeof p==="string"?p:p.name||"Oyuncu")}</span><span class="text-[10px] text-slate-400">${typeof p==="object"?escapePrivateHtml(p.pos||"")+(p.rating?" • "+p.rating+" GEN":""):""}</span></div>`).join(""):'<p class="text-xs text-slate-500">Bu maç için kaydedilmiş kadro bulunmuyor.</p>';squads.innerHTML=`<section class="rounded-xl border border-emerald-400/20 bg-emerald-950/20 p-3 space-y-2"><h3 class="text-sm font-black text-emerald-300">🟢 ${escapePrivateHtml(m.home||"Takım 1")}</h3>${renderList(snap?.home)}</section><section class="rounded-xl border border-rose-400/20 bg-rose-950/20 p-3 space-y-2"><h3 class="text-sm font-black text-rose-300">🔴 ${escapePrivateHtml(m.away||"Takım 2")}</h3>${renderList(snap?.away)}</section>`;document.getElementById("matchHistoryDetailModal").classList.remove("hidden");}
-function closeMatchHistoryDetail(){document.getElementById("matchHistoryDetailModal")?.classList.add("hidden");}
-function tournamentRef(){return currentRoomId?db.ref(`rooms/${currentRoomId}/tournament/matches`):null;}
-function fixtureCountdown(m){if(m.status==="played")return "";const stamp=Number(m.matchAt)||new Date(m.dateTime||0).getTime();if(!Number.isFinite(stamp)||!stamp)return "";const diff=stamp-Date.now();if(diff<=0)return "🔴 Maç saati geldi";const days=Math.floor(diff/86400000),hours=Math.floor(diff%86400000/3600000),mins=Math.floor(diff%3600000/60000),secs=Math.floor(diff%60000/1000);return `⏳ ${days?days+" gün ":""}${hours} sa ${mins} dk ${secs} sn kaldı`;}
-function renderTournament(){
- const tools=document.getElementById("tournamentAdminTools");if(!tools)return;tools.classList.toggle("hidden",!isRoomAdmin);
- const matches=(rooms[currentRoomId]&&rooms[currentRoomId].tournament&&rooms[currentRoomId].tournament.matches)||{};
- const entries=Object.entries(matches).map(([id,m])=>({id,...(m||{})})).sort((a,b)=>(Number(a.matchAt)||new Date(a.dateTime||0).getTime()||0)-(Number(b.matchAt)||new Date(b.dateTime||0).getTime()||0));
- const playedCount=entries.filter(m=>m.status==="played").length;
- const pc=document.getElementById("tournamentPlayedCount"),fc=document.getElementById("tournamentFixtureCount");if(pc)pc.textContent=playedCount;if(fc)fc.textContent=entries.length;
- const box=document.getElementById("tournamentFixtures");
- if(!entries.length)box.innerHTML='<p class="text-xs text-slate-500">Henüz fikstür yok. Yönetici ilk maçı ekleyebilir.</p>';
- else box.innerHTML=entries.map(m=>{
-  const played=m.status==="played",hs=Number(m.homeScore)||0,as=Number(m.awayScore)||0,score=played?`${hs} - ${as}`:"VS",dt=m.dateTime?formatMatchDateTime(m.dateTime):"Tarih belirlenmedi";
-  let outcome="";if(played){if(hs>as)outcome=`Kazanan: ${esc(m.home)} • Kaybeden: ${esc(m.away)}`;else if(as>hs)outcome=`Kazanan: ${esc(m.away)} • Kaybeden: ${esc(m.home)}`;else outcome="Sonuç: Beraberlik";}
-  const countdown=!played?fixtureCountdown(m):"";
-  return `<div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3"><div class="flex items-center justify-between gap-2"><span class="text-[10px] text-slate-400">📅 ${esc(dt)}</span><span class="text-[9px] font-bold ${played?"text-emerald-300":"text-amber-300"}">${played?"TAMAMLANDI":"PLANLANDI"}</span></div><div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 mt-2"><b class="text-xs text-white">${esc(m.home||"Takım 1")}</b><strong class="text-lg text-emerald-300 tabular-nums">${score}</strong><b class="text-xs text-white text-right">${esc(m.away||"Takım 2")}</b></div>${played?`<p class="text-[10px] mt-2 ${hs===as?"text-amber-300":"text-emerald-300"}">${outcome}</p>`:`<p class="text-[10px] text-amber-300 mt-2">${esc(countdown)}</p>`}${isRoomAdmin?`<div class="flex flex-wrap gap-2 mt-2"><button type="button" onclick="editFixtureDateTime('${m.id}')" class="text-[10px] text-sky-300 underline">Tarih/saat düzenle</button><button type="button" onclick="enterFixtureResult('${m.id}')" class="text-[10px] text-emerald-300 underline">${played?"Skoru düzenle":"Sonuç gir"}</button><button type="button" onclick="deleteFixture('${m.id}')" class="text-[10px] text-rose-300 underline">Sil</button></div>`:""}</div>`;
- }).join("");
- const stats={};const get=t=>stats[t]||(stats[t]={team:t,played:0,wins:0,draws:0,losses:0,gf:0,ga:0,points:0});
- entries.filter(m=>m.status==="played").forEach(m=>{const a=get(m.home),b=get(m.away),x=Number(m.homeScore)||0,y=Number(m.awayScore)||0;a.played++;b.played++;a.gf+=x;a.ga+=y;b.gf+=y;b.ga+=x;if(x>y){a.wins++;a.points+=3;b.losses++;}else if(y>x){b.wins++;b.points+=3;a.losses++;}else{a.draws++;b.draws++;a.points++;b.points++;}});
- const rows=Object.values(stats).sort((a,b)=>b.points-a.points||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf||a.team.localeCompare(b.team,"tr"));
- const sb=document.getElementById("tournamentStandings");sb.innerHTML=rows.length?`<table class="w-full text-[10px] text-left"><thead class="text-slate-400"><tr><th class="p-2"># / Takım</th><th class="p-2">O</th><th class="p-2">G</th><th class="p-2">B</th><th class="p-2">M</th><th class="p-2">A:Y</th><th class="p-2">Av.</th><th class="p-2">P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="border-t border-slate-700"><td class="p-2 font-bold text-white">${i+1}. ${esc(r.team)}</td><td class="p-2">${r.played}</td><td class="p-2 text-emerald-300">${r.wins}</td><td class="p-2">${r.draws}</td><td class="p-2 text-rose-300">${r.losses}</td><td class="p-2">${r.gf}:${r.ga}</td><td class="p-2">${r.gf-r.ga}</td><td class="p-2 font-black text-amber-300">${r.points}</td></tr>`).join("")}</tbody></table><p class="text-[9px] text-slate-500 mt-2">O: Oynanan • G: Galibiyet • B: Beraberlik • M: Mağlubiyet • A:Y: Atılan/Yenilen gol • Av.: Averaj</p>`:'<p class="text-xs text-slate-500">Puan tablosu maç sonuçları girildikçe otomatik oluşur.</p>';
-}
-async function addTournamentFixture(e){e.preventDefault();if(!isRoomAdmin||!currentRoomId)return;const home=document.getElementById("fixtureHome").value.trim(),away=document.getElementById("fixtureAway").value.trim(),date=document.getElementById("fixtureDate").value,time=document.getElementById("fixtureTime").value;if(!home||!away||home.toLowerCase()===away.toLowerCase()||!date||!time){alert("İki farklı takım, tarih ve saat girin.");return;}try{const ref=tournamentRef().push();await ref.set({home,away,dateTime:`${date}T${time}`,matchAt:new Date(`${date}T${time}`).getTime(),status:"scheduled",createdAt:firebase.database.ServerValue.TIMESTAMP,createdBy:currentUser.uid});e.target.reset();document.getElementById("fixtureTime").value="20:00";}catch(err){alert("Fikstür eklenemedi: "+err.message);}}
-async function enterFixtureResult(id){if(!isRoomAdmin||!currentRoomId)return;const m=((rooms[currentRoomId]||{}).tournament||{}).matches||{};const f=m[id];if(!f)return;const a=prompt(`${f.home} kaç gol attı?`,f.homeScore??"");if(a===null)return;const b=prompt(`${f.away} kaç gol attı?`,f.awayScore??"");if(b===null)return;if(a.trim()===""||b.trim()===""||!Number.isInteger(Number(a))||!Number.isInteger(Number(b))||Number(a)<0||Number(b)<0){alert("Skorlar sıfır veya daha büyük tam sayı olmalı.");return;}try{const info=currentRoomInfo||{},liveRoster=mergeRoster((rooms[currentRoomId]||{}).roster||{},info);const rosterSnapshot={home:liveRoster.filter(x=>x.team==="green"&&isOccupied(x)).map(x=>({name:x.name,pos:x.pos,rating:x.rating||null})),away:liveRoster.filter(x=>x.team==="red"&&isOccupied(x)).map(x=>({name:x.name,pos:x.pos,rating:x.rating||null}))};await tournamentRef().child(id).update({homeScore:Number(a),awayScore:Number(b),status:"played",playedAt:firebase.database.ServerValue.TIMESTAMP,rosterSnapshot});}catch(err){alert("Sonuç kaydedilemedi: "+err.message);}}
-async function editFixtureDateTime(id){if(!isRoomAdmin||!currentRoomId)return;const m=(((rooms[currentRoomId]||{}).tournament||{}).matches||{})[id];if(!m)return;const date=prompt("Maç tarihi (YYYY-AA-GG)",(m.dateTime||"").slice(0,10));if(date===null)return;const time=prompt("Maç saati (SS:DD)",(m.dateTime||"").slice(11,16));if(time===null)return;const dt=`${date}T${time}`;if(!Number.isFinite(new Date(dt).getTime())){alert("Tarih veya saat geçersiz.");return;}try{await tournamentRef().child(id).update({dateTime:dt,matchAt:new Date(dt).getTime()});}catch(err){alert("Güncellenemedi: "+err.message);}}
-async function deleteFixture(id){if(!isRoomAdmin||!confirm("Bu fikstür maçı silinsin mi?"))return;try{await tournamentRef().child(id).remove();}catch(err){alert("Silinemedi: "+err.message);}}
+function openMatchHistoryDetail(encodedRoomId,encodedMatchId){const roomId=decodeURIComponent(encodedRoomId),matchId=decodeURIComponent(encodedMatchId);let room=rooms?.[roomId],m=room?.tournament?.matches?.[matchId],info=room?.info||{};if(!m){m=archivedMatchHistory?.[roomId]?.[matchId];info={title:m?.roomTitle,pitchName:m?.pitchName,region:m?.region,district:m?.district};}if(!m)return;const title=document.getElementById("matchHistoryDetailTitle"),meta=document.getElementById("matchHistoryDetailMeta"),score=document.getElementById("matchHistoryDetailScore"),squads=document.getElementById("matchHistoryDetailSquads");title.textContent=`${m.home||"Takım 1"} - ${m.away||"Takım 2"}`;meta.textContent=[info.title||m.roomTitle,info.pitchName||m.pitchName,[info.region||m.region,info.district||m.district].filter(Boolean).join(" / "),m.dateTime?formatMatchDateTime(m.dateTime):""].filter(Boolean).join(" • ");score.innerHTML=`<div class="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-center"><div class="text-xs text-slate-400">MAÇ SONUCU</div><div class="mt-1 text-4xl font-black tabular-nums text-emerald-300">${Number(m.homeScore)||0} - ${Number(m.awayScore)||0}</div></div>`;let homePlayers=m.rosterSnapshot?.home||[],awayPlayers=m.rosterSnapshot?.away||[];if(!homePlayers.length&&!awayPlayers.length&&room?.roster){const merged=mergeRoster(room.roster,info);homePlayers=merged.filter(x=>x.team==="green"&&isOccupied(x));awayPlayers=merged.filter(x=>x.team==="red"&&isOccupied(x));}const renderList=(list,color)=>`<div class="rounded-2xl border border-${color}-400/25 bg-${color}-950/20 p-3"><h3 class="text-xs font-black text-${color}-300 mb-2">KADRO (${list.length})</h3>${list.length?`<ul class="space-y-1.5 text-xs">${list.map(p=>`<li class="flex items-center justify-between rounded-lg bg-slate-900/80 px-2.5 py-1.5"><span class="font-bold text-white">${esc(p.name||"Oyuncu")}</span><span class="text-[10px] font-bold text-slate-400">${esc(SLOT_LABEL[p.pos]||p.pos||"")}</span></li>`).join("")}</ul>`:'<p class="text-xs text-slate-500">Kadro kaydı bulunmuyor.</p>'}</div>`;squads.innerHTML=renderList(homePlayers,"emerald")+renderList(awayPlayers,"rose");document.getElementById("matchHistoryDetailModal").classList.remove("hidden");}
+function closeMatchHistoryDetail(){document.getElementById("matchHistoryDetailModal").classList.add("hidden");}
 
-function playerInitials(name){return String(name||"?").trim().split(/\s+/).slice(0,2).map(x=>x.charAt(0)).join("").toLocaleUpperCase("tr-TR")||"?";}
-function fcStat(value){return Math.max(1,Math.min(99,Number(value)||75));}
-function renderFcPlayerCard(s,kind="field"){
- const rating=fcStat(s.rating);
- const paidText=s.paid?"ÖDEME TAMAM":"ÖDEME BEKLİYOR";
- const feeText=kind==="bench"?"YEDEK":`${getSlotPriceForRoom(currentRoomInfo,s.pos)} ₺`;
- const photo=s.photoData?`<img src="${s.photoData}" alt="">`:esc(playerInitials(s.name));
- const rawType=String(s.cardType||(rating>=92?"icon":rating>=88?"black":rating>=82?"promo":rating>=75?"gold":rating>=65?"silver":"bronze")).toLowerCase();
- const cardClassMap={gold:"fc-card-gold",silver:"fc-card-silver",bronze:"fc-card-bronze",black:"fc-card-black","black-gold":"fc-card-black",promo:"fc-card-promo",special:"fc-card-promo",icon:"fc-card-icon"};
- const rarity=cardClassMap[rawType]||"fc-card-gold";
- const positionLabel=({GK:"KL",DEF:"STP",MID:"MO",FWD:"SNT",SUB:"YDK"})[s.pos]||"OY";
- const roleMark=s.roleMark||s.roleBadge||(rating>=85?`${positionLabel}++`:`${positionLabel}+`);
- return `<div class="fc-player-card ${kind==="bench"?"fc-bench-card":""} ${rarity}" ${isRoomAdmin?`onclick="toggleFcCardActions(event,'${s.id}')" role="button" tabindex="0" aria-label="${esc(s.name)} oyuncu işlemlerini aç"`:""}>
-  <div class="fc-card-top"><span class="fc-rating">${rating}</span><span class="fc-card-position">${esc(positionLabel)}</span></div>
-  <div class="fc-card-stars">★ ★ ★</div>
-  <div class="fc-card-avatar">${photo}</div>
-  <div class="fc-card-name">${esc(s.name)}</div>
-  <div class="fc-card-country-row"><span title="Türkiye">🇹🇷</span><span class="fc-mini-crest">${esc(String(s.clubShort||s.club||"KK").slice(0,3).toUpperCase())}</span><span class="fc-role-mark">${esc(roleMark)}</span></div>
-  <div class="fc-card-fee">${feeText}</div>
-  <div class="fc-card-status">${kind==="bench"?"YEDEK":paidText}</div>
-  ${isRoomAdmin?`<div class="fc-card-actions" aria-label="Oyuncu işlemleri"><button type="button" onclick="event.stopPropagation();closeFcCardActions();setPlayerRating('${s.id}')">GEN</button><button type="button" class="photo-action" onclick="event.stopPropagation();closeFcCardActions();choosePlayerPhoto('${s.id}')">FOTO</button><button type="button" onclick="event.stopPropagation();closeFcCardActions();openMoveModal('${s.id}',${s.applicationId?`'${s.applicationId}'`:"null"})">TAŞI</button><button type="button" onclick="event.stopPropagation();closeFcCardActions();removeSlot('${s.id}')">ÇIKAR</button></div>`:""}
- </div>`;
-}
-function closeFcCardActions(){document.querySelectorAll('.fc-player-card.fc-actions-open').forEach(card=>card.classList.remove('fc-actions-open'));}
-function toggleFcCardActions(event,slotId){if(!isRoomAdmin)return;event.stopPropagation();const card=event.currentTarget,wasOpen=card.classList.contains('fc-actions-open');closeFcCardActions();if(!wasOpen)card.classList.add('fc-actions-open');}
-document.addEventListener('click',event=>{if(!event.target.closest('.fc-player-card'))closeFcCardActions();});
-document.addEventListener('keydown',event=>{if(event.key==='Escape')closeFcCardActions();});
-async function setPlayerRating(slotId){if(!isRoomAdmin||!currentRoomId)return;const player=roster.find(x=>x.id===slotId);if(!player||!isOccupied(player))return;const current=Math.max(1,Math.min(99,Number(player.rating)||75));const raw=prompt(`${player.name} için FC reytingi (1-99):`,String(current));if(raw===null)return;const rating=Number(raw);if(!Number.isInteger(rating)||rating<1||rating>99){alert("Reyting 1 ile 99 arasında tam sayı olmalı.");return;}try{await db.ref(`rooms/${currentRoomId}/roster/${slotId}/rating`).set(rating);}catch(err){alert("Reyting kaydedilemedi: "+err.message);}}
-async function choosePlayerPhoto(slotId){
- if(!isRoomAdmin||!currentRoomId)return;
- const slot=roster.find(x=>x.id===slotId);if(!slot||!isOccupied(slot))return;
- let picker=document.getElementById("fcPlayerPhotoPicker");
- if(!picker){picker=document.createElement("input");picker.type="file";picker.accept="image/*";picker.id="fcPlayerPhotoPicker";picker.hidden=true;document.body.appendChild(picker);}
- picker.value="";
- picker.onchange=async()=>{
-  const file=picker.files&&picker.files[0];if(!file)return;
-  if(!file.type.startsWith("image/")){alert("Lütfen resim dosyası seç.");return;}
-  if(file.size>8*1024*1024){alert("Fotoğraf en fazla 8 MB olabilir.");return;}
+async function registerPlayer(){
+  const name=document.getElementById("accountName").value.trim(),email=document.getElementById("accountEmail").value.trim(),password=document.getElementById("accountPassword").value,msg=document.getElementById("accountMessage"),btn=document.getElementById("registerBtn");
+  if(!name||!email||password.length<6){msg.textContent="Adını, e-postanı ve en az 6 karakter şifreni gir.";return;}
+  btn.disabled=true;msg.textContent="";
   try{
-   const bitmap=await createImageBitmap(file),canvas=document.createElement("canvas");
-   const scale=Math.min(1,420/Math.max(bitmap.width,bitmap.height));
-   canvas.width=Math.round(bitmap.width*scale);canvas.height=Math.round(bitmap.height*scale);
-   canvas.getContext("2d").drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();
-   const data=canvas.toDataURL("image/jpeg",.78);
-   await db.ref(`rooms/${currentRoomId}/roster/${slotId}/photoData`).set(data);
-   alert("Oyuncu fotoğrafı karta eklendi.");
-  }catch(err){alert("Fotoğraf eklenemedi: "+err.message);}
- };
- picker.click();
+    const cred=await auth.createUserWithEmailAndPassword(email,password);
+    try{await cred.user.updateProfile({displayName:name});}catch(_){}
+    try{await db.ref("users/"+cred.user.uid).set({name,email,createdAt:Date.now()});}catch(_){}
+    const pName=document.getElementById("playerName");
+    if(pName&&!pName.value)pName.value=name;
+    msg.textContent="Üyeliğin oluşturuldu ve giriş yaptın.";
+  }catch(e){msg.textContent=e.message;}
+  finally{btn.disabled=false;}
 }
-function renderPitchRow(slots,info){return `<div class="pitch-player-row">${slots.map(s=>{const full=isOccupied(s),slotFee=getSlotPriceForRoom(info,s.pos);if(!full)return `<button type="button" onclick="selectSlotOnPitch('${s.team}','${s.id}')" class="fc-player-card empty"><div class="fc-card-top"><span class="fc-rating" style="font-size:11px">＋</span><span class="fc-card-position">${s.pos}</span></div><div class="fc-card-stars">✦ ✦ ✦</div><div class="fc-card-avatar">＋</div><div class="fc-card-name">BOŞ YER</div><div class="fc-card-fee">${slotFee} ₺</div><div class="fc-card-status">KADROYA KATIL</div></button>`;return renderFcPlayerCard(s,"field");}).join("")}</div>`;}
-function renderTeam(team,info){const a=roster.filter(s=>s.team===team);const order=team==="red"?[...SLOT_ORDER].reverse():SLOT_ORDER;return order.map(pos=>renderPitchRow(a.filter(s=>s.pos===pos),info)).join("");}
-function renderBench(){const box=document.getElementById("benchPlayers");if(!box)return;const slots=roster.filter(s=>s.team==="bench");const section=document.getElementById("benchSection");if(section)section.classList.toggle("hidden",slots.length===0);const occupied=slots.filter(isOccupied).length;const count=document.getElementById("benchCount");if(count)count.textContent=`${occupied} / ${slots.length}`;box.innerHTML=slots.map(s=>isOccupied(s)?renderFcPlayerCard(s,"bench"):`<button type="button" class="bench-player-card empty" ${isRoomAdmin?`onclick="focusBenchAdd()"`:"disabled"}><span class="text-xl">＋</span><span class="bench-name">BOŞ YEDEK</span><span class="bench-role">${isRoomAdmin?"YÖNETİCİ EKLESİN":"YEDEK YERİ"}</span></button>`).join("");const form=document.getElementById("benchAddForm"),hint=document.getElementById("benchAdminHint");if(form)form.classList.toggle("hidden",!isRoomAdmin||occupied>=slots.length);if(hint)hint.classList.toggle("hidden",!isRoomAdmin||slots.length===0);}
-function focusBenchAdd(){if(!isRoomAdmin)return;const input=document.getElementById("benchPlayerName");if(input)input.focus();}
-async function addBenchPlayer(e){e.preventDefault();if(!isRoomAdmin||!currentRoomId)return;const input=document.getElementById("benchPlayerName"),name=String(input.value||"").trim();if(!name){alert("Yedek oyuncunun adını gir.");return;}const slot=roster.find(s=>s.team==="bench"&&!isOccupied(s));if(!slot){alert("Yedek kulübesi dolu.");return;}const btn=document.getElementById("benchAddBtn");btn.disabled=true;try{await db.ref(`rooms/${currentRoomId}/roster/${slot.id}`).set({name,paid:false,status:"approved",applicationId:null,addedBy:currentUser.uid,addedAt:firebase.database.ServerValue.TIMESTAMP});input.value="";}catch(err){alert("Yedek eklenemedi: "+err.message);}finally{btn.disabled=false;}}
-function renderAll(){
-  if(!currentRoomId)return;
-  const cap=getTotalCapacityFromInfo(currentRoomInfo),formation=getFormationDefinition(cap,currentRoomInfo&&currentRoomInfo.formation);
-  const green=document.getElementById("greenTeamPitch"),red=document.getElementById("redTeamPitch");
-  if(green)green.innerHTML=renderTeam("green",currentRoomInfo);
-  if(red)red.innerHTML=renderTeam("red",currentRoomInfo);
-  renderBench();
-  const formationBadge=document.getElementById("pitchFormationBadge");
-  if(formationBadge)formationBadge.textContent=`7 VS 7 • ${formation.id}`;
-  if(isRoomAdmin)syncRoomFormationOptions();
-  const fieldCount=roster.filter(s=>(s.team==="green"||s.team==="red")&&isOccupied(s)).length;
-  const quota=document.getElementById("quotaBadge");
-  if(quota)quota.textContent=`Sahadaki Oyuncu: ${fieldCount} / ${cap}`;
-  updateSlotDropdown();
-  if(isRoomAdmin)renderApplications();
+async function loginPlayer(){
+  const email=document.getElementById("accountEmail").value.trim(),password=document.getElementById("accountPassword").value,msg=document.getElementById("accountMessage"),btn=document.getElementById("memberLoginBtn");
+  if(!email||!password){msg.textContent="E-posta ve şifreni gir.";return;}
+  btn.disabled=true;msg.textContent="";
+  try{
+    const cred=await auth.signInWithEmailAndPassword(email,password);
+    try{
+      const snap=await db.ref("users/"+cred.user.uid+"/name").once("value");
+      const savedName=snap.val()||cred.user.displayName||"";
+      const pName=document.getElementById("playerName");
+      if(savedName&&pName&&!pName.value)pName.value=savedName;
+    }catch(_){}
+    msg.textContent="Giriş yapıldı.";
+  }catch(e){msg.textContent=e.message;}
+  finally{btn.disabled=false;}
 }
-function updateSlotDropdown(){const team=document.getElementById("teamSelect").value,sel=document.getElementById("slotSelect"),old=sel.value;const empty=roster.filter(s=>s.team===team&&!isOccupied(s)&&s.status==="empty").sort((a,b)=>SLOT_ORDER.indexOf(a.pos)-SLOT_ORDER.indexOf(b.pos)||a.id.localeCompare(b.id));sel.innerHTML=empty.length?empty.map(s=>`<option value="${s.id}">${SLOT_LABEL[s.pos]} (${s.pos}) · ${getSlotPriceForRoom(currentRoomInfo,s.pos)} ₺ · Boş</option>`).join(""):'<option value="">Bu takımda boş mevki yok</option>';if(empty.some(s=>s.id===old))sel.value=old;updatePrice();}
-function updatePrice(){const s=roster.find(x=>x.id===document.getElementById("slotSelect").value);document.getElementById("priceDisplay").textContent=s?(getSlotPriceForRoom(currentRoomInfo,s.pos)+" ₺"):"—";}
-function selectSlotOnPitch(team,id){if(!currentUser){alert("Başvuru yapmak için önce hesabına giriş yap.");return;}document.getElementById("teamSelect").value=team;updateSlotDropdown();document.getElementById("slotSelect").value=id;updatePrice();document.getElementById("playerName").focus();}
+async function logoutPlayer(){
+  if(isAdmin&&auth){try{await auth.signOut();}catch(_){}}
+  isAdmin=false;isRoomAdmin=false;document.getElementById("adminBar").classList.add("hidden");
+  if(auth&&auth.currentUser&&!ADMIN_UIDS.includes(auth.currentUser.uid)){try{await auth.signOut();}catch(_){}}
+  syncAuthUiState(null);document.getElementById("accountMessage").textContent="Çıkış yapıldı.";
+}
 
-async function handleJoin(e){e.preventDefault();if(!currentUser||!currentRoomId){showMessage("Başvuru yapmadan önce giriş yapmalısın.",false);return;}const b=document.getElementById("joinSubmit"),name=document.getElementById("playerName").value.trim(),slot=roster.find(s=>s.id===document.getElementById("slotSelect").value);if(!name)return showMessage("Lütfen adını gir.",false);if(!slot||isOccupied(slot)||slot.status!=="empty")return showMessage("Bu mevki uygun değil.",false);b.disabled=true;b.textContent="Başvuru gönderiliyor…";try{const ref=db.ref(`rooms/${currentRoomId}/applications`).push();await ref.set({uid:currentUser.uid,email:currentUser.email||"",slotId:slot.id,name,team:slot.team,pos:slot.pos,price:getSlotPriceForRoom(currentRoomInfo,slot.pos),status:"pending",paid:false,createdAt:firebase.database.ServerValue.TIMESTAMP});document.getElementById("playerName").value="";showMessage("Başvurun bu maç odasına kaydedildi. Oda yöneticisi onayı bekleniyor.");}catch(err){showMessage("Başvuru kaydedilemedi: "+err.message,false);}finally{b.disabled=false;b.textContent="📝 Başvurumu Gönder";updateSlotDropdown();}}
-
-async function registerPlayer(){const name=document.getElementById("accountName").value.trim(),email=document.getElementById("accountEmail").value.trim(),password=document.getElementById("accountPassword").value,msg=document.getElementById("accountMessage");msg.textContent="";if(!name||name.length>40){msg.textContent="Lütfen adını/lakabını gir (en fazla 40 karakter).";return;}if(!email||password.length<6){msg.textContent="Geçerli e-posta ve en az 6 karakterli şifre gir.";return;}const b=document.getElementById("registerBtn");b.disabled=true;try{const cred=await auth.createUserWithEmailAndPassword(email,password);try{await db.ref("users/"+cred.user.uid).set({name,email:cred.user.email||email,createdAt:firebase.database.ServerValue.TIMESTAMP});}catch(_){}syncAuthUiState(cred.user);msg.textContent="Hesabın oluşturuldu ve giriş yapıldı.";}catch(e){msg.textContent="Kayıt hatası: "+e.message;}finally{b.disabled=false;}}
-async function loginPlayer(){const email=document.getElementById("accountEmail").value.trim(),password=document.getElementById("accountPassword").value,msg=document.getElementById("accountMessage");msg.textContent="";if(!email||!password){msg.textContent="E-posta ve şifreni gir.";return;}const b=document.getElementById("memberLoginBtn");b.disabled=true;try{const cred=await auth.signInWithEmailAndPassword(email,password);syncAuthUiState(cred.user);msg.textContent="Giriş başarılı.";}catch(e){msg.textContent="Giriş hatası: "+e.message;}finally{b.disabled=false;}}
-async function logoutPlayer(){try{await auth.signOut();syncAuthUiState(null);}catch(e){document.getElementById("accountMessage").textContent=e.message;}}
-function toggleAdminPanel(){if(isRoomAdmin){document.getElementById("adminBar").scrollIntoView({behavior:"smooth"});return;}document.getElementById("loginError").textContent="";document.getElementById("adminLoginModal").classList.remove("hidden");}
+function toggleAdminPanel(){if(!currentRoomId&&isAdmin){const p=document.getElementById("sponsorAdminPanel");if(p){p.classList.toggle("hidden");p.scrollIntoView({behavior:"smooth",block:"nearest"});}return;}if(isAdmin){computeRoomAdmin();if(!currentRoomId)alert("Sistem yöneticisi olarak giriş yaptın. Bir maç odasına girince Oda Yönetici Paneli görünür.");return;}document.getElementById("adminLoginModal").classList.remove("hidden");document.getElementById("loginError").textContent="";}
 function closeAdminLogin(){document.getElementById("adminLoginModal").classList.add("hidden");}
-async function adminLogin(e){e.preventDefault();const b=document.getElementById("adminLoginSubmit"),err=document.getElementById("loginError");b.disabled=true;err.textContent="";try{const cred=await auth.signInWithEmailAndPassword(document.getElementById("adminEmail").value.trim(),document.getElementById("adminPassword").value);syncAuthUiState(cred.user);document.getElementById("adminPassword").value="";closeAdminLogin();}catch(x){err.textContent="Giriş başarısız: "+x.message;}finally{b.disabled=false;}}
-async function adminLogout(){await auth.signOut();syncAuthUiState(null);}
+async function adminLogin(e){e.preventDefault();const email=document.getElementById("adminEmail").value.trim(),password=document.getElementById("adminPassword").value,btn=document.getElementById("adminLoginSubmit"),err=document.getElementById("loginError");err.textContent="";btn.disabled=true;try{const cred=await auth.signInWithEmailAndPassword(email,password);if(!ADMIN_UIDS.includes(cred.user.uid)){await auth.signOut();err.textContent="Bu hesap yönetici listesinde değil.";return;}closeAdminLogin();if(!currentRoomId){const p=document.getElementById("sponsorAdminPanel");if(p){p.classList.remove("hidden");p.scrollIntoView({behavior:"smooth",block:"nearest"});}}}catch(x){err.textContent=x.message;}finally{btn.disabled=false;}}
+async function adminLogout(){isRoomAdmin=false;document.getElementById("adminBar").classList.add("hidden");stopRoomApplicationsListener();renderAll();}
 
-function startRoomApplicationsListener(){if(roomAppsRef||!currentRoomId||!currentUser)return;roomAppsRef=db.ref(`rooms/${currentRoomId}/applications`);roomAppsRef.on("value",s=>{applications=s.val()||{};renderApplications();},()=>{});}
-function stopRoomApplicationsListener(){if(roomAppsRef){roomAppsRef.off();roomAppsRef=null;}applications={};renderApplications();}
-function refreshAdminApplications(){if(isRoomAdmin&&currentRoomId)db.ref(`rooms/${currentRoomId}/applications`).once("value").then(s=>{applications=s.val()||{};renderApplications();}).catch(e=>alert("Başvurular okunamadı: "+e.message));}
-function renderApplications(){const p=document.getElementById("pendingApplications"),aBox=document.getElementById("approvedApplications");if(!isRoomAdmin){p.innerHTML="Oda yöneticisi yetkisi gerekli.";aBox.innerHTML="Oda yöneticisi yetkisi gerekli.";return;}const entries=Object.entries(applications),pending=entries.filter(([,a])=>a.status==="pending"),approved=entries.filter(([,a])=>a.status==="approved");p.innerHTML=pending.length?pending.map(([id,a])=>`<div class="rounded-lg bg-slate-900 border border-slate-700 p-3 flex flex-wrap justify-between gap-2"><div><b>${esc(a.name)}</b><div class="text-xs text-slate-400">${esc(roomTeamName(a.team))} · ${SLOT_LABEL[a.pos]||a.pos} · ${getSlotPriceForRoom(currentRoomInfo,a.pos)} ₺</div></div><div class="flex gap-2"><button type="button" onclick="approveApplication('${id}')" class="px-3 py-2 rounded bg-emerald-600 text-xs font-bold">Kabul et</button><button type="button" onclick="rejectApplication('${id}')" class="px-3 py-2 rounded bg-red-700 text-xs font-bold">Reddet</button></div></div>`).join(""):"<p class='text-xs text-slate-500'>Bekleyen başvuru yok.</p>";aBox.innerHTML=approved.length?approved.map(([id,a])=>{const s=roster.find(x=>x.id===a.slotId),paid=!!(s&&s.paid),curTeam=s?s.team:a.team,curPos=s?s.pos:a.pos,curSlotId=s?s.id:a.slotId;return `<div class="rounded-lg bg-slate-900 border border-slate-700 p-3 flex flex-wrap justify-between gap-2"><div><b>${esc(a.name)}</b><div class="text-xs text-slate-400">${curTeam==="bench"?"Yedek Kulübesi":esc(roomTeamName(curTeam))+" · "+(SLOT_LABEL[curPos]||curPos)+" · "+getSlotPriceForRoom(currentRoomInfo,curPos)+" ₺"}</div><div class="text-xs ${paid?"text-emerald-300":"text-amber-300"}">${paid?"Ödeme onaylandı":"Ödeme bekliyor"}</div></div><div class="flex flex-wrap gap-2">${paid?`<button type="button" onclick="undoPayment('${id}')" class="px-2 py-2 bg-amber-700 rounded text-xs font-bold">Geri al</button>`:`<button type="button" onclick="confirmPayment('${id}')" class="px-2 py-2 bg-emerald-600 rounded text-xs font-bold">Ödemeyi onayla</button>`}<button type="button" onclick="openMoveModal('${curSlotId}','${id}')" class="px-2 py-2 bg-sky-700 rounded text-xs font-bold">Yer / takım değiştir</button><button type="button" onclick="removeApprovedPlayer('${id}')" class="px-2 py-2 bg-red-700 rounded text-xs font-bold">Çıkar</button></div></div>`;}).join(""):"<p class='text-xs text-slate-500'>Henüz onaylanmış başvuru yok.</p>";}
+function startRoomApplicationsListener(){if(!db||!currentRoomId||roomAppsRef)return;roomAppsRef=db.ref("rooms/"+currentRoomId+"/applications");roomAppsRef.on("value",s=>{applications=s.val()||{};renderAdminLists();},e=>showMessage("Başvuru okuma hatası: "+e.message,false));}
+function stopRoomApplicationsListener(){if(roomAppsRef){roomAppsRef.off();roomAppsRef=null;}applications={};}
+function refreshAdminApplications(){if(!currentRoomId||!db)return;db.ref("rooms/"+currentRoomId+"/applications").once("value").then(s=>{applications=s.val()||{};renderAdminLists();});}
 
-function openMoveModal(sourceSlotId,appId=null){if(!isRoomAdmin)return;const src=roster.find(x=>x.id===sourceSlotId);if(!src||!isOccupied(src)){alert("Taşınacak oyuncu bulunamadı.");return;}const targets=roster.filter(x=>x.id!==sourceSlotId).sort((a,b)=>(a.team==="bench"?1:0)-(b.team==="bench"?1:0)||(a.team===b.team?0:a.team==="green"?-1:1)||SLOT_ORDER.indexOf(a.pos)-SLOT_ORDER.indexOf(b.pos)||a.id.localeCompare(b.id));if(!targets.length){alert("Değiştirilecek başka kadro yeri bulunmuyor.");return;}movingContext={sourceSlotId,appId:appId||src.applicationId||null};document.getElementById("movePlayerInfo").innerHTML=`<b>${esc(src.name)}</b> için boş yere taşıma veya başka oyuncuyla yer değiştirme seçebilirsin.`;document.getElementById("moveTargetSlot").innerHTML=targets.map(x=>{const occupied=roster.find(y=>y.id===x.id);const label=x.team==="bench"?"🪑 Yedek Kulübesi":"⚽ "+esc(roomTeamName(x.team))+" · "+(SLOT_LABEL[x.pos]||x.pos);return `<option value="${x.id}">${label}${isOccupied(occupied)?" · "+esc(occupied.name)+" ile değiştir":" · BOŞ"}</option>`;}).join("");document.getElementById("moveError").textContent="";document.getElementById("movePlayerModal").classList.remove("hidden");}
+function getSlot(id){return roster.find(x=>x.id===id);}
+function getRosterByTeam(team){return roster.filter(x=>x.team===team&&x.team!=="bench");}
+function getTeamRows(team){const cap=getTotalCapacityFromInfo(currentRoomInfo);const formDef=getFormationDefinition(cap,currentRoomInfo&&currentRoomInfo.formation);const list=getRosterByTeam(team);const rows=[];let offset=0;formDef.slots.forEach(([pos,count])=>{rows.push(list.slice(offset,offset+count));offset+=count;});return rows;}
+function getBenchSlots(){return roster.filter(x=>x.team==="bench");}
+function renderBenchSection(){const benchSlots=getBenchSlots(),section=document.getElementById("benchSection"),countEl=document.getElementById("benchCount"),listEl=document.getElementById("benchPlayers"),formEl=document.getElementById("benchAddForm"),hintEl=document.getElementById("benchAdminHint");if(!section||!countEl||!listEl)return;if(getTotalCapacityFromInfo(currentRoomInfo)!==14){section.classList.add("hidden");return;}section.classList.remove("hidden");const occupiedCount=benchSlots.filter(isOccupied).length;countEl.textContent=`${occupiedCount} / ${benchSlots.length}`;if(formEl)formEl.classList.toggle("hidden",!isRoomAdmin);if(hintEl)hintEl.classList.toggle("hidden",!isRoomAdmin);listEl.innerHTML=benchSlots.map((s,idx)=>{const occ=isOccupied(s);if(!occ){return `<div class="bench-player-card empty"><span class="text-sm font-black">+</span><span class="bench-role">${esc(s.label)} ${idx+1}</span><span class="text-[8px] opacity-75 mt-1">Boş</span></div>`;}const paidBadge=s.paid?'<span class="text-[8px] font-black text-emerald-300">✓ Ödendi</span>':'<span class="text-[8px] font-black text-amber-300">⏳ Bekliyor</span>';const actions=isRoomAdmin?`<div class="bench-actions"><button type="button" onclick="openMoveModal('${esc(s.id)}')">🔄 Taşı</button><button type="button" onclick="clearSlot('${esc(s.id)}')">✕</button></div>`:"";return `<div class="bench-player-card"><span class="bench-role">${esc(s.label)} ${idx+1}</span><span class="bench-name mt-1">${esc(s.name)}</span><div class="mt-1">${paidBadge}</div>${actions}</div>`;}).join("");}
+async function addBenchPlayer(e){e.preventDefault();if(!isRoomAdmin||!currentRoomId)return;const inp=document.getElementById("benchPlayerName"),btn=document.getElementById("benchAddBtn"),name=(inp?.value||"").trim();if(!name){alert("Lütfen yedek oyuncu adını gir.");return;}const freeSlot=getBenchSlots().find(s=>!isOccupied(s));if(!freeSlot){alert("Yedek kulübesi dolu (en fazla 2 yedek).");return;}btn.disabled=true;try{await db.ref(`rooms/${currentRoomId}/roster/${freeSlot.id}`).update({name,status:"approved",paid:false,applicationId:null});inp.value="";}catch(err){alert("Yedek oyuncu eklenemedi: "+err.message);}finally{btn.disabled=false;}}
+
+const DEFAULT_CARD_STARS="★★★☆☆",CARD_THEMES=["gold","silver","bronze","black","promo","icon"];
+const POSITION_STAT_LABELS={GK:["DIV","HAN","KIC","REF","SPD","POS"],DEF:["PAC","SHO","PAS","DRI","DEF","PHY"],MID:["PAC","SHO","PAS","DRI","DEF","PHY"],FWD:["PAC","SHO","PAS","DRI","DEF","PHY"],SUB:["PAC","SHO","PAS","DRI","DEF","PHY"]};
+function getPlayerRating(p){const r=Number(p&&p.rating);return Number.isFinite(r)&&r>=40&&r<=99?Math.round(r):80;}
+function getPlayerStars(p){const raw=String(p&&p.stars||"").trim();if(!raw)return DEFAULT_CARD_STARS;const count=Math.min(5,Math.max(1,(raw.match(/★/g)||[]).length||Number(raw)||3));return "★".repeat(count)+"☆".repeat(5-count);}
+function getCardTheme(p){const t=String(p&&p.cardTheme||"gold").toLowerCase();return CARD_THEMES.includes(t)?t:"gold";}
+function getPlayerPhoto(p){const u=String(p&&p.photoUrl||"").trim();return (u.startsWith("https://")||u.startsWith("data:image/"))?u:"";}
+function getPlayerStats(p,pos){const labels=POSITION_STAT_LABELS[pos]||POSITION_STAT_LABELS.MID;const base=getPlayerRating(p);const raw=Array.isArray(p&&p.stats)?p.stats:[];const nums=labels.map((_,i)=>{const v=Number(raw[i]);return Number.isFinite(v)&&v>=40&&v<=99?Math.round(v):Math.min(99,Math.max(55,base+((i*7)%11)-5));});return labels.map((label,i)=>[label,nums[i]]);}
+function cardVisualHtml(p,posLabel){
+  const rating=getPlayerRating(p),stars=getPlayerStars(p),theme=getCardTheme(p),photo=getPlayerPhoto(p),name=esc(p.name);
+  const avatar=photo?`<img src="${esc(photo)}" alt="${name}" loading="lazy">`:esc(name.charAt(0).toLocaleUpperCase("tr-TR")||"⚽");
+  const statsHtml=getPlayerStats(p,p.pos||posLabel).map(([k,v])=>`<span>${k} <b>${v}</b></span>`).join("");
+  const fee=getSlotPriceForRoom(currentRoomInfo,p.pos);
+  const feeHtml=fee?`<div class="fc-card-fee">${fee}₺</div>`:"";
+  const status=p.paid?'<div class="fc-card-status">✓ Ödendi</div>':'<div class="fc-card-status">⏳ Bekliyor</div>';
+  const actions=isRoomAdmin?`<div class="fc-card-actions"><button type="button" onclick="event.stopPropagation();openMoveModal('${esc(p.id)}')">Taşı</button><button type="button" onclick="event.stopPropagation();togglePaid('${esc(p.id)}')">${p.paid?"Ödenmedi":"Ödendi"}</button><button type="button" class="photo-action" onclick="event.stopPropagation();openPhotoModal('${esc(p.id)}')">Foto</button><button type="button" onclick="event.stopPropagation();clearSlot('${esc(p.id)}')">Sil</button></div>`:"";
+  return `<div class="fc-player-card fc-card-${theme}" onclick="toggleCardActions(event,this)" onkeydown="handleCardKeydown(event,this)" tabindex="0" role="button" aria-label="${name}, ${esc(posLabel)}"><div class="fc-card-top"><span class="fc-rating">${rating}</span><span class="fc-card-position">${esc(posLabel)}</span></div><div class="fc-card-stars">${stars}</div><div class="fc-card-avatar">${avatar}</div><div class="fc-card-name">${name}</div><div class="fc-card-country-row"><span class="fc-mini-crest">TR</span><span class="fc-role-mark">${esc(posLabel)}</span></div>${feeHtml}${status}<div class="fc-card-stats">${statsHtml}</div>${actions}</div>`;
+}
+function closeAllCardActions(exceptCard=null){document.querySelectorAll(".fc-player-card.fc-actions-open").forEach(el=>{if(el!==exceptCard)el.classList.remove("fc-actions-open");});}
+function toggleCardActions(e,card){if(!isRoomAdmin)return;if(e)e.stopPropagation();const willOpen=!card.classList.contains("fc-actions-open");closeAllCardActions(willOpen?card:null);card.classList.toggle("fc-actions-open",willOpen);}
+function handleCardKeydown(e,card){if(!isRoomAdmin)return;if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleCardActions(e,card);}else if(e.key==="Escape"){card.classList.remove("fc-actions-open");}}
+document.addEventListener("click",e=>{if(!e.target.closest(".fc-player-card"))closeAllCardActions();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAllCardActions();});
+
+function renderTeamPitch(team,elId){const el=document.getElementById(elId);el.innerHTML="";for(const row of getTeamRows(team)){const rDiv=document.createElement("div");rDiv.className="pitch-player-row";for(const s of row){const d=document.createElement("div");if(!isOccupied(s)){const b=document.createElement("button");b.type="button";b.className="fc-player-card empty";b.innerHTML=`<div class="fc-card-top"><span>+</span><span class="fc-card-position">${esc(s.pos)}</span></div><div class="fc-card-stars">${DEFAULT_CARD_STARS}</div><div class="fc-card-avatar">+</div><div class="fc-card-name">${esc(s.label)}</div><div class="fc-card-status">${getSlotPriceForRoom(currentRoomInfo,s.pos)}₺ • Boş</div>`;b.onclick=()=>selectSlotForForm(s.id);d.appendChild(b);}else{d.innerHTML=cardVisualHtml(s,s.pos);}rDiv.appendChild(d);}el.appendChild(rDiv);}}
+
+function renderAll(){
+  const cap=getTotalCapacityFromInfo(currentRoomInfo);
+  const formDef=getFormationDefinition(cap,currentRoomInfo&&currentRoomInfo.formation);
+  const badge=document.getElementById("pitchFormationBadge");
+  if(badge)badge.textContent=`DİZİLİŞ ${formDef.id}`;
+  syncRoomFormationOptions();
+  renderTeamPitch("green","greenTeamPitch");
+  renderTeamPitch("red","redTeamPitch");
+  renderBenchSection();
+  updateSlotDropdown();
+  updatePrice();
+  if(isRoomAdmin)renderAdminLists();
+  renderTournament();
+}
+function selectSlotForForm(id){const s=getSlot(id);if(!s||isOccupied(s))return;document.getElementById("teamSelect").value=s.team;updateSlotDropdown();document.getElementById("slotSelect").value=id;updatePrice();document.getElementById("playerName").focus();}
+function updateSlotDropdown(){const team=document.getElementById("teamSelect").value,sel=document.getElementById("slotSelect"),prev=sel.value;const free=roster.filter(x=>x.team===team&&x.team!=="bench"&&!isOccupied(x));sel.innerHTML=free.length?free.map(x=>`<option value="${esc(x.id)}">${esc(x.label)} (${getSlotPriceForRoom(currentRoomInfo,x.pos)}₺)</option>`).join(""):`<option value="">Bu takımda boş mevki yok</option>`;if(free.some(x=>x.id===prev))sel.value=prev;}
+function updatePrice(){const id=document.getElementById("slotSelect").value,s=getSlot(id);document.getElementById("priceDisplay").textContent=s?getSlotPriceForRoom(currentRoomInfo,s.pos)+" ₺":getPerPersonFeeFromInfo(currentRoomInfo)+" ₺";}
+
+async function handleJoin(e){
+  e.preventDefault();
+  if(!currentUser){showMessage("Başvuru yapmak için önce hesabınla giriş yapmalısın.",false);return;}
+  if(!currentRoomId){showMessage("Oda seçilmedi.",false);return;}
+  const name=document.getElementById("playerName").value.trim(),team=document.getElementById("teamSelect").value,slotId=document.getElementById("slotSelect").value,btn=document.getElementById("joinSubmit");
+  if(!name){showMessage("Lütfen adını veya lakabını gir.",false);return;}
+  const s=getSlot(slotId);
+  if(!s){showMessage("Seçilen mevki bulunamadı.",false);return;}
+  if(isOccupied(s)){showMessage("Bu mevki az önce doldu.",false);return;}
+  btn.disabled=true;
+  try{
+    const slotPrice=getSlotPriceForRoom(currentRoomInfo,s.pos);
+    const appRef=db.ref("rooms/"+currentRoomId+"/applications").push();
+    await appRef.set({name,team,pos:s.pos,slotId:s.id,price:slotPrice,paid:false,status:"pending",uid:currentUser.uid,email:currentUser.email||"",createdAt:firebase.database.ServerValue.TIMESTAMP});
+    showMessage(`Başvurun (${s.label} • ${slotPrice}₺) alındı! Yönetici onayından sonra kadroda görüneceksin.`,true);
+  }catch(x){showMessage("Başvuru gönderilemedi: "+x.message,false);}
+  finally{btn.disabled=false;}
+}
+
+function renderAdminLists(){if(!isRoomAdmin)return;const pBox=document.getElementById("pendingApplications"),aBox=document.getElementById("approvedApplications");const entries=Object.entries(applications||{}).filter(([,v])=>v&&typeof v==="object");const pending=entries.filter(([,v])=>v.status==="pending");pBox.innerHTML=pending.length?pending.map(([id,v])=>`<div class="p-3 rounded-xl bg-slate-900 border border-slate-700 flex flex-wrap items-center justify-between gap-2"><div><b>${esc(v.name)}</b> <span class="text-xs text-slate-400">(${esc(roomTeamName(v.team))} • ${esc(SLOT_LABEL[v.pos]||v.pos)} • ${esc(v.price)}₺)</span></div><div class="flex gap-2"><button type="button" onclick="approveApplication('${esc(id)}')" class="px-3 py-1 rounded bg-emerald-600 text-xs font-bold">Onayla</button><button type="button" onclick="rejectApplication('${esc(id)}')" class="px-3 py-1 rounded bg-red-700 text-xs font-bold">Reddet</button></div></div>`).join(""):'<p class="text-xs text-slate-500">Bekleyen başvuru yok.</p>';const approved=roster.filter(isOccupied);aBox.innerHTML=approved.length?approved.map(s=>`<div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-wrap items-center justify-between gap-2"><div><b>${esc(s.name)}</b> <span class="text-xs text-slate-400">(${esc(roomTeamName(s.team))} • ${esc(s.label)})</span> <span class="text-xs font-bold ${s.paid?"text-emerald-400":"text-amber-300"}">${s.paid?"• Ödendi":"• Ödenmedi"}</span></div><div class="flex flex-wrap gap-1.5"><button type="button" onclick="togglePaid('${esc(s.id)}')" class="px-2.5 py-1 rounded bg-slate-700 text-xs">${s.paid?"Ödenmedi yap":"Ödendi yap"}</button><button type="button" onclick="openMoveModal('${esc(s.id)}')" class="px-2.5 py-1 rounded bg-amber-600 text-slate-950 text-xs font-bold">🔄 Yer / Takım Değiştir</button><button type="button" onclick="clearSlot('${esc(s.id)}')" class="px-2.5 py-1 rounded bg-red-800 text-xs">Boşalt</button></div></div>`).join(""):'<p class="text-xs text-slate-500">Kadroda onaylanmış oyuncu yok.</p>';}
+
+async function approveApplication(appId){if(!isRoomAdmin||!currentRoomId)return;const appData=applications[appId];if(!appData)return;const targetSlot=getSlot(appData.slotId)||roster.find(x=>x.team===appData.team&&!isOccupied(x));if(!targetSlot){alert("Bu takım için boş mevki kalmadı.");return;}if(isOccupied(targetSlot)){alert("Hedef mevki şu an dolu. Önce mevcut oyuncuyu taşı veya boşalt.");return;}try{await db.ref(`rooms/${currentRoomId}/roster/${targetSlot.id}`).update({name:appData.name,paid:!!appData.paid,status:"approved",applicationId:appId});await db.ref(`rooms/${currentRoomId}/applications/${appId}`).update({status:"approved",slotId:targetSlot.id});}catch(e){alert("Onaylanamadı: "+e.message);}}
+async function rejectApplication(appId){if(!isRoomAdmin||!currentRoomId||!applications[appId])return;try{await db.ref(`rooms/${currentRoomId}/applications/${appId}`).update({status:"rejected"});}catch(e){alert("Reddedilemedi: "+e.message);}}
+async function togglePaid(slotId){if(!isRoomAdmin||!currentRoomId)return;const s=getSlot(slotId);if(!s||!isOccupied(s))return;const nextPaid=!s.paid;try{await db.ref(`rooms/${currentRoomId}/roster/${slotId}/paid`).set(nextPaid);if(s.applicationId)await db.ref(`rooms/${currentRoomId}/applications/${s.applicationId}/paid`).set(nextPaid);}catch(e){alert("Ödeme durumu güncellenemedi: "+e.message);}}
+async function clearSlot(slotId){if(!isRoomAdmin||!currentRoomId)return;const s=getSlot(slotId);if(!s)return;if(!confirm(`${s.name||s.label} kadrodan çıkarılsın mı?`))return;try{await db.ref(`rooms/${currentRoomId}/roster/${slotId}`).set({name:"",paid:false,status:"empty",applicationId:null});if(s.applicationId)await db.ref(`rooms/${currentRoomId}/applications/${s.applicationId}/status`).set("removed");}catch(e){alert("Mevki boşaltılamadı: "+e.message);}}
+
+function openMoveModal(slotId){if(!isRoomAdmin)return;const s=getSlot(slotId);if(!s||!isOccupied(s))return;movingContext={sourceSlotId:slotId};document.getElementById("movePlayerInfo").textContent=`Oyuncu: ${s.name} • Mevcut: ${roomTeamName(s.team)} - ${s.label} (${s.paid?"Ödendi":"Ödenmedi"})`;const sel=document.getElementById("moveTargetSlot");sel.innerHTML=roster.filter(x=>x.id!==slotId).map(x=>{const state=isOccupied(x)?`DOLU: ${x.name} (${x.paid?"Ödendi":"Ödenmedi"})`:"BOŞ";return `<option value="${esc(x.id)}">${esc(roomTeamName(x.team))} • ${esc(x.label)} [${esc(state)}]</option>`;}).join("");document.getElementById("moveError").textContent="";document.getElementById("movePlayerModal").classList.remove("hidden");}
 function closeMoveModal(){movingContext=null;document.getElementById("movePlayerModal").classList.add("hidden");}
-async function confirmMovePlayer(e){e.preventDefault();if(!isRoomAdmin||!movingContext||!currentRoomId)return;const targetSlotId=document.getElementById("moveTargetSlot").value,errBox=document.getElementById("moveError"),btn=document.getElementById("moveSubmitBtn");errBox.textContent="";if(!targetSlotId||targetSlotId===movingContext.sourceSlotId){errBox.textContent="Lütfen farklı bir kadro yeri seç.";return;}btn.disabled=true;try{const basePath=`rooms/${currentRoomId}`,srcMeta=roster.find(x=>x.id===movingContext.sourceSlotId),dstMeta=roster.find(x=>x.id===targetSlotId);if(!srcMeta||!dstMeta)throw new Error("Kadro bilgisi bulunamadı.");const srcSnap=await db.ref(`${basePath}/roster/${movingContext.sourceSlotId}`).once("value"),srcVal=srcSnap.val();if(!srcVal||!srcVal.name||srcVal.status==="empty")throw new Error("Kaynak oyuncu artık bu yerde değil.");const dstSnap=await db.ref(`${basePath}/roster/${targetSlotId}`).once("value"),dstVal=dstSnap.val();if(!dstVal&&dstMeta.team!=="bench")throw new Error("Seçilen kadro yeri bulunamadı.");const targetOccupied=!!(dstVal&&dstVal.name&&dstVal.status!=="empty");const sourceAppId=movingContext.appId||srcVal.applicationId||null,targetAppId=targetOccupied?(dstVal.applicationId||null):null;const emptyPlayer={name:"",paid:false,status:"empty",applicationId:null};const movedSource={...srcVal,paid:srcVal.paid===true,status:"approved",applicationId:sourceAppId};let rosterUpdates={};if(targetOccupied){const movedTarget={...dstVal,paid:dstVal.paid===true,status:"approved",applicationId:targetAppId};rosterUpdates[movingContext.sourceSlotId]=movedTarget;rosterUpdates[targetSlotId]=movedSource;}else{rosterUpdates[movingContext.sourceSlotId]=emptyPlayer;rosterUpdates[targetSlotId]=movedSource;}await db.ref(`${basePath}/roster`).update(rosterUpdates);const updateApp=async(id,slotId,meta)=>{if(!id)return;const appSnap=await db.ref(`${basePath}/applications/${id}`).once("value");if(appSnap.exists())await db.ref(`${basePath}/applications/${id}`).update({slotId,team:meta.team,pos:meta.pos,price:meta.team==="bench"?0:getSlotPriceForRoom(currentRoomInfo,meta.pos),movedAt:firebase.database.ServerValue.TIMESTAMP});};if(targetOccupied){await updateApp(sourceAppId,targetSlotId,dstMeta);await updateApp(targetAppId,movingContext.sourceSlotId,srcMeta);}else{await updateApp(sourceAppId,targetSlotId,dstMeta);}closeMoveModal();alert(targetOccupied?"Oyuncuların yerleri karşılıklı değiştirildi.":"Oyuncunun yeri güncellendi.");}catch(err){errBox.textContent="Taşıma başarısız: "+err.message;}finally{btn.disabled=false;}}
+async function confirmMovePlayer(e){e.preventDefault();if(!isRoomAdmin||!currentRoomId||!movingContext)return;const src=getSlot(movingContext.sourceSlotId),dst=getSlot(document.getElementById("moveTargetSlot").value),err=document.getElementById("moveError"),btn=document.getElementById("moveSubmitBtn");if(!src||!dst||src.id===dst.id){err.textContent="Farklı bir mevki seçin.";return;}btn.disabled=true;err.textContent="";try{const srcData={name:src.name,paid:!!src.paid,status:"approved",applicationId:src.applicationId||null};const dstOccupied=isOccupied(dst);const dstData=dstOccupied?{name:dst.name,paid:!!dst.paid,status:"approved",applicationId:dst.applicationId||null}:{name:"",paid:false,status:"empty",applicationId:null};await db.ref(`rooms/${currentRoomId}/roster/${dst.id}`).set(srcData);await db.ref(`rooms/${currentRoomId}/roster/${src.id}`).set(dstData);if(src.applicationId)await db.ref(`rooms/${currentRoomId}/applications/${src.applicationId}`).update({team:dst.team,pos:dst.pos,slotId:dst.id,price:getSlotPriceForRoom(currentRoomInfo,dst.pos)});if(dstOccupied&&dst.applicationId)await db.ref(`rooms/${currentRoomId}/applications/${dst.applicationId}`).update({team:src.team,pos:src.pos,slotId:src.id,price:getSlotPriceForRoom(currentRoomInfo,src.pos)});closeMoveModal();}catch(x){err.textContent="Taşıma yapılamadı: "+x.message;}finally{btn.disabled=false;}}
 
-async function approveApplication(id){const a=applications[id];if(!isRoomAdmin||!a||!currentRoomId)return;try{const ref=db.ref(`rooms/${currentRoomId}/roster/${a.slotId}`),s=(await ref.once("value")).val();if(!s||s.status!=="empty"||s.name){alert("Bu mevki artık boş değil.");return;}await ref.update({name:a.name,paid:false,status:"approved",applicationId:id});await db.ref(`rooms/${currentRoomId}/applications/${id}`).update({status:"approved",paid:false,reviewedAt:firebase.database.ServerValue.TIMESTAMP});alert("Başvuru kabul edildi.");}catch(e){alert("Onay başarısız: "+e.message);}}
-async function rejectApplication(id){if(!isRoomAdmin||!applications[id]||!currentRoomId)return;try{await db.ref(`rooms/${currentRoomId}/applications/${id}`).update({status:"rejected",reviewedAt:firebase.database.ServerValue.TIMESTAMP});}catch(e){alert(e.message);}}
-async function confirmPayment(id){const a=applications[id];if(!isRoomAdmin||!a||!currentRoomId)return;try{await db.ref(`rooms/${currentRoomId}/roster/${a.slotId}`).update({paid:true});await db.ref(`rooms/${currentRoomId}/applications/${id}`).update({paid:true,paidAt:firebase.database.ServerValue.TIMESTAMP});}catch(e){alert("Ödeme onaylanamadı: "+e.message);}}
-async function undoPayment(id){const a=applications[id];if(!isRoomAdmin||!a||!currentRoomId)return;try{await db.ref(`rooms/${currentRoomId}/roster/${a.slotId}`).update({paid:false});await db.ref(`rooms/${currentRoomId}/applications/${id}`).update({paid:false,paidAt:null});}catch(e){alert(e.message);}}
-async function removeApprovedPlayer(id){const a=applications[id];if(!isRoomAdmin||!a||!currentRoomId||!confirm(a.name+" kadrodan çıkarılsın mı?"))return;try{await db.ref(`rooms/${currentRoomId}/roster/${a.slotId}`).update({name:"",paid:false,status:"empty",applicationId:null});await db.ref(`rooms/${currentRoomId}/applications/${id}`).update({status:"removed",paid:false});}catch(e){alert(e.message);}}
-async function removeSlot(id){const s=roster.find(x=>x.id===id);if(!isRoomAdmin||!s||!currentRoomId||!confirm(s.name+" çıkarılsın mı?"))return;try{await db.ref(`rooms/${currentRoomId}/roster/${id}`).update({name:"",paid:false,status:"empty",applicationId:null});if(s.applicationId)await db.ref(`rooms/${currentRoomId}/applications/${s.applicationId}`).update({status:"removed",paid:false});}catch(e){alert(e.message);}}
-async function resetAllPlayers(){if(!isRoomAdmin||!currentRoomId||!confirm("Tüm kadro yuvaları boşaltılsın mı?"))return;try{for(const s of roster)await db.ref(`rooms/${currentRoomId}/roster/${s.id}`).update({name:"",paid:false,status:"empty",applicationId:null});for(const [id,a] of Object.entries(applications))if(a.status==="approved")await db.ref(`rooms/${currentRoomId}/applications/${id}`).update({status:"removed",paid:false});alert("Kadro boşaltıldı.");}catch(e){alert("İşlem başarısız: "+e.message);}}
+async function resetAllPlayers(){if(!isRoomAdmin||!currentRoomId||!confirm("Tüm kadro boşaltılsın mı?"))return;try{await db.ref("rooms/"+currentRoomId+"/roster").set(makeDefaultRosterMap(currentRoomInfo));await db.ref("rooms/"+currentRoomId+"/applications").remove();}catch(e){alert("Kadrolar sıfırlanamadı: "+e.message);}}
 
-async function copyIban(){const val=document.getElementById("roomIbanText").textContent;try{await navigator.clipboard.writeText(val);alert("IBAN kopyalandı.");}catch(_){alert(val);}}
-async function copyWhatsAppRoster(){if(!currentRoomId)return;const info=currentRoomInfo||{},cap=getTotalCapacityFromInfo(info),totalPrice=getPitchPriceFromInfo(info),perPerson=getPerPersonFeeFromInfo(info),link=getRoomShareUrl(currentRoomId);const lines=[`⚽ ${(info.title||"KADROKUR").toUpperCase()}`,`📅 ${info.pitchName||""} ${info.schedule?"| "+info.schedule:""} | ${cap} Kişi (${perPerson}₺/kişi • Saha: ${totalPrice}₺)`.trim(),""];for(const team of ["green","red"]){lines.push(team==="green"?`🏠 ${info.homeTeam||"1. Takım"}`:`✈️ ${info.awayTeam||"2. Takım"}`);for(const s of roster.filter(x=>x.team===team))lines.push(`${SLOT_LABEL[s.pos]}: ${isOccupied(s)?s.name+(s.paid?" ✅":" ⏳"):"BOŞ ("+getSlotPriceForRoom(info,s.pos)+"₺)"}`);lines.push("");}const subs=roster.filter(x=>x.team==="bench");if(subs.length){lines.push("🪑 YEDEK KULÜBESİ");subs.forEach(s=>lines.push(isOccupied(s)?s.name:"Boş yedek"));lines.push("");}lines.push(`🔗 Oda Linki: ${link}`);lines.push(`🏷️ Oda Kodu: ${currentRoomId}`);const text=lines.join("\n");try{await navigator.clipboard.writeText(text);alert("Kadro ve oda linki kopyalandı!");}catch(_){alert(text);}}
+function copyIban(){const iban=(currentRoomInfo&&currentRoomInfo.iban)||"TR53 0006 2000 5950 0006 6773 76";navigator.clipboard.writeText(iban).then(()=>alert("IBAN kopyalandı: "+iban)).catch(()=>alert(iban));}
+function copyWhatsAppRoster(){const info=currentRoomInfo||{};const cap=getTotalCapacityFromInfo(info);const perPerson=getPerPersonFeeFromInfo(info);const g=getRosterByTeam("green"),r=getRosterByTeam("red"),b=getBenchSlots();const line=p=>isOccupied(p)?`• ${p.label}: ${p.name} (${p.paid?"✅ Ödendi":"⏳ Ödenmedi"})`:`• ${p.label}: [Boş - ${getSlotPriceForRoom(info,p.pos)}₺]`;const txt=[`⚽ *${info.title||info.pitchName||"Halı Saha Maçı"}*`,`📍 ${[info.region,info.district,info.pitchName].filter(Boolean).join(" / ")}`,`📅 ${info.schedule||""} • ${cap} Kişi • ${perPerson}₺/kişi`,"",`🟢 *${roomTeamName("green")}* (${g.filter(isOccupied).length}/${g.length})`,...g.map(line),"",`🔴 *${roomTeamName("red")}* (${r.filter(isOccupied).length}/${r.length})`,...r.map(line),...(b.length?["",`🪑 *Yedekler* (${b.filter(isOccupied).length}/${b.length})`,...b.map((p,i)=>isOccupied(p)?`• ${p.label} ${i+1}: ${p.name} (${p.paid?"✅ Ödendi":"⏳ Ödenmedi"})`:`• ${p.label} ${i+1}: [Boş]`)]:[]),"",`💳 IBAN (${info.ibanOwner||"Oda Sahibi"}): ${info.iban||"TR53 0006 2000 5950 0006 6773 76"}`].join("\n");navigator.clipboard.writeText(txt).then(()=>alert("WhatsApp kadro metni kopyalandı!")).catch(()=>alert(txt));}
 
-let pitchFullscreenPlaceholders=null;
-function restorePitchFullscreenLayout(){
- const stage=document.getElementById("pitchStage"),bench=document.getElementById("benchSection");
- if(!stage||!pitchFullscreenPlaceholders)return;
- const {stageMarker,benchMarker}=pitchFullscreenPlaceholders;
- stage.classList.remove("is-pitch-fullscreen");
- if(bench&&benchMarker&&benchMarker.parentNode)benchMarker.parentNode.insertBefore(bench,benchMarker);
- if(stageMarker&&stageMarker.parentNode)stageMarker.parentNode.insertBefore(stage,stageMarker);
- stageMarker?.remove();benchMarker?.remove();pitchFullscreenPlaceholders=null;
- document.body.classList.remove("pitch-fullscreen-active");
-}
-function syncPitchFullscreenButton(){
- const stage=document.getElementById("pitchStage"),btn=document.getElementById("pitchFullscreenBtn"),icon=document.getElementById("pitchFullscreenIcon"),label=document.getElementById("pitchFullscreenText");
- if(!stage||!btn)return;
- const active=stage.classList.contains("is-pitch-fullscreen");
- btn.setAttribute("aria-pressed",String(active));btn.setAttribute("aria-label",active?"Sahayı küçült":"Sahayı tam ekran yap");
- if(icon)icon.textContent=active?"⤢":"⛶";if(label)label.textContent=active?"KÜÇÜLT":"TAM EKRAN";
- document.body.classList.toggle("pitch-fullscreen-active",active);
-}
-async function togglePitchFullscreen(){
- const stage=document.getElementById("pitchStage"),bench=document.getElementById("benchSection");if(!stage)return;
- if(stage.classList.contains("is-pitch-fullscreen")){
-  if(document.fullscreenElement&&document.exitFullscreen){try{await document.exitFullscreen();}catch(_){}}
-  restorePitchFullscreenLayout();syncPitchFullscreenButton();return;
- }
- const stageMarker=document.createComment("KadroKur saha konumu"),benchMarker=document.createComment("KadroKur yedek konumu");
- stage.parentNode.insertBefore(stageMarker,stage);
- if(bench&&bench.parentNode)bench.parentNode.insertBefore(benchMarker,bench);
- pitchFullscreenPlaceholders={stageMarker,benchMarker};
- document.body.appendChild(stage);
- if(bench)stage.appendChild(bench);
- stage.classList.add("is-pitch-fullscreen");syncPitchFullscreenButton();
- if(stage.requestFullscreen){try{await stage.requestFullscreen();}catch(_){}}
- syncPitchFullscreenButton();
-}
-document.addEventListener("fullscreenchange",()=>{
- const stage=document.getElementById("pitchStage");
- if(stage&&document.fullscreenElement!==stage&&stage.classList.contains("is-pitch-fullscreen"))restorePitchFullscreenLayout();
- syncPitchFullscreenButton();
-});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){const stage=document.getElementById("pitchStage");if(stage?.classList.contains("is-pitch-fullscreen")){if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});restorePitchFullscreenLayout();syncPitchFullscreenButton();}}});
+async function openPhotoModal(slotId){if(!isRoomAdmin||!currentRoomId)return;const s=getSlot(slotId);if(!s||!isOccupied(s))return;const currentUrl=getPlayerPhoto(s);const next=prompt(`${s.name} için oyuncu fotoğraf URL'si (https://...) girin veya temizlemek için boş bırakın:`,currentUrl);if(next===null)return;const trimmed=next.trim();if(trimmed&&!trimmed.startsWith("https://")){alert("Güvenlik için yalnızca https:// ile başlayan görsel bağlantısı kullanın.");return;}try{await db.ref(`rooms/${currentRoomId}/roster/${slotId}/photoUrl`).set(trimmed||null);}catch(e){alert("Fotoğraf güncellenemedi: "+e.message);}}
 
+function getTournamentMatches(){const raw=rooms?.[currentRoomId]?.tournament?.matches||{};return Object.entries(raw).map(([id,m])=>({id,...m})).sort((a,b)=>String(a.dateTime||"").localeCompare(String(b.dateTime||"")));}
+function computeTournamentStandings(matches){const table=new Map();const ensure=name=>{const key=String(name||"").trim();if(!key)return null;if(!table.has(key))table.set(key,{team:key,played:0,won:0,drawn:0,lost:0,gf:0,ga:0,gd:0,points:0});return table.get(key);};for(const m of matches){const h=ensure(m.home),a=ensure(m.away);if(!h||!a)continue;if(m.status!=="played")continue;const hs=Number(m.homeScore),as=Number(m.awayScore);if(!Number.isFinite(hs)||!Number.isFinite(as))continue;h.played+=1;a.played+=1;h.gf+=hs;h.ga+=as;a.gf+=as;a.ga+=hs;h.gd=h.gf-h.ga;a.gd=a.gf-a.ga;if(hs>as){h.won+=1;h.points+=3;a.lost+=1;}else if(as>hs){a.won+=1;a.points+=3;h.lost+=1;}else{h.drawn+=1;a.drawn+=1;h.points+=1;a.points+=1;}}return Array.from(table.values()).sort((x,y)=>(y.points-x.points)||(y.gd-x.gd)||(y.gf-x.gf)||x.team.localeCompare(y.team,"tr"));}
+async function addTournamentFixture(e){e.preventDefault();if(!isRoomAdmin||!currentRoomId)return;const home=document.getElementById("fixtureHome").value.trim(),away=document.getElementById("fixtureAway").value.trim(),date=document.getElementById("fixtureDate").value,time=document.getElementById("fixtureTime").value;if(!home||!away||home.toLocaleLowerCase("tr-TR")===away.toLocaleLowerCase("tr-TR")){alert("Lütfen iki farklı takım adı gir.");return;}try{await db.ref(`rooms/${currentRoomId}/tournament/matches`).push({home,away,dateTime:`${date}T${time}`,status:"scheduled",homeScore:null,awayScore:null,createdAt:firebase.database.ServerValue.TIMESTAMP});document.getElementById("fixtureForm").reset();document.getElementById("fixtureTime").value="20:00";}catch(err){alert("Fikstür eklenemedi: "+err.message);}}
+async function saveFixtureScore(matchId){if(!isRoomAdmin||!currentRoomId)return;const hs=Number(document.getElementById(`score-h-${matchId}`)?.value),as=Number(document.getElementById(`score-a-${matchId}`)?.value);if(!Number.isFinite(hs)||!Number.isFinite(as)||hs<0||as<0){alert("Geçerli bir skor gir.");return;}try{const snapRoster=roster.filter(isOccupied);const snapshot={home:snapRoster.filter(x=>x.team==="green").map(x=>({name:x.name,pos:x.pos,rating:x.rating||null})),away:snapRoster.filter(x=>x.team==="red").map(x=>({name:x.name,pos:x.pos,rating:x.rating||null}))};await db.ref(`rooms/${currentRoomId}/tournament/matches/${matchId}`).update({homeScore:Math.round(hs),awayScore:Math.round(as),status:"played",playedAt:firebase.database.ServerValue.TIMESTAMP,rosterSnapshot:snapshot});}catch(err){alert("Skor kaydedilemedi: "+err.message);}}
+async function deleteFixture(matchId){if(!isRoomAdmin||!currentRoomId||!confirm("Bu maç fikstürden silinsin mi?"))return;try{await db.ref(`rooms/${currentRoomId}/tournament/matches/${matchId}`).remove();}catch(err){alert("Maç silinemedi: "+err.message);}}
+function renderTournament(){const fBox=document.getElementById("tournamentFixtures"),sBox=document.getElementById("tournamentStandings");if(!fBox||!sBox)return;const matches=getTournamentMatches();const playedCount=matches.filter(m=>m.status==="played").length;const pEl=document.getElementById("tournamentPlayedCount"),cEl=document.getElementById("tournamentFixtureCount");if(pEl)pEl.textContent=String(playedCount);if(cEl)cEl.textContent=String(matches.length);if(!matches.length){fBox.innerHTML='<p class="text-xs text-slate-500">Henüz fikstür maçı eklenmedi.</p>';}else{fBox.innerHTML=matches.map(m=>{const dt=m.dateTime?formatMatchDateTime(m.dateTime):"Tarih belirtilmedi";const played=m.status==="played";const scoreText=played?`<span class="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 font-black text-sm">${esc(m.homeScore)} - ${esc(m.awayScore)}</span>`:'<span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-bold">Oynanmadı</span>';const adminControls=isRoomAdmin?`<div class="mt-2 pt-2 border-t border-slate-800 flex flex-wrap items-center gap-2"><input id="score-h-${esc(m.id)}" type="number" min="0" max="99" value="${played?esc(m.homeScore):0}" aria-label="Ev sahibi skor" class="w-14 px-2 py-1 rounded bg-slate-950 border border-slate-700 text-xs text-white text-center"><span class="text-xs font-bold text-slate-400">-</span><input id="score-a-${esc(m.id)}" type="number" min="0" max="99" value="${played?esc(m.awayScore):0}" aria-label="Deplasman skor" class="w-14 px-2 py-1 rounded bg-slate-950 border border-slate-700 text-xs text-white text-center"><button type="button" onclick="saveFixtureScore('${esc(m.id)}')" class="px-3 py-1 rounded bg-amber-400 text-slate-950 text-xs font-black">Skoru Kaydet</button><button type="button" onclick="deleteFixture('${esc(m.id)}')" class="px-2 py-1 rounded bg-rose-900 text-rose-200 text-xs font-bold">Sil</button></div>`:"";return `<div class="rounded-xl bg-slate-900/90 border border-slate-800 p-3"><div class="flex items-center justify-between gap-2"><span class="text-[10px] text-slate-400">📅 ${esc(dt)}</span>${scoreText}</div><div class="mt-1.5 flex items-center justify-between gap-2 text-xs font-bold text-white"><span class="truncate">${esc(m.home)}</span><span class="text-[10px] text-slate-500">VS</span><span class="truncate text-right">${esc(m.away)}</span></div>${adminControls}</div>`;}).join("");}const rows=computeTournamentStandings(matches);if(!rows.length){sBox.innerHTML='<p class="text-xs text-slate-500">Henüz tamamlanmış maç skoru yok.</p>';}else{sBox.innerHTML=`<table class="w-full text-left border-collapse text-xs"><thead><tr class="border-b border-slate-800 text-[10px] text-slate-400"><th class="py-2 pr-2">#</th><th class="py-2 pr-2">Takım</th><th class="py-2 px-1 text-center">O</th><th class="py-2 px-1 text-center">G</th><th class="py-2 px-1 text-center">B</th><th class="py-2 px-1 text-center">M</th><th class="py-2 px-1 text-center">AV</th><th class="py-2 pl-2 text-right text-amber-300">P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="border-b border-slate-800/60 ${i===0?"bg-amber-500/10":""}"><td class="py-2 pr-2 font-black text-slate-400">${i+1}</td><td class="py-2 pr-2 font-bold text-white truncate max-w-[120px]">${esc(r.team)}</td><td class="py-2 px-1 text-center text-slate-300">${r.played}</td><td class="py-2 px-1 text-center text-emerald-300">${r.won}</td><td class="py-2 px-1 text-center text-slate-400">${r.drawn}</td><td class="py-2 px-1 text-center text-rose-300">${r.lost}</td><td class="py-2 px-1 text-center font-bold ${r.gd>0?"text-emerald-300":r.gd<0?"text-rose-300":"text-slate-400"}">${r.gd>0?"+"+r.gd:r.gd}</td><td class="py-2 pl-2 text-right font-black text-amber-300">${r.points}</td></tr>`).join("")}</tbody></table>`;}}
 
-function initHomeTopMenus(){
- const move=(id,target)=>{const el=document.getElementById(id),host=document.getElementById(target);if(el&&host)host.appendChild(el);};
- move("roomsList","homeTopRoomsContent");
- const searchHost=document.getElementById("homeTopSearchContent");
- const filter=document.getElementById("filterRegion")?.closest(".glass-card");
- const direct=document.getElementById("directRoomCode")?.closest(".glass-card");
- const status=document.getElementById("lobbyJoinStatus");
- if(searchHost){if(filter)searchHost.appendChild(filter);if(direct)searchHost.appendChild(direct);if(status)searchHost.appendChild(status);}
- move("accountPanel","homeTopAccountContent");
+const PRIVATE_SQUAD_STORAGE_KEY="kadrokur_private_squad_v1",PRIVATE_SQUAD_PASS_KEY="kadrokur_private_squad_pass_v1";
+let privateSquadUnlocked=false,privateSquadConfig=null,privateSquadConfigRef=null,privateSquadPendingAction=null;
+function loadPrivateSquadState(){try{const raw=localStorage.getItem(PRIVATE_SQUAD_STORAGE_KEY);const parsed=raw?JSON.parse(raw):{};return{namesText:typeof parsed.namesText==="string"?parsed.namesText:"",green:Array.isArray(parsed.green)?parsed.green.slice(0,7):[],red:Array.isArray(parsed.red)?parsed.red.slice(0,7):[],bench:Array.isArray(parsed.bench)?parsed.bench.slice(0,2):[]};}catch(_){return{namesText:"",green:[],red:[],bench:[]};}}
+function savePrivateSquadState(state){try{localStorage.setItem(PRIVATE_SQUAD_STORAGE_KEY,JSON.stringify(state));}catch(_){}}
+function parsePrivateSquadNames(text){return String(text||"").split(/\r?\n/).map(line=>line.trim()).filter(Boolean);}
+function updatePrivateSquadCount(){const inp=document.getElementById("privateSquadNames"),cnt=document.getElementById("privateSquadCount");if(!inp||!cnt)return;const count=parsePrivateSquadNames(inp.value).length;cnt.textContent=`${count} oyuncu • Hedef: 16 kişi`;}
+function renderPrivateSquad(){const state=loadPrivateSquadState(),inp=document.getElementById("privateSquadNames");if(inp&&document.activeElement!==inp)inp.value=state.namesText||"";updatePrivateSquadCount();const renderList=(items,emptyText,accentClass)=>items&&items.length?items.map((name,i)=>`<div class="flex items-center justify-between rounded-xl bg-slate-950/80 border border-white/10 px-3 py-2"><span class="text-xs font-black ${accentClass}">${i+1}.</span><span class="font-bold text-white truncate ml-2 flex-1">${esc(name)}</span></div>`).join(""):`<p class="text-xs text-slate-500">${esc(emptyText)}</p>`;document.getElementById("privateTeamGreen").innerHTML=renderList(state.green,"Henüz kadro oluşturulmadı.","text-emerald-300");document.getElementById("privateTeamRed").innerHTML=renderList(state.red,"Henüz kadro oluşturulmadı.","text-rose-300");document.getElementById("privateBench").innerHTML=renderList(state.bench,"Yedekler burada görünecek.","text-amber-300");}
+function savePrivateSquadNames(){const inp=document.getElementById("privateSquadNames");if(!inp)return;const state=loadPrivateSquadState();state.namesText=inp.value;savePrivateSquadState(state);updatePrivateSquadCount();alert("Oyuncu listesi kaydedildi.");}
+function shuffleArray(arr){const copy=arr.slice();for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]];}return copy;}
+function buildPrivateSquad(){const inp=document.getElementById("privateSquadNames");if(!inp)return;const names=parsePrivateSquadNames(inp.value);if(names.length<16){alert(`16 oyuncu gerekli. Şu an ${names.length} oyuncu var.`);return;}const picked=shuffleArray(names).slice(0,16),green=picked.slice(0,7),red=picked.slice(7,14),bench=picked.slice(14,16);savePrivateSquadState({namesText:inp.value,green,red,bench});renderPrivateSquad();}
+async function copyPrivateSquad(){const state=loadPrivateSquadState();if(!state.green.length&&!state.red.length){alert("Önce kadro oluştur.");return;}const lines=["⚽ *Kendi Aranda Kadro (7v7 + 2 Yedek)*","","🟢 *1. Takım*",...state.green.map((n,i)=>`${i+1}. ${n}`),"","🔴 *2. Takım*",...state.red.map((n,i)=>`${i+1}. ${n}`),"","🟡 *Yedekler*",...(state.bench.length?state.bench.map((n,i)=>`${i+1}. ${n}`):["-"])].join("\n");try{await navigator.clipboard.writeText(lines);alert("Özel kadro kopyalandı!");}catch(_){alert(lines);}}
+function clearPrivateSquad(){if(!confirm("Özel kadro ve oyuncu listesi temizlensin mi?"))return;savePrivateSquadState({namesText:"",green:[],red:[],bench:[]});const inp=document.getElementById("privateSquadNames");if(inp)inp.value="";renderPrivateSquad();}
+async function sha256Hex(text){if(window.crypto&&window.crypto.subtle){const buf=await window.crypto.subtle.digest("SHA-256",new TextEncoder().encode(text));return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");}let h=0x811c9dc5;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,0x01000193);}return (h>>>0).toString(16).padStart(8,"0");}
+function ensurePrivateSquadConfigListener(){if(privateSquadConfigRef||!db)return;privateSquadConfigRef=db.ref("privateSquadAccess");privateSquadConfigRef.on("value",snap=>{privateSquadConfig=snap.val()||null;},()=>{});}
+async function getOrCreateSalt(cfg){if(cfg&&cfg.salt)return cfg.salt;if(!db)return"kadrokur-private-salt";const snap=await db.ref("privateSquadAccess/salt").once("value");if(snap.val())return snap.val();const salt=Array.from(window.crypto?.getRandomValues(new Uint8Array(12))||[1,2,3,4,5,6,7,8,9,10,11,12]).map(b=>b.toString(16).padStart(2,"0")).join("");try{await db.ref("privateSquadAccess/salt").set(salt);}catch(_){}return salt;}
+async function hasSharedPrivatePassword(){ensurePrivateSquadConfigListener();if(privateSquadConfig&&privateSquadConfig.hash)return true;if(db){try{const snap=await db.ref("privateSquadAccess/hash").once("value");if(snap.val())return true;}catch(_){}}return !!localStorage.getItem(PRIVATE_SQUAD_PASS_KEY);}
+function togglePrivatePasswordVisibility(inputId,btn){const inp=document.getElementById(inputId);if(!inp)return;const show=inp.type==="password";inp.type=show?"text":"password";if(btn)btn.textContent=show?"Gizle":"Göster";}
+async function openPrivateSquadGate(onSuccess){
+  if(privateSquadUnlocked){if(typeof onSuccess==="function")onSuccess();else showPrivateSquadSection();return;}
+  privateSquadPendingAction=typeof onSuccess==="function"?onSuccess:null;
+  const setupMode=!(await hasSharedPrivatePassword());
+  document.getElementById("privateSquadGateTitle").textContent=setupMode?"Ortak Şifre Oluştur":"Ortak Şifre Girişi";
+  document.getElementById("privateSquadGateDescription").textContent=setupMode?"İlk kullanımda arkadaşlarınla paylaşacağın ortak şifreyi belirle. Sonraki girişlerde bu şifre kullanılacak.":"Özel kadro alanına girmek için ortak şifreyi gir.";
+  document.getElementById("privateSquadConfirmWrap").classList.toggle("hidden",!setupMode);
+  document.getElementById("privateSquadGateSubmit").textContent=setupMode?"Şifre Oluştur":"Giriş Yap";
+  document.getElementById("privateSquadPassword").value="";document.getElementById("privateSquadPasswordConfirm").value="";document.getElementById("privateSquadGateError").textContent="";
+  document.getElementById("privateSquadGate").classList.remove("hidden");
+  document.getElementById("privateSquadPassword").focus();
 }
-function toggleHomeChat(button){
- const panel=document.getElementById("homeChatPanel");
- if(!panel)return;
- const willOpen=panel.classList.contains("hidden");
- panel.classList.toggle("hidden",!willOpen);
- button?.setAttribute("aria-expanded",willOpen?"true":"false");
- if(willOpen)requestAnimationFrame(()=>panel.scrollIntoView({behavior:"smooth",block:"center"}));
-}
-function toggleHomeTopMenu(name,button){
- const ids={rooms:"homeTopRooms",search:"homeTopSearch",account:"homeTopAccount"};
- const target=document.getElementById(ids[name]);if(!target)return;
- const willOpen=target.classList.contains("hidden");
- Object.values(ids).forEach(id=>document.getElementById(id)?.classList.add("hidden"));
- document.querySelectorAll(".home-top-btn").forEach(btn=>btn.setAttribute("aria-expanded","false"));
- if(willOpen){target.classList.remove("hidden");button?.setAttribute("aria-expanded","true");}
-}
-document.addEventListener("click",e=>{
- if(e.target.closest(".home-top-actions")||e.target.closest(".home-top-dropdown"))return;
- document.querySelectorAll(".home-top-dropdown").forEach(el=>el.classList.add("hidden"));
- document.querySelectorAll(".home-top-btn").forEach(btn=>btn.setAttribute("aria-expanded","false"));
-});
-
-// Özel kadro alanı: ilk kullanıcı ortak şifreyi kurar; sonraki herkes aynı Firebase şifresiyle girer.
-let privateSquadUnlocked = false;
-let privateSquadGateMode = "setup";
-const PRIVATE_SQUAD_ACCESS_PATH = "privateSquad/access";
-async function privatePasswordHash(password,salt){
-  if(!window.crypto?.subtle)throw new Error("Güvenli şifreleme bu tarayıcıda desteklenmiyor. Güncel HTTPS tarayıcı kullan.");
-  const enc=new TextEncoder(),key=await crypto.subtle.importKey("raw",enc.encode(password),"PBKDF2",false,["deriveBits"]);
-  const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:enc.encode(salt),iterations:150000,hash:"SHA-256"},key,256);
-  return Array.from(new Uint8Array(bits)).map(x=>x.toString(16).padStart(2,"0")).join("");
-}
-function randomPrivateSalt(){const bytes=new Uint8Array(16);crypto.getRandomValues(bytes);return Array.from(bytes).map(x=>x.toString(16).padStart(2,"0")).join("");}
-async function openPrivateSquadGate(){
-  const gate=document.getElementById("privateSquadGate"),err=document.getElementById("privateSquadGateError"),input=document.getElementById("privateSquadPassword");
-  gate.classList.remove("hidden");err.textContent="Kontrol ediliyor…";input.value="";document.getElementById("privateSquadPasswordConfirm").value="";
-  try{
-    if(!db)throw new Error("Firebase bağlantısı henüz hazır değil. Birkaç saniye sonra tekrar dene.");
-    const snap=await db.ref(PRIVATE_SQUAD_ACCESS_PATH).once("value");
-    privateSquadGateMode=snap.exists()?"login":"setup";
-    document.getElementById("privateSquadGateTitle").textContent=privateSquadGateMode==="setup"?"Ortak Şifre Oluştur":"Özel Kadro Girişi";
-    document.getElementById("privateSquadGateDescription").textContent=privateSquadGateMode==="setup"?"İlk kullanımda arkadaşlarınla paylaşacağın ortak şifreyi belirle. Sonraki girişlerde bu şifre kullanılacak.":"Daha önce oluşturulan ortak şifreyi girerek kadro oluşturma seçeneklerine geç.";
-    document.getElementById("privateSquadConfirmWrap").classList.toggle("hidden",privateSquadGateMode!=="setup");
-    document.getElementById("privateSquadGateSubmit").textContent=privateSquadGateMode==="setup"?"Şifre Oluştur":"Giriş Yap";
-    input.placeholder=privateSquadGateMode==="setup"?"En az 6 karakterli ortak şifre":"Ortak giriş şifresi";input.autocomplete=privateSquadGateMode==="setup"?"new-password":"current-password";
-    err.textContent="";setTimeout(()=>input.focus(),80);
-  }catch(e){err.textContent="Firebase erişim hatası: "+e.message+" • Veritabanı kurallarında privateSquad/access okuma/yazma izni gerekebilir.";}
-}
-function closePrivateSquadGate(){document.getElementById("privateSquadGate")?.classList.add("hidden");}
-function togglePrivatePasswordVisibility(id,btn){const input=document.getElementById(id);if(!input)return;input.type=input.type==="password"?"text":"password";if(btn)btn.textContent=input.type==="password"?"Göster":"Gizle";}
+function closePrivateSquadGate(){privateSquadPendingAction=null;document.getElementById("privateSquadGate").classList.add("hidden");}
 async function submitPrivateSquadPassword(){
-  const input=document.getElementById("privateSquadPassword"),confirmInput=document.getElementById("privateSquadPasswordConfirm"),err=document.getElementById("privateSquadGateError"),btn=document.getElementById("privateSquadGateSubmit");
-  const password=input.value;if(password.length<6){err.textContent="Ortak şifre en az 6 karakter olmalı.";input.focus();return;}
-  btn.disabled=true;btn.textContent="Kontrol ediliyor…";err.textContent="";
-  try{
-    const ref=db.ref(PRIVATE_SQUAD_ACCESS_PATH);
-    if(privateSquadGateMode==="setup"){
-      if(password!==confirmInput.value){err.textContent="Şifreler eşleşmiyor.";confirmInput.focus();return;}
-      const salt=randomPrivateSalt(),hash=await privatePasswordHash(password,salt);
-      const result=await ref.transaction(current=>current===null?{salt,hash,createdAt:firebase.database.ServerValue.TIMESTAMP}:undefined);
-      if(!result.committed){privateSquadGateMode="login";err.textContent="Ortak şifre başka biri tarafından oluşturulmuş. Şimdi o şifreyle giriş yap.";document.getElementById("privateSquadGateTitle").textContent="Özel Kadro Girişi";document.getElementById("privateSquadGateDescription").textContent="Daha önce oluşturulan ortak şifreyi gir.";document.getElementById("privateSquadConfirmWrap").classList.add("hidden");btn.textContent="Giriş Yap";return;}
-    }else{
-      const snap=await ref.once("value"),saved=snap.val();if(!saved?.salt||!saved?.hash)throw new Error("Ortak şifre kaydı bulunamadı. Sayfayı yenileyip tekrar dene.");
-      const hash=await privatePasswordHash(password,saved.salt);if(hash!==saved.hash){err.textContent="Şifre hatalı. Lütfen tekrar dene.";input.select();return;}
-    }
-    privateSquadUnlocked=true;closePrivateSquadGate();document.getElementById("homeView").classList.add("hidden");document.getElementById("privateSquadSection").classList.remove("hidden");loadPrivateSquad();
-  }catch(e){err.textContent="İşlem tamamlanamadı: "+e.message+" • Firebase privateSquad/access iznini kontrol et.";}
-  finally{btn.disabled=false;btn.textContent=privateSquadGateMode==="setup"?"Şifre Oluştur":"Giriş Yap";}
+  const pass=document.getElementById("privateSquadPassword").value,confirmEl=document.getElementById("privateSquadPasswordConfirm"),err=document.getElementById("privateSquadGateError");
+  err.textContent="";
+  if(pass.length<6){err.textContent="Şifre en az 6 karakter olmalı.";return;}
+  const setupMode=!(await hasSharedPrivatePassword());
+  if(setupMode){
+    if(pass!==confirmEl.value){err.textContent="Şifreler birbiriyle eşleşmiyor.";return;}
+    const salt=await getOrCreateSalt(privateSquadConfig),hash=await sha256Hex(`${salt}:${pass}`);
+    if(db){try{await db.ref("privateSquadAccess").set({salt,hash,updatedAt:Date.now()});}catch(e){err.textContent="Şifre sunucuya kaydedilemedi: "+e.message;return;}}
+    try{localStorage.setItem(PRIVATE_SQUAD_PASS_KEY,hash);}catch(_){}
+    privateSquadUnlocked=true;const action=privateSquadPendingAction;closePrivateSquadGate();if(action)action();else showPrivateSquadSection();return;
+  }
+  const salt=await getOrCreateSalt(privateSquadConfig),enteredHash=await sha256Hex(`${salt}:${pass}`),remoteHash=privateSquadConfig&&privateSquadConfig.hash?privateSquadConfig.hash:(db?(await db.ref("privateSquadAccess/hash").once("value")).val():null),localHash=localStorage.getItem(PRIVATE_SQUAD_PASS_KEY);
+  if(remoteHash&&enteredHash===remoteHash){privateSquadUnlocked=true;const action=privateSquadPendingAction;closePrivateSquadGate();if(action)action();else showPrivateSquadSection();}
+  else if(!remoteHash&&localHash&&enteredHash===localHash){privateSquadUnlocked=true;const action=privateSquadPendingAction;closePrivateSquadGate();if(action)action();else showPrivateSquadSection();}
+  else{err.textContent="Şifre hatalı. Tekrar dene.";}
 }
-function closePrivateSquad(){document.getElementById("privateSquadSection")?.classList.add("hidden");document.getElementById("homeView")?.classList.remove("hidden");}
-function privateNames(){return (document.getElementById("privateSquadNames")?.value||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,40);}
-function updatePrivateSquadCount(){const n=privateNames().length;const el=document.getElementById("privateSquadCount");if(el)el.textContent=`${n} oyuncu • ${n<16?`${16-n} kişi daha ekleyebilirsin`:(n>16?`${n-16} kişi yedek havuzunda`:`7'ye 7 + 2 yedek hazır`)}`;}
-function savePrivateSquadNames(){if(!privateSquadUnlocked)return;try{localStorage.setItem("kadrokur_private_names_v1",JSON.stringify(privateNames()));updatePrivateSquadCount();alert("Oyuncu listesi bu cihazda kaydedildi.");}catch(e){alert("Liste kaydedilemedi: "+e.message);}}
-function loadPrivateSquad(){try{const saved=JSON.parse(localStorage.getItem("kadrokur_private_names_v1")||"[]");if(saved.length)document.getElementById("privateSquadNames").value=saved.join("\n");const teams=JSON.parse(localStorage.getItem("kadrokur_private_teams_v1")||"null");if(teams)renderPrivateTeams(teams);}catch(_){}updatePrivateSquadCount();}
-function renderPrivateTeams(data){const render=(arr)=>arr.map((name,i)=>`<div class="flex items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-3 py-2"><span class="text-[10px] text-slate-500">${String(i+1).padStart(2,"0")}</span><span class="font-semibold">${escapePrivateHtml(name)}</span></div>`).join("")||'<p class="text-xs text-slate-500">Oyuncu yok.</p>';document.getElementById("privateTeamGreen").innerHTML=render(data.green||[]);document.getElementById("privateTeamRed").innerHTML=render(data.red||[]);document.getElementById("privateBench").innerHTML=render(data.bench||[]);}
-function escapePrivateHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function buildPrivateSquad(){if(!privateSquadUnlocked)return;const names=privateNames();if(names.length<14){alert("Takım kurmak için en az 14 oyuncu girmelisin.");return;}const shuffled=[...names].sort(()=>Math.random()-.5);const data={green:shuffled.slice(0,7),red:shuffled.slice(7,14),bench:shuffled.slice(14)};renderPrivateTeams(data);try{localStorage.setItem("kadrokur_private_names_v1",JSON.stringify(names));localStorage.setItem("kadrokur_private_teams_v1",JSON.stringify(data));}catch(e){alert("Kadro oluşturuldu ancak kaydedilemedi: "+e.message);}updatePrivateSquadCount();}
-function copyPrivateSquad(){const data=JSON.parse(localStorage.getItem("kadrokur_private_teams_v1")||"null");if(!data){alert("Önce takımları oluşturmalısın.");return;}const msg=`⚽ KADROKUR | ÖZEL KADRO\n\n🟢 1. TAKIM\n${(data.green||[]).map((x,i)=>`${i+1}. ${x}`).join("\n")}\n\n🔴 2. TAKIM\n${(data.red||[]).map((x,i)=>`${i+1}. ${x}`).join("\n")}\n\n🟡 YEDEKLER\n${(data.bench||[]).map((x,i)=>`${i+1}. ${x}`).join("\n")}`;if(navigator.clipboard?.writeText)navigator.clipboard.writeText(msg).then(()=>alert("Kadro kopyalandı.")).catch(()=>prompt("Kadro metni:",msg));else prompt("Kadro metni:",msg);}
-function clearPrivateSquad(){if(!confirm("Özel kadro listesini ve takımları temizlemek istiyor musun?"))return;document.getElementById("privateSquadNames").value="";["kadrokur_private_names_v1","kadrokur_private_teams_v1"].forEach(k=>localStorage.removeItem(k));renderPrivateTeams({green:[],red:[],bench:[]});updatePrivateSquadCount();}
-document.addEventListener("input",e=>{if(e.target?.id==="privateSquadNames")updatePrivateSquadCount();});
+function showPrivateSquadSection(){const sec=document.getElementById("privateSquadSection");if(!sec)return;sec.classList.remove("hidden");renderPrivateSquad();const inp=document.getElementById("privateSquadNames");if(inp){inp.removeEventListener("input",updatePrivateSquadCount);inp.addEventListener("input",updatePrivateSquadCount);}sec.scrollIntoView({behavior:"smooth",block:"start"});}
+function closePrivateSquad(){const sec=document.getElementById("privateSquadSection");if(sec)sec.classList.add("hidden");window.scrollTo({top:0,behavior:"smooth"});}
+document.addEventListener("DOMContentLoaded",()=>{ensurePrivateSquadConfigListener();});
 
-  initHomeTopMenus();
-  initFirebase();
+function togglePitchFullscreen(){
+  const stage=document.getElementById("pitchStage")||document.querySelector(".pitch-stage");
+  if(!stage)return;
+  const open=!stage.classList.contains("is-pitch-fullscreen");
+  stage.classList.toggle("is-pitch-fullscreen",open);
+  document.body.classList.toggle("pitch-fullscreen-active",open);
+  const btn=document.getElementById("pitchFullscreenBtn");
+  const icon=document.getElementById("pitchFullscreenIcon");
+  const text=document.getElementById("pitchFullscreenText");
+  if(btn)btn.setAttribute("aria-pressed",String(open));
+  if(icon)icon.textContent=open?"✕":"⛶";
+  if(text)text.textContent=open?"ÇIK":"TAM EKRAN";
+  if(open)stage.scrollTop=0;
+}
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){
+    const stage=document.getElementById("pitchStage")||document.querySelector(".pitch-stage");
+    if(stage&&stage.classList.contains("is-pitch-fullscreen"))togglePitchFullscreen();
+  }
+});
+
+let openHomeTopMenuName=null;
+function ensureHomeTopMenusMounted(){
+  const roomsBox=document.getElementById("homeTopRoomsContent"),roomsList=document.getElementById("roomsList");
+  if(roomsBox&&roomsList&&roomsList.parentElement!==roomsBox){roomsBox.appendChild(roomsList);renderRoomsLobby();}
+  const searchBox=document.getElementById("homeTopSearchContent");
+  if(searchBox&&!searchBox.dataset.mounted){
+    const filterCard=document.querySelector("#homeView .lg\\:col-span-8 .glass-card:first-child");
+    const codeCard=document.querySelector("#homeView .lg\\:col-span-8 .glass-card:nth-child(2)");
+    const statusEl=document.getElementById("lobbyJoinStatus");
+    if(filterCard)searchBox.appendChild(filterCard);
+    if(codeCard)searchBox.appendChild(codeCard);
+    if(statusEl)searchBox.appendChild(statusEl);
+    searchBox.dataset.mounted="1";
+  }
+  const accBox=document.getElementById("homeTopAccountContent"),accPanel=document.getElementById("accountPanel");
+  if(accBox&&accPanel&&accPanel.parentElement!==accBox)accBox.appendChild(accPanel);
+}
+function closeHomeTopMenus(){
+  openHomeTopMenuName=null;
+  ["homeTopRooms","homeTopSearch","homeTopAccount"].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add("hidden");});
+  document.querySelectorAll(".home-top-btn").forEach(b=>b.setAttribute("aria-expanded","false"));
+}
+function toggleHomeTopMenu(name,btn){
+  if(document.getElementById("homeView")?.classList.contains("hidden"))goHome();
+  ensureHomeTopMenusMounted();
+  const map={rooms:"homeTopRooms",search:"homeTopSearch",account:"homeTopAccount"};
+  const targetId=map[name];if(!targetId)return;
+  const target=document.getElementById(targetId);
+  const wasOpen=openHomeTopMenuName===name&&target&&!target.classList.contains("hidden");
+  closeHomeTopMenus();
+  if(!wasOpen&&target){target.classList.remove("hidden");if(btn)btn.setAttribute("aria-expanded","true");openHomeTopMenuName=name;}
+}
+function toggleHomeChat(btn){
+  if(document.getElementById("homeView")?.classList.contains("hidden"))goHome();
+  const panel=document.getElementById("homeChatPanel");if(!panel)return;
+  const willShow=panel.classList.contains("hidden");
+  panel.classList.toggle("hidden",!willShow);
+  if(btn)btn.setAttribute("aria-expanded",String(willShow));
+  if(willShow)panel.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+document.addEventListener("click",e=>{if(!e.target.closest("#homeTopDropdowns")&&!e.target.closest(".home-top-btn"))closeHomeTopMenus();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeHomeTopMenus();});
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",ensureHomeTopMenusMounted);else ensureHomeTopMenusMounted();
+
+/* === 9:16 DIKEY VIDEO LISTESI & OYNATICI === */
+const REELS_DATA=[
+  {
+    title:"Haftanın Maç Özeti",
+    tag:"MP4",
+    src:"./assets/videos/mac1.mp4",
+    poster:""
+  },
+  {
+    title:"Kadro & Hazırlık Anları",
+    tag:"MP4",
+    src:"./assets/videos/mac2.mp4",
+    poster:""
+  },
+  {
+    title:"YouTube Shorts Örneği",
+    tag:"Shorts",
+    src:"https://www.youtube.com/shorts/dQw4w9WgXcQ",
+    poster:""
+  },
+  {
+    title:"Saha & Atmosfer",
+    tag:"Video",
+    src:"./assets/videos/mac3.mp4",
+    poster:""
+  }
+];
+
+function getYoutubeEmbedUrl(url){
+  try{
+    const u=new URL(url);
+    let id="";
+    if(u.hostname.includes("youtu.be")){
+      id=u.pathname.replace("/","").split("/")[0];
+    }else if(u.pathname.includes("/shorts/")){
+      id=u.pathname.split("/shorts/")[1].split("/")[0];
+    }else if(u.pathname.includes("/embed/")){
+      id=u.pathname.split("/embed/")[1].split("/")[0];
+    }else if(u.searchParams.get("v")){
+      id=u.searchParams.get("v");
+    }
+    return id?`https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1`:null;
+  }catch(_){
+    return null;
+  }
+}
+
+function renderReels(){
+  const grid=document.getElementById("reelsGrid");
+  if(!grid)return;
+  grid.innerHTML="";
+
+  REELS_DATA.forEach(item=>{
+    const card=document.createElement("article");
+    card.className="reel-card";
+    const ytEmbed=getYoutubeEmbedUrl(item.src);
+
+    if(ytEmbed){
+      const ytIdMatch=ytEmbed.match(/\/embed\/([^?]+)/);
+      const ytId=ytIdMatch?ytIdMatch[1]:"";
+      const thumb=item.poster||(ytId?`https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`:"");
+      card.innerHTML=`
+        ${thumb?`<img src="${esc(thumb)}" alt="${esc(item.title)}" loading="lazy">`:""}
+        <span class="reel-badge">${esc(item.tag||"Shorts")}</span>
+        <span class="reel-play-btn" aria-hidden="true">▶</span>
+        <div class="reel-overlay">
+          <p class="reel-caption">${esc(item.title)}</p>
+        </div>
+      `;
+    }else{
+      card.innerHTML=`
+        <video src="${esc(item.src)}" ${item.poster?`poster="${esc(item.poster)}"`:""} muted playsinline preload="metadata"></video>
+        <span class="reel-badge">${esc(item.tag||"Video")}</span>
+        <span class="reel-play-btn" aria-hidden="true">▶</span>
+        <div class="reel-overlay">
+          <p class="reel-caption">${esc(item.title)}</p>
+        </div>
+      `;
+      const previewVideo=card.querySelector("video");
+      card.addEventListener("mouseenter",()=>{
+        if(previewVideo&&window.innerWidth>768){
+          previewVideo.play().catch(()=>{});
+        }
+      });
+      card.addEventListener("mouseleave",()=>{
+        if(previewVideo){
+          previewVideo.pause();
+          previewVideo.currentTime=0;
+        }
+      });
+    }
+
+    card.addEventListener("click",()=>openReelModal(item));
+    grid.appendChild(card);
+  });
+}
+
+function openReelModal(item){
+  const modal=document.getElementById("reelModal");
+  const mediaBox=document.getElementById("reelModalMedia");
+  if(!modal||!mediaBox)return;
+
+  const ytEmbed=getYoutubeEmbedUrl(item.src);
+  if(ytEmbed){
+    mediaBox.innerHTML=`<iframe src="${esc(ytEmbed)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+  }else{
+    mediaBox.innerHTML=`<video src="${esc(item.src)}" controls autoplay playsinline style="width:100%;height:100%;object-fit:contain;"></video>`;
+  }
+  modal.classList.add("is-open");
+}
+
+function closeReelModal(){
+  const modal=document.getElementById("reelModal");
+  const mediaBox=document.getElementById("reelModalMedia");
+  if(!modal||!mediaBox)return;
+  modal.classList.remove("is-open");
+  mediaBox.innerHTML="";
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  renderReels();
+  const closeBtn=document.getElementById("reelModalClose");
+  const modal=document.getElementById("reelModal");
+  if(closeBtn)closeBtn.addEventListener("click",closeReelModal);
+  if(modal){
+    modal.addEventListener("click",e=>{
+      if(e.target===modal)closeReelModal();
+    });
+  }
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape")closeReelModal();
+  });
+});
+
+initFirebase();
 </script>
-</body></html>
+</body>
+</html>
